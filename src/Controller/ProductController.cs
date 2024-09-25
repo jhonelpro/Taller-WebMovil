@@ -40,6 +40,84 @@ namespace api.src.Controller
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
+        [HttpGet("keyword/{keyword}")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsBykeyWorkd(string keyword)
+        {
+            if (string.IsNullOrWhiteSpace(keyword)){
+                return BadRequest("Keyword cannot be empty or null.");
+            }
+
+            var products = await _context.Products
+                .Where(p => p.Name.Contains(keyword))
+                .ToListAsync();
+
+            if (products == null || !products.Any())
+            {
+                return NotFound("No product found");
+            }
+
+            return Ok(products);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Type"></param>
+        /// <returns></returns>
+        [HttpGet("Type/{Type}")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByType(int Type)
+        {
+            var products = await _context.Products
+                .Where(p => p.ProductTypesId == Type)
+                .ToListAsync();
+
+            if (products == null || !products.Any())
+            {
+                return NotFound("No product found");
+            }
+
+            return Ok(products);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Ascending")]
+        public async Task<ActionResult<IEnumerable<Product>>> AscendingForm()
+        {
+            var products = await _context.Products.OrderBy(p => p.Price).ToListAsync();
+
+            if (products == null || !products.Any())
+            {
+                return NotFound("No product found");
+            }
+
+            return Ok(products);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Descending")]
+        public async Task<ActionResult<IEnumerable<Product>>> DescendingForm()
+        {
+            var Products = await _context.Products.OrderBy(p => p.Price).Reverse().ToListAsync();
+
+            if (Products == null || !Products.Any())
+            {
+                return NotFound("No product found");
+            }
+
+            return Ok(Products);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="product"></param>
         /// <returns></returns>
         [HttpPost]
