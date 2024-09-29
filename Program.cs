@@ -3,7 +3,6 @@ using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
 Env.Load();
 
 builder.Services.AddControllers();
