@@ -13,5 +13,18 @@ namespace api.src.Controller
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
+        private readonly ApplicationDBContext _context;
+
+        public UserController(ApplicationDBContext context)
+        {
+            _context = context;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProducts()
+        {
+            var products = await _context.Products.ToListAsync();
+            return Ok(products);
+        }
     }
 }
