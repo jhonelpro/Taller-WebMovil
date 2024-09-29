@@ -27,6 +27,9 @@ namespace api.src.Models
         public List<Product_Cart> Product_Carts { get; } = [];
         public List<Product_Purchase> product_Purchases { get; } = [];
 
-
+        internal static Product ToProductFromCreateDto()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

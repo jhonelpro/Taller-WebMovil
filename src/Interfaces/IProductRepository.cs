@@ -7,10 +7,10 @@ using api.src.Models;
 
 namespace api.src.Interfaces
 {
-    public interface IProductRepositorie
+    public interface IProductRepository
     {
-        Task<List<Product>> GetProducts();
-        Task<Product> AddProduct(CreateProductRequestDto createProductRequestDto);
+        Task<List<ProductDto>> GetProducts();
+        Task<Product> AddProduct(Product product);
         Task<Product?> UpdateProduct(int id, UpdateProductRequestDto updateProductRequestDto);
         Task<Product?> DeleteProduct(int id);
     }
