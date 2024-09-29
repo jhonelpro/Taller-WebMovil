@@ -72,11 +72,12 @@ namespace api.src.Data
                         .RuleFor(p => p.Name, f => f.Commerce.ProductName())
                         .RuleFor(p => p.Price, f => f.Random.Number(1000, 100000))
                         .RuleFor(p => p.Stock, f => f.Random.Number(0, 100000))
-                        .RuleFor(u => u.ProductTypesId, f => f.Random.Number(1,5));
+                        .RuleFor(p => p.ProductTypeId, f => f.Random.Number(1, 5)); // Asegúrate de que el rango es correcto.
                     
                     var products = ProductFaker.Generate(10);
                     context.Products.AddRange(products);
                 }
+
 
                 context.SaveChanges();
             }
