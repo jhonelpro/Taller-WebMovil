@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using api.src.Models;
 
-namespace api.src.Models
+namespace api.src.DTOs
 {
-    public class User
+    public class UserDto
     {
-        public int Id { get; set; }
-        
         [RegularExpression(@"^\d{7,8}-[0-9Kk]$", ErrorMessage = "Invalid RUT format. The format should be 12345678-9 or 12345678-K.")]
         public string Rut { get; set; } = string.Empty;
 
@@ -32,10 +30,7 @@ namespace api.src.Models
         [Required]
         [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$", ErrorMessage = "Password must be alphanumeric and contain at least one letter and one number.")]
         [StringLength(20, MinimumLength = 8, ErrorMessage = "Password must be between 20 and 8 characters")]
-        public string Password { get; set; } = string.Empty;
-
-        //EtityFramework relationship
-        public int RoleId { get; set; }
+        internal int RoleId;
         public Role Role { get; set; } = null!;
     }
 }

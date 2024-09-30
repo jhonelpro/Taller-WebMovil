@@ -46,7 +46,7 @@ namespace api.src.Data
                         .RuleFor(u => u.Birth_Date, f => f.Person.DateOfBirth)
                         .RuleFor(u => u.Email, f => f.Person.Email)
                         .RuleFor(u => u.Password, f => f.Random.AlphaNumeric(8))
-                        .RuleFor(u => u.RoleId, f => 1);
+                        .RuleFor(u => u.RoleId, f => 2);
                     
                     var usesrs = UserFaker.Generate(10);
                     context.Users.AddRange(usesrs);
@@ -61,7 +61,7 @@ namespace api.src.Data
                         .RuleFor(u => u.Email, f => "admin@idwm.cl")
                         .RuleFor(u => u.Gender, f => "Masculino")
                         .RuleFor(u => u.Password, f => "P4ssw0rd")
-                        .RuleFor(u => u.RoleId, f => 2);
+                        .RuleFor(u => u.RoleId, f => 1);
                     
                     context.Users.AddRange(Admin);
                 }

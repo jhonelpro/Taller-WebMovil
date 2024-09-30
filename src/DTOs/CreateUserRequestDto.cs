@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 
-namespace api.src.Models
+namespace api.src.DTOs
 {
-    public class User
+    public class CreateUserRequestDto
     {
-        public int Id { get; set; }
-        
         [RegularExpression(@"^\d{7,8}-[0-9Kk]$", ErrorMessage = "Invalid RUT format. The format should be 12345678-9 or 12345678-K.")]
         public string Rut { get; set; } = string.Empty;
 
@@ -36,6 +33,5 @@ namespace api.src.Models
 
         //EtityFramework relationship
         public int RoleId { get; set; }
-        public Role Role { get; set; } = null!;
     }
 }
