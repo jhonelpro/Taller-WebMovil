@@ -23,7 +23,17 @@ namespace api.src.Repositories
         {
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
-            return user;
+
+            var addedUser = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == user.Id);
+            
+            if (addedUser == null)
+            {
+                throw new Exception("Failed to add user");
+            }
+
+            return addedUser;
         }
 
         public async Task<List<UserDto>> GetUsers()
@@ -47,7 +57,12 @@ namespace api.src.Repositories
             existingUser.Gender = user.Gender;
 
             await _context.SaveChangesAsync();
-            return existingUser;
+
+            var updatedUser = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            return updatedUser;
         }
     }
 }

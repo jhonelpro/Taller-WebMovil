@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace api.src.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class FourthMigration : Migration
+    public partial class FifthMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -72,6 +72,7 @@ namespace api.src.Data.Migrations
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     Gender = table.Column<string>(type: "TEXT", nullable: false),
                     Password = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    IsActive = table.Column<int>(type: "INTEGER", nullable: false),
                     RoleId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>

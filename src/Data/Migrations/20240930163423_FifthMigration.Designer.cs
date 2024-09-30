@@ -11,8 +11,8 @@ using api.src.Data;
 namespace api.src.Data.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20240929233233_FourthMigration")]
-    partial class FourthMigration
+    [Migration("20240930163423_FifthMigration")]
+    partial class FifthMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -193,6 +193,9 @@ namespace api.src.Data.Migrations
                     b.Property<string>("Gender")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("IsActive")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()

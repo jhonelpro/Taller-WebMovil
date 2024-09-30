@@ -34,6 +34,10 @@ namespace api.src.Models
         [StringLength(20, MinimumLength = 8, ErrorMessage = "Password must be between 20 and 8 characters")]
         public string Password { get; set; } = string.Empty;
 
+        [Required]
+        [Range(0, 1, ErrorMessage = "IsActive must be 0 or 1.")]
+        public int IsActive { get; set; }
+
         //EtityFramework relationship
         public int RoleId { get; set; }
         public Role Role { get; set; } = null!;
