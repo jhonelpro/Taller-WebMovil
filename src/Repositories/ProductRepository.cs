@@ -58,11 +58,12 @@ namespace api.src.Repositories
                 throw new Exception("Product not found");
             }
 
-            existingProduct.Name = string.IsNullOrWhiteSpace(product.Name) ? existingProduct.Name : product.Name;
-            existingProduct.ProductTypeId = product.ProductTypeId != 0 ? product.ProductTypeId : existingProduct.ProductTypeId;
-            existingProduct.Price = product.Price != 0 ? product.Price : existingProduct.Price;
-            existingProduct.Stock = product.Stock != 0 ? product.Stock : existingProduct.Stock;
-            existingProduct.Image = string.IsNullOrWhiteSpace(product.Image) ? existingProduct.Image : product.Image;
+            existingProduct.Name = product.Name;
+            existingProduct.ProductTypeId = product.ProductTypeId;
+            existingProduct.Price = product.Price;
+            existingProduct.Stock = product.Stock;
+            existingProduct.Image = product.Image;
+            
             await _context.SaveChangesAsync();
             return existingProduct;
         }

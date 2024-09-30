@@ -22,7 +22,7 @@ namespace api.src.Mappers
             };   
         }
 
-        public static User ToProductFromCreateDto(this CreateUserRequestDto createUserRequestDto)
+        public static User ToUserFromCreateDto(this CreateUserRequestDto createUserRequestDto)
         {
             return new User
             {
@@ -31,6 +31,16 @@ namespace api.src.Mappers
                 Email = createUserRequestDto.Email,
                 RoleId = createUserRequestDto.RoleId,
                 Password = createUserRequestDto.Password
+            };
+        }
+
+        public static User ToUserFromUpdateDto(this UpdateUserRequestDto updateUserRequestDto)
+        {
+            return new User
+            {
+                Name = updateUserRequestDto.Name,
+                Birth_Date = updateUserRequestDto.Birth_Date,
+                Gender = updateUserRequestDto.Gender,
             };
         }
     }
