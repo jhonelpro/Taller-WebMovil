@@ -44,7 +44,7 @@ namespace api.src.Controller
         {
             var product = productDto.ToProductFromCreateDto();
             await _productRepository.AddProduct(product);
-            return Ok(product);
+            return Ok(product.ToProductDto());
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace api.src.Controller
                 return NotFound("Product not found");
             }
 
-            return Ok(existingProduct);
+            return Ok(existingProduct.ToProductDto());
         }
 
         [HttpDelete("{id}")]
@@ -76,7 +76,7 @@ namespace api.src.Controller
                 return NotFound("Product not found");
             }
             
-            return Ok(product);
+            return Ok(product.ToProductDto());
         }
     }
 }
