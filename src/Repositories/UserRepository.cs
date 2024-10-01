@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.src.Data;
 using api.src.DTOs;
+using api.src.DTOs.User;
 using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models;
@@ -102,9 +103,38 @@ namespace api.src.Repositories
                 .ToListAsync();
         }
 
+        public async Task<User?> UpdatePassword(int id, UpdatePasswordRequestDto user)
+        {
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+             
+            if (existingUser == null) {
+                throw new Exception("User not found");
+            }
+
+            if (!string.Equals(user.CurrentPassword, existingUser.Password))
+            {
+                throw new Exception("La contraseña actual es incorrecta");
+            }
+
+            if (user.newPassword != user.ConfirmPassword)
+            {
+                throw new Exception("La nueva contraseña y su confirmación no coinciden");
+            }
+
+            existingUser.Password = user.newPassword;
+
+            await _context.SaveChangesAsync();
+
+            var updatedUser = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            return updatedUser;
+        }
+
         public async Task<User?> UpdateUser(int id, UpdateUserRequestDto user)
         {
-            var existingUser = _context.Users.FirstOrDefault(u => u.Id == id);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
              
             if (existingUser == null) {
                 throw new Exception("User not found");

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.src.Data;
 using api.src.DTOs;
+using api.src.DTOs.User;
 using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models;
@@ -90,6 +91,24 @@ namespace api.src.Controller
             {
                 return NotFound();
             }
+            return Ok(existingUser.ToUserDto());
+        }
+
+        [HttpPut("{id}/newPassword")]
+        public async Task<IActionResult> UpdatePassword(int id, [FromBody] UpdatePasswordRequestDto password)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var existingUser = await _userRepository.UpdatePassword(id, password);
+
+            if (existingUser == null)
+            {
+                return NotFound();
+            }
+            
             return Ok(existingUser.ToUserDto());
         }
 
