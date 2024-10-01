@@ -12,5 +12,8 @@ namespace api.src.Interfaces
         Task<List<UserDto>> GetUsers();
         Task<User> AddUser(User user);
         Task<User?> UpdateUser(int id, UpdateUserRequestDto user);
+        Task<User?> EnableUser(int id);
+        Task<User?> DisableUser(int id);
+        Task<User?> GetUserById(int id);
     }
 }

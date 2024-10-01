@@ -31,6 +31,6 @@ namespace api.src.DTOs
         [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$", ErrorMessage = "Password must be alphanumeric and contain at least one letter and one number.")]
         [StringLength(20, MinimumLength = 8, ErrorMessage = "Password must be between 20 and 8 characters")]
         internal int RoleId;
-        public Role Role { get; set; } = null!;
+        public string RoleName  { get; set; } = string.Empty;
     }
 }

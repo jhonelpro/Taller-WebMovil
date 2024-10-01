@@ -18,7 +18,7 @@ namespace api.src.Mappers
                 Birth_Date = user.Birth_Date,
                 Email = user.Email,
                 Gender = user.Gender,
-                Role = user.Role
+                RoleName = user.Role.Name
             };   
         }
 

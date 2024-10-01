@@ -36,6 +36,64 @@ namespace api.src.Repositories
             return addedUser;
         }
 
+        public async Task<User?> DisableUser(int id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }else if (user.IsActive == 0)
+            {
+                throw new Exception("User is already inactive");
+            }
+
+            user.IsActive = 0;
+            await _context.SaveChangesAsync();
+
+            var userDisabeld = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            return userDisabeld;
+        }
+
+        public async Task<User?> EnableUser(int id)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Id == id);
+
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }else if (user.IsActive == 1)
+            {
+                throw new Exception("User is already active");
+            }
+
+            user.IsActive = 1;
+            await _context.SaveChangesAsync();
+
+            var userEnabled = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            return userEnabled;
+        }
+
+        public async Task<User?> GetUserById(int id)
+        {
+            var user = _context.Users.FirstOrDefaultAsync(p => p.Id == id);
+
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+
+            return await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
+        }
+
         public async Task<List<UserDto>> GetUsers()
         {
             return await _context.Users
