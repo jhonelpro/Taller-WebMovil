@@ -19,7 +19,13 @@ namespace api.src.Repositories
         public UserRepository(ApplicationDBContext context)
         {
             _context = context;
-        }
+        }   
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public async Task<User> AddUser(User user)
         {
             await _context.Users.AddAsync(user);
@@ -36,7 +42,12 @@ namespace api.src.Repositories
 
             return addedUser;
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<User?> DisableUser(int id)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
@@ -59,6 +70,11 @@ namespace api.src.Repositories
             return userDisabeld;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<User?> EnableUser(int id)
         {
             var user = _context.Users.FirstOrDefault(u => u.Id == id);
@@ -81,6 +97,11 @@ namespace api.src.Repositories
             return userEnabled;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<User?> GetUserById(int id)
         {
             var user = _context.Users.FirstOrDefaultAsync(p => p.Id == id);
@@ -95,6 +116,10 @@ namespace api.src.Repositories
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<UserDto>> GetUsers()
         {
             return await _context.Users
@@ -103,6 +128,12 @@ namespace api.src.Repositories
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public async Task<User?> UpdatePassword(int id, UpdatePasswordRequestDto user)
         {
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
@@ -132,6 +163,12 @@ namespace api.src.Repositories
             return updatedUser;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public async Task<User?> UpdateUser(int id, UpdateUserRequestDto user)
         {
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
