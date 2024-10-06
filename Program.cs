@@ -15,7 +15,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-string connectionString = Environment.GetEnvironmentVariable("DATA_BASE_URL") ?? "Data Soruce=app.db";
+string connectionString = Environment.GetEnvironmentVariable("DATA_BASE_URL") ?? "Data Source=app.db";
 builder.Services.AddDbContext<ApplicationDBContext>(opt => opt.UseSqlite(connectionString));
 
 var app = builder.Build();

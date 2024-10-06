@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.src.Data;
 using api.src.DTOs;
+using api.src.Helpers;
 using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models;
@@ -47,6 +48,12 @@ namespace api.src.Repositories
                 .Include(p => p.ProductType)
                 .Select(p => p.ToProductDto())
                 .ToListAsync();
+        }
+
+        public async Task<List<ProductDto>> GetAvailableProducts(QueryObject query)
+        {
+            var products = _context.Products.AsQueryable();
+            return await _context.Products.Select(p => p.ToProductDto()).ToListAsync();
         }
 
         public async Task<Product?> UpdateProduct(int id, UpdateProductRequestDto product)
