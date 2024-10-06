@@ -43,10 +43,32 @@ namespace api.src.Controller
         /// <returns></returns>
         
         [HttpGet("available")]
-        public async Task<IActionResult> GetAvailableProducts(QueryObject query)
+        public async Task<IActionResult> GetAvailableProducts([FromQuery] QueryObject query)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+        try
         {
             var products = await _productRepository.GetAvailableProducts(query);
-            return Ok();
+            return Ok(products);
+        }
+        catch (Exception ex) 
+        {
+            if (ex.Message == "Product not found")
+            {
+                return NotFound(new { Message = ex.Message });
+            }
+            else if (ex.Message == "Product Type incorrect")
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            else
+            {
+                return StatusCode(500, new { Message = "An error occurred while processing your request." });
+            }
+        }
         }
 
         [HttpPost]
