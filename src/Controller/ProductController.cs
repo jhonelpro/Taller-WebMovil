@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.src.Data;
 using api.src.DTOs;
+using api.src.Helpers;
 using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models;
 using api.src.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.src.Controller
@@ -39,6 +41,36 @@ namespace api.src.Controller
         /// </summary>
         /// <param name="Product"></param>
         /// <returns></returns>
+        
+        [HttpGet("available")]
+        public async Task<IActionResult> GetAvailableProducts([FromQuery] QueryObject query)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+        try
+        {
+            var products = await _productRepository.GetAvailableProducts(query);
+            return Ok(products);
+        }
+        catch (Exception ex) 
+        {
+            if (ex.Message == "Product not found")
+            {
+                return NotFound(new { Message = ex.Message });
+            }
+            else if (ex.Message == "Product Type incorrect")
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            else
+            {
+                return StatusCode(500, new { Message = "An error occurred while processing your request." });
+            }
+        }
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddProduct([FromBody] CreateProductRequestDto productDto)
         {
