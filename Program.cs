@@ -20,39 +20,34 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(
-    opt => 
-    {
+    opt => {
         opt.Password.RequireDigit = false;
         opt.Password.RequireLowercase = false;
         opt.Password.RequireUppercase = false;
         opt.Password.RequireNonAlphanumeric = false;
-        opt.Password.RequiredLength = 6;
+        opt.Password.RequiredLength = 8;
     }
 ).AddEntityFrameworkStores<ApplicationDBContext>();
 
-builder.Services.AddAuthentication(
-    opt =>
+builder.Services.AddAuthentication(opt => {
+    opt.DefaultAuthenticateScheme =
+    opt.DefaultChallengeScheme =
+    opt.DefaultForbidScheme = 
+    opt.DefaultScheme =
+    opt.DefaultSignInScheme =
+    opt.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+
+}).AddJwtBearer(options => {
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        opt.DefaultAuthenticateScheme = 
-        opt.DefaultChallengeScheme = 
-        opt.DefaultForbidScheme = 
-        opt.DefaultScheme = 
-        opt.DefaultSignInScheme = 
-        opt.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-    }
-).AddJwtBearer(opt =>
-    {
-        opt.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["JWT:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["JWT:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"] ?? throw new ArgumentException("JWT Key not found"))),
-        };
-        //TODO PARA LOS ESTUDIANTES, ENVES DE USAR APPSETTINGD.JSON, USAR ENV
-    }
-);
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SigningKey"] ?? throw new ArgumentNullException("Jwt:SigningKey"))),
+    };
+});
 
 string connectionString = Environment.GetEnvironmentVariable("DATA_BASE_URL") ?? "Data Source=app.db";
 builder.Services.AddDbContext<ApplicationDBContext>(opt => opt.UseSqlite(connectionString));
