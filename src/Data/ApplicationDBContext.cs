@@ -3,20 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.src.Models;
+using api.src.Models.User;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.src.Data
 {
-    public class ApplicationDBContext(DbContextOptions dbContextOptions) : DbContext(dbContextOptions)
+    public class ApplicationDBContext : IdentityDbContext<AppUser>
     {
-        public DbSet<User> Users { get; set; } = null!;
-        public DbSet<Role> Roles { get; set; } = null!;
         public DbSet<Product> Products { get; set; } = null!;
         public DbSet<ProductType> ProductTypes { get; set; } = null!;
         public DbSet<Cart> Carts { get; set; } = null!;
         public DbSet<Purchase> Purchases { get; set; } = null!;
         public DbSet<Product_Cart> Product_Carts { get; set; } = null!;
         public DbSet<Product_Purchase> Product_Purchases { get; set; } = null!;
+
+        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options) : base(options)
+        {
+            
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
