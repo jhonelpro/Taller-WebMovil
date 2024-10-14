@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.src.DTOs.Auth;
 using api.src.DTOs.User;
+using api.src.Interfaces;
 using api.src.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace api.src.Controller
 {
@@ -14,10 +17,14 @@ namespace api.src.Controller
     public class AuthController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly ITokenService _tokenService;
+        private readonly SignInManager<AppUser> _signInManager;
 
-        public AuthController(UserManager<AppUser> userManager)
+        public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
+            _tokenService = tokenService;
+            _signInManager = signInManager;
         }
 
         [HttpPost("register")]
@@ -39,7 +46,7 @@ namespace api.src.Controller
                     Rut = registerDto.Rut,
                     Name = registerDto.Name,
                     DateOfBirth = registerDto.DateOfBirth,
-                    Gender = registerDto.Gender
+                    Gender = registerDto.Gender,
                 };
 
                 if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.ConfirmPassword))
@@ -56,7 +63,12 @@ namespace api.src.Controller
 
                     if (roleResult.Succeeded)
                     {
-                        return Ok("User created successfully");
+                        return Ok(new NewUserDto
+                        {
+                            UserName = user.UserName!,
+                            Email = user.Email!,
+                            Token = _tokenService.CreateToken(user)
+                        });
                     }
                     else
                     {
@@ -71,6 +83,34 @@ namespace api.src.Controller
             catch (Exception e)
             {
                 return StatusCode(500, e.Message);
+            }
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        {
+            try {
+                if(!ModelState.IsValid) {
+                    return BadRequest(ModelState);
+                }
+
+                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == loginDto.UserName);
+                if(user == null) return Unauthorized("Invalid username or password.");
+
+
+                var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+                if(!result.Succeeded) return Unauthorized("Invalid username or password.");
+
+                return Ok(
+                    new NewUserDto
+                    {
+                        UserName = user.UserName!,
+                        Email = user.Email!,
+                        Token = _tokenService.CreateToken(user)
+                    }
+                );
+            }catch (Exception ex) {
+                return StatusCode(500, ex.Message);
             }
         }
     }

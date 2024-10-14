@@ -17,6 +17,7 @@ namespace api.src.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
+    //Agregar Authorize
     public class ProductController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
