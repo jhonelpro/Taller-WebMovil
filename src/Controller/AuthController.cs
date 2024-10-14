@@ -34,10 +34,15 @@ namespace api.src.Controller
             {
                 if (!ModelState.IsValid) return BadRequest(ModelState);
 
-                if (!string.Equals(registerDto.Password, registerDto.ConfirmPassword, StringComparison.Ordinal))
-                {
-                    return BadRequest("Passwords do not match");
-                }
+                if (await _userManager.Users.AnyAsync(p => p.Email == registerDto.Email)) return BadRequest("Email already exists");
+
+                if (await _userManager.Users.AnyAsync(p => p.Rut == registerDto.Rut)) return BadRequest("Rut already exists");
+
+                if (registerDto.DateOfBirth >= DateTime.Now) return BadRequest("Date of birth must be in the past");
+
+                if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.ConfirmPassword)) return BadRequest("Password is required");
+
+                if (!string.Equals(registerDto.Password, registerDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest("Passwords do not match");
 
                 var user = new AppUser
                 {
@@ -48,12 +53,6 @@ namespace api.src.Controller
                     DateOfBirth = registerDto.DateOfBirth,
                     Gender = registerDto.Gender,
                 };
-
-                if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.ConfirmPassword))
-                {
-                    return BadRequest("Password is required");
-                }
-
 
                 var createUser = await _userManager.CreateAsync(user, registerDto.Password);
 
