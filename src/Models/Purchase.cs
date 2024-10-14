@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.src.Models.User;
 
 namespace api.src.Models
 {
@@ -15,8 +16,8 @@ namespace api.src.Models
         public string Street { get; set; } = string.Empty;
 
         //EtityFramework relationship
-        public int UserId { get; set; }
-        public User User { get; set; } = null!;
+        public string UserId { get; set; } = null!;
+        public AppUser User { get; set; } = null!;
         public List<Product_Purchase> product_Purchases { get; set; } = [];
     }
 }
