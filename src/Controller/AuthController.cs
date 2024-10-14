@@ -89,9 +89,8 @@ namespace api.src.Controller
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             try {
-                if(!ModelState.IsValid) {
-                    return BadRequest(ModelState);
-                }
+                
+                if(!ModelState.IsValid) return BadRequest(ModelState);
 
                 var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == loginDto.UserName);
                 if(user == null) return Unauthorized("Invalid username or password.");

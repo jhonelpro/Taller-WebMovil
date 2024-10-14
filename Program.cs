@@ -50,7 +50,6 @@ builder.Services.AddAuthentication(opt => {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SigningKey"] ?? throw new ArgumentNullException("Jwt:SigningKey"))),
     };
-    // TODO
 });
 
 builder.Services.AddSwaggerGen(option =>
