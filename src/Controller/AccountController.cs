@@ -53,7 +53,37 @@ namespace api.src.Controller
             {
                 return BadRequest(ex.Message);
             }
+        }
 
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid) return BadRequest(ModelState);
+
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null) return Unauthorized("User not found");
+
+                var passwordVerification = await _userManager.CheckPasswordAsync(user, changePasswordDto.CurrentPassword);
+
+                if (!passwordVerification) return BadRequest("Current password is incorrect");
+
+                if (!string.Equals(changePasswordDto.NewPassword, changePasswordDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest("Passwords do not match");
+
+                var result = await _userManager.ChangePasswordAsync(user, changePasswordDto.CurrentPassword, changePasswordDto.NewPassword);
+
+                if (!result.Succeeded)
+                {
+                    return BadRequest(result.Errors);
+                }
+
+                return Ok("Password changed successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

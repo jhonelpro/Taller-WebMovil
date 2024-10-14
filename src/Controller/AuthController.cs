@@ -89,7 +89,7 @@ namespace api.src.Controller
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             try {
-                
+
                 if(!ModelState.IsValid) return BadRequest(ModelState);
 
                 var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == loginDto.UserName);
@@ -107,6 +107,7 @@ namespace api.src.Controller
                         Token = _tokenService.CreateToken(user)
                     }
                 );
+                
             }catch (Exception ex) {
                 return StatusCode(500, ex.Message);
             }
