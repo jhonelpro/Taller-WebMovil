@@ -3,19 +3,70 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.src.Models;
+using api.src.Models.User;
 using Bogus;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace api.src.Data
 {
     public class DataSeeder
     {
-        public static void Initialize(IServiceProvider serviceProvider)
+        public static async void Initialize(IServiceProvider serviceProvider)
         {
 
             using (var scope = serviceProvider.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 var context = services.GetRequiredService<ApplicationDBContext>();
+                var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
+
+                var faker = new Faker("es");
+                var genders = new List<string> { "Femenino", "Masculino", "Prefiero no decirlo", "Otro" };
+                Random random = new Random();
+
+                if (!await userManager.Users.AnyAsync())
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        var email = faker.Internet.Email();
+
+                        var user = new AppUser
+                        {
+                            UserName = email,
+                            Email = email,
+                            Name = faker.Name.FullName(),
+                            Rut = faker.Random.Number(10000000, 99999999).ToString(),
+                            DateOfBirth = faker.Date.Past(18),
+                            Gender = genders[random.Next(0, genders.Count)]
+                        };
+
+                        var result = await userManager.CreateAsync(user, "Password1234!");
+
+                        if (!result.Succeeded)
+                        {
+                            throw new Exception("Error creating user");
+                        }
+                    }
+
+                    var admin = new AppUser
+                    {
+                        UserName = "admin@idwm.cl",
+                        Email = "admin@idwm.cl",
+                        Name = "Ignacio Mancilla",
+                        Rut = "20.416.699-4",
+                        Gender = "Masculino",
+                        DateOfBirth = new DateTime(2000, 10, 25)
+                    };
+
+                    var adminResult = await userManager.CreateAsync(admin, "P4ssw0rd");
+
+                    if (!adminResult.Succeeded)
+                    {
+                        throw new Exception("Error creating admin user");
+                    }
+                }
 
                 if (!context.ProductTypes.Any())
                 {
