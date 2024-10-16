@@ -10,7 +10,6 @@ namespace api.src.Interfaces
 {
     public interface IProductRepository
     {
-        Task<List<ProductDto>> GetProducts();
         Task<List<ProductDto>> GetAvailableProducts(QueryObject query);
         Task<Product> AddProduct(Product product);
         Task<Product?> UpdateProduct(int id, UpdateProductRequestDto updateProductRequestDto);

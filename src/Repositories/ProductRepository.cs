@@ -42,14 +42,6 @@ namespace api.src.Repositories
             return product;
         }
 
-        public async Task<List<ProductDto>> GetProducts()
-        {
-            return await _context.Products
-                .Include(p => p.ProductType)
-                .Select(p => p.ToProductDto())
-                .ToListAsync();
-        }
-
         public async Task<List<ProductDto>> GetAvailableProducts(QueryObject query)
         {
             var products = _context.Products.Include(p => p.ProductType).AsQueryable();
