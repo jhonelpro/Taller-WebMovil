@@ -78,7 +78,7 @@ namespace api.src.Controller
 
                 await _userManager.UpdateAsync(user);
 
-                return Ok("User deactivated");
+                return Ok(UserMapper.MapUserToUserDto(user));
             }
             catch (Exception ex)
             {
