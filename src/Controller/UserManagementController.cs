@@ -50,5 +50,40 @@ namespace api.src.Controller
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("ChangeStateUser/{email}")]
+        public async Task<IActionResult> ChangeStateUser(string email)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                if (string.IsNullOrEmpty(email)) return BadRequest("Email is required");
+
+                var user = await _userManager.FindByEmailAsync(email);
+
+                if (user == null)
+                {
+                    return BadRequest("User not found");
+                }
+
+                if (user.IsActive == 1){
+                    user.IsActive = 0;
+                } else {
+                    user.IsActive = 1;
+                }
+
+                await _userManager.UpdateAsync(user);
+
+                return Ok("User deactivated");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
