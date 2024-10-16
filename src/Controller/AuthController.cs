@@ -99,6 +99,8 @@ namespace api.src.Controller
                 var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
                 if(!result.Succeeded) return Unauthorized("Invalid username or password.");
 
+                if(user.IsActive == 0) return Unauthorized("User is not active.");
+
                 return Ok(
                     new NewUserDto
                     {
