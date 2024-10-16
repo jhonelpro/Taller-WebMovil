@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
-namespace api.src.Models.User
+namespace api.src.DTOs.User
 {
-    public class AppUser : IdentityUser
+    public class UserDto
     {
+        public string UserName { get; set; } = null!;
+        
         [Required]
         public string? Rut { get; set; } = string.Empty;
 
@@ -22,7 +22,12 @@ namespace api.src.Models.User
 
         [Required]
         [RegularExpression(@"Femenino|Masculino|Prefiero no decirlo|Otro", ErrorMessage = "Gender must be one of the specified values.")]
-        public string? Gender { get; set; } = string.Empty;
+        public string? Gender { get; set; } = string.Empty!;
+
+        [Required]
+        [EmailAddress]
+        public string? Email { get; set; } = string.Empty;
+
         [Required]
         public int IsActive { get; set; }
     }

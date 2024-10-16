@@ -39,7 +39,8 @@ namespace api.src.Data
                             Name = faker.Name.FullName(),
                             Rut = faker.Random.Number(10000000, 99999999).ToString(),
                             DateOfBirth = faker.Date.Past(18),
-                            Gender = genders[random.Next(0, genders.Count)]
+                            Gender = genders[random.Next(0, genders.Count)],
+                            IsActive = 1
                         };
 
                         var result = await userManager.CreateAsync(user, "Password1234!");
@@ -57,14 +58,22 @@ namespace api.src.Data
                         Name = "Ignacio Mancilla",
                         Rut = "20.416.699-4",
                         Gender = "Masculino",
-                        DateOfBirth = new DateTime(2000, 10, 25)
+                        DateOfBirth = new DateTime(2000, 10, 25),
+                        IsActive = 1
                     };
 
                     var adminResult = await userManager.CreateAsync(admin, "P4ssw0rd");
 
-                    if (!adminResult.Succeeded)
+                    if (adminResult.Succeeded)
                     {
-                        throw new Exception("Error creating admin user");
+                        await userManager.AddToRoleAsync(admin, "Admin");
+                    }
+                    else
+                    {
+                        foreach (var error in adminResult.Errors)
+                        {
+                            Console.WriteLine($"Error: {error.Description}");
+                        }
                     }
                 }
 
