@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.src.DTOs;
+using api.src.Helpers;
 using api.src.Interfaces;
 using api.src.Mappers;
 using Microsoft.AspNetCore.Authorization;
@@ -22,6 +23,13 @@ namespace api.src.Controller.Product
             _productRepository = productRepository;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetProducts([FromQuery] QueryObjectProduct query)
+        {
+            var products = await _productRepository.GetProducts(query);
+            return Ok(products);
+        }
+        
         [HttpPost]
         public async Task<IActionResult> AddProduct([FromBody] CreateProductRequestDto productDto)
         {

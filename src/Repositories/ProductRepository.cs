@@ -21,6 +21,21 @@ namespace api.src.Repositories
             _context = context;
         }
 
+        public async Task<List<ProductDto>> GetProducts(QueryObjectProduct query)
+        {
+            var products = _context.Products.Include(p => p.ProductType).AsQueryable();
+
+            if (!string.IsNullOrEmpty(query.textFilter))
+            {
+                products = products.Where(p => p.Name.Contains(query.textFilter) ||
+                                               p.ProductType.Name.Contains(query.textFilter) ||
+                                               p.Price.ToString().Contains(query.textFilter) ||
+                                               p.Stock.ToString().Contains(query.textFilter));
+            }
+
+            return await products.Select(p => p.ToProductDto()).ToListAsync();
+        }
+
         public async Task<Product> AddProduct(Product product)
         {
             await _context.Products.AddAsync(product);
