@@ -52,6 +52,7 @@ namespace api.src.Controller
                     Name = registerDto.Name,
                     DateOfBirth = registerDto.DateOfBirth,
                     Gender = registerDto.Gender,
+                    IsActive = 1
                 };
 
                 var createUser = await _userManager.CreateAsync(user, registerDto.Password);

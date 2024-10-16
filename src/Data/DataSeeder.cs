@@ -64,9 +64,16 @@ namespace api.src.Data
 
                     var adminResult = await userManager.CreateAsync(admin, "P4ssw0rd");
 
-                    if (!adminResult.Succeeded)
+                    if (adminResult.Succeeded)
                     {
-                        throw new Exception("Error creating admin user");
+                        await userManager.AddToRoleAsync(admin, "Admin");
+                    }
+                    else
+                    {
+                        foreach (var error in adminResult.Errors)
+                        {
+                            Console.WriteLine($"Error: {error.Description}");
+                        }
                     }
                 }
 
