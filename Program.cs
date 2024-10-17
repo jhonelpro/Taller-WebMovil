@@ -1,9 +1,11 @@
 using System.Text;
 using api.src.Data;
+using api.src.Helpers;
 using api.src.Interfaces;
 using api.src.Models.User;
 using api.src.Repositories;
 using api.src.Service;
+using CloudinaryDotNet;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -12,7 +14,17 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
 Env.Load();
+
+var CloudinarySettings = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
+    var CloudinaryAccount = new Account(
+        CloudinarySettings!.CloudName,
+        CloudinarySettings.ApiKey,
+        CloudinarySettings.ApiSecret
+    );
+var Cloudinary = new Cloudinary(CloudinaryAccount);
+builder.Services.AddSingleton(Cloudinary);
 
 builder.Services.AddControllers();
 // Add services to the container.
@@ -64,6 +76,7 @@ builder.Services.AddSwaggerGen(option =>
         BearerFormat = "JWT",
         Scheme = "Bearer"
     });
+
     option.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -97,6 +110,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();

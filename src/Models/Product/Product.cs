@@ -18,7 +18,9 @@ namespace api.src.Models
 
         [Range(0,100000, ErrorMessage = "Stocl must be a non-negative integer less than 100,000")]
         public required int Stock { get; set; }
-        public string Image { get; set; } = string.Empty;
+
+        [Required]
+        public string ImageUrl { get; set; } = null!;
 
         //EtityFramework relationship
         public int ProductTypeId { get; set; }  // Cambiado a ProductTypeId
@@ -26,10 +28,5 @@ namespace api.src.Models
 
         public List<Product_Cart> Product_Carts { get; } = [];
         public List<Product_Purchase> product_Purchases { get; } = [];
-
-        internal static Product ToProductFromCreateDto()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
