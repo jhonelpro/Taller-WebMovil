@@ -26,23 +26,6 @@ namespace api.src.Controller
             _productRepository = productRepository;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<IActionResult> GetProducts()
-        {
-            var products = await _productRepository.GetProducts();
-            return Ok(products);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Product"></param>
-        /// <returns></returns>
-        
         [HttpGet("available")]
         public async Task<IActionResult> GetAvailableProducts([FromQuery] QueryObject query)
         {
@@ -70,46 +53,6 @@ namespace api.src.Controller
                     return StatusCode(500, new { Message = "An error occurred while processing your request." });
                 }
             }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> AddProduct([FromBody] CreateProductRequestDto productDto)
-        {
-            var product = productDto.ToProductFromCreateDto();
-            await _productRepository.AddProduct(product);
-            return Ok(product.ToProductDto());
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="product"></param>
-        /// <returns></returns>
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProduct([FromRoute] int id, [FromBody] UpdateProductRequestDto product)
-        {
-            var existingProduct = await _productRepository.UpdateProduct(id, product);
-            
-            if (existingProduct == null)
-            {
-                return NotFound("Product not found");
-            }
-
-            return Ok(existingProduct.ToProductDto());
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct([FromRoute] int id)
-        {
-            var product = await _productRepository.DeleteProduct(id);
-
-            if (product == null)
-            {
-                return NotFound("Product not found");
-            }
-            
-            return Ok(product.ToProductDto());
         }
     }
 }
