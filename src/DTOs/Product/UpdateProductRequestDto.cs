@@ -17,8 +17,9 @@ namespace api.src.DTOs
 
         [Range(0,100000, ErrorMessage = "Stocl must be a non-negative integer less than 100,000")]
         public int Stock { get; set; }
-        public string Image { get; set; } = string.Empty;
+
+        [Required]
+        public IFormFile Image { get; set; } = null!;
         public int ProductTypeId { get; set; } 
-        public ProductType ProductType { get; set; } = null!;
     }
 }

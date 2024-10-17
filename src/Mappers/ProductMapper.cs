@@ -18,7 +18,7 @@ namespace api.src.Mappers
                 Price = product.Price,
                 Stock = product.Stock,
                 ProductType = product.ProductType,
-                Image = product.Image
+                ImageUrl = product.ImageUrl
             };
         }
 
@@ -30,7 +30,6 @@ namespace api.src.Mappers
                 Price = createProductRequestDto.Price,
                 Stock = createProductRequestDto.Stock,
                 ProductTypeId = createProductRequestDto.ProductTypeId,
-                Image = createProductRequestDto.Image,
             };
         }
 
@@ -42,7 +41,6 @@ namespace api.src.Mappers
                 Price = updateProductRequestDto.Price,
                 Stock = updateProductRequestDto.Stock,
                 ProductTypeId = updateProductRequestDto.ProductTypeId,
-                Image = updateProductRequestDto.Image,
             };
         }
     }

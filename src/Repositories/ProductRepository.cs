@@ -8,6 +8,9 @@ using api.src.Helpers;
 using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.src.Repositories
@@ -41,13 +44,25 @@ namespace api.src.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Product> AddProduct(Product product)
+        public async Task<Product> AddProduct(Product product, ImageUploadResult uploadResult)
         {
-            await _context.Products.AddAsync(product);
+            if (product == null || uploadResult == null) throw new ArgumentNullException("Product or UploadResult cannot be null");
+            
+            var newProduct = new Product
+            {
+                Name = product.Name,
+                ProductTypeId = product.ProductTypeId,
+                Price = product.Price,
+                Stock = product.Stock,
+                ImageUrl = uploadResult.SecureUrl.AbsoluteUri
+            };
+
+            await _context.Products.AddAsync(newProduct);
             await _context.SaveChangesAsync();
 
-            var productAdded = await _context.Products.Include(p => p.ProductType).FirstOrDefaultAsync(p => p.Id == product.Id);
-            return productAdded!;
+            await _context.Entry(newProduct).Reference(p => p.ProductType).LoadAsync();
+
+            return newProduct;
         }
 
         public async Task<Product?> DeleteProduct(int id)
@@ -112,7 +127,7 @@ namespace api.src.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Product?> UpdateProduct(int id, UpdateProductRequestDto product)
+        public async Task<Product?> UpdateProduct(int id, UpdateProductRequestDto product, ImageUploadResult uploadResult)
         {
             var existingProduct = await _context.Products.Include(p => p.ProductType).FirstOrDefaultAsync(p => p.Id == id);
             
@@ -125,7 +140,7 @@ namespace api.src.Repositories
             existingProduct.ProductTypeId = product.ProductTypeId;
             existingProduct.Price = product.Price;
             existingProduct.Stock = product.Stock;
-            existingProduct.Image = product.Image;
+            existingProduct.ImageUrl = uploadResult.SecureUrl.AbsoluteUri;
             
             await _context.SaveChangesAsync();
 

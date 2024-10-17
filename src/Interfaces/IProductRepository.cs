@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using api.src.DTOs;
 using api.src.Helpers;
 using api.src.Models;
+using CloudinaryDotNet.Actions;
 
 namespace api.src.Interfaces
 {
@@ -12,8 +13,8 @@ namespace api.src.Interfaces
     {
         Task<List<ProductDto>> GetProducts(QueryObjectProduct query);
         Task<List<ProductDto>> GetAvailableProducts(QueryObject query);
-        Task<Product> AddProduct(Product product);
-        Task<Product?> UpdateProduct(int id, UpdateProductRequestDto updateProductRequestDto);
+        Task<Product> AddProduct(Product product, ImageUploadResult uploadResult);
+        Task<Product?> UpdateProduct(int id, UpdateProductRequestDto updateProductRequestDto, ImageUploadResult uploadResult);
         Task<Product?> DeleteProduct(int id);
     }
 }
