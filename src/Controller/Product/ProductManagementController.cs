@@ -29,7 +29,7 @@ namespace api.src.Controller.Product
             var products = await _productRepository.GetProducts(query);
             return Ok(products);
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> AddProduct([FromBody] CreateProductRequestDto productDto)
         {

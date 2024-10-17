@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using api.src.Models;
 
 namespace api.src.DTOs
 {
@@ -18,5 +19,6 @@ namespace api.src.DTOs
         public int Stock { get; set; }
         public string Image { get; set; } = string.Empty;
         public int ProductTypeId { get; set; } 
+        public ProductType ProductType { get; set; } = null!;
     }
 }

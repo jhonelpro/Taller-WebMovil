@@ -33,19 +33,26 @@ namespace api.src.Repositories
                                                p.Stock.ToString().Contains(query.textFilter));
             }
 
-            return await products.Select(p => p.ToProductDto()).ToListAsync();
+            var skipNumber = (query.pageNumber - 1) * query.pageSize;
+
+            return await products.Skip(skipNumber).Take(query.pageSize)
+                .Include(p => p.ProductType)
+                .Select(p => p.ToProductDto())
+                .ToListAsync();
         }
 
         public async Task<Product> AddProduct(Product product)
         {
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
-            return product;
+
+            var productAdded = await _context.Products.Include(p => p.ProductType).FirstOrDefaultAsync(p => p.Id == product.Id);
+            return productAdded!;
         }
 
         public async Task<Product?> DeleteProduct(int id)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var product = await _context.Products.Include(p => p.ProductType).FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
             {
@@ -107,7 +114,7 @@ namespace api.src.Repositories
 
         public async Task<Product?> UpdateProduct(int id, UpdateProductRequestDto product)
         {
-            var existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var existingProduct = await _context.Products.Include(p => p.ProductType).FirstOrDefaultAsync(p => p.Id == id);
             
             if (existingProduct == null)
             {
@@ -121,7 +128,9 @@ namespace api.src.Repositories
             existingProduct.Image = product.Image;
             
             await _context.SaveChangesAsync();
-            return existingProduct;
+
+            var productUpdated = await _context.Products.Include(p => p.ProductType).FirstOrDefaultAsync(p => p.Id == id);
+            return productUpdated;
         }
     }
 }
