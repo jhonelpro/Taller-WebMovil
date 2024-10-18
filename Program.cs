@@ -33,8 +33,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IShoppingCartInterface, CartRepository>();
-builder.Services.AddScoped<IShoppingCart_ProductInterface, ShoppingCart_ProductRepository>();
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(
     opt => {

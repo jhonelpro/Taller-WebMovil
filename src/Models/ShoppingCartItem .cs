@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace api.src.Models
 {
-    public class Product_Cart
+    public class ShoppingCartItem 
     {
         public int Quantity { get; set; }
 
         public int CartId { get; set; }
-        public Cart Cart { get; set; } = null!;
+        public ShoppingCart shoppingCart { get; set; } = null!;
 
         public int ProductId { get; set; }
         public Product Product { get; set; } = null!;
