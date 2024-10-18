@@ -11,6 +11,7 @@ namespace api.src.Interfaces
 {
     public interface IProductRepository
     {
+        Task<Product?> GetProductById(int id);
         Task<List<ProductDto>> GetProducts(QueryObjectProduct query);
         Task<List<ProductDto>> GetAvailableProducts(QueryObject query);
         Task<Product> AddProduct(Product product, ImageUploadResult uploadResult);
