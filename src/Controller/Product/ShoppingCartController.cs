@@ -6,6 +6,9 @@ using api.src.DTOs.Product;
 using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models;
+using api.src.Models.User;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -16,10 +19,17 @@ namespace api.src.Controller.Product
     public class ShoppingCartController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
+        private readonly IShoppingCart _shoppingCart;
+        private readonly IShoppingCartItem _shoppingCartItem;
+        private readonly UserManager<AppUser> _userManager;
 
-        public ShoppingCartController(IProductRepository productRepository)
+        public ShoppingCartController(IProductRepository productRepository, IShoppingCart shoppingCart, 
+        IShoppingCartItem shoppingCartItem, UserManager<AppUser> userManager)
         {
             _productRepository = productRepository;
+            _shoppingCart = shoppingCart;
+            _shoppingCartItem = shoppingCartItem;
+            _userManager = userManager;
         }
         
         [HttpPost("AddTocart/{productId}/{quantity}")]
@@ -47,7 +57,7 @@ namespace api.src.Controller.Product
         }
 
         [HttpDelete("RemoveFromCart/{productId}")]
-        public async Task<IActionResult> RemoveProductFromShoopinCart([FromRoute] int productId)
+        public async Task<IActionResult> RemoveProductFromShoopingCart([FromRoute] int productId)
         {
             var cartItems = await Task.Run(() => GetCartItemsFromCookies());
 
@@ -103,7 +113,7 @@ namespace api.src.Controller.Product
         {
             var options = new CookieOptions
             {
-                Expires = DateTime.Now.AddDays(7)
+                Expires = DateTime.Now.AddMinutes(5)
             };
             Response.Cookies.Append("ShoppingCart", JsonConvert.SerializeObject(cartItems), options);
         }
