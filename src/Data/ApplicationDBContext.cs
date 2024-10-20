@@ -20,9 +20,9 @@ namespace api.src.Data
 
         public DbSet<Product> Products { get; set; } = null!;
         public DbSet<ProductType> ProductTypes { get; set; } = null!;
-        public DbSet<Cart> Carts { get; set; } = null!;
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; } = null!;
         public DbSet<Purchase> Purchases { get; set; } = null!;
-        public DbSet<Product_Cart> Product_Carts { get; set; } = null!;
+        public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; } = null!;
         public DbSet<Product_Purchase> Product_Purchases { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -39,17 +39,17 @@ namespace api.src.Data
 
             modelBuilder.Entity<IdentityRole>().HasData(roles);
             
-            modelBuilder.Entity<Product_Cart>()
+            modelBuilder.Entity<ShoppingCartItem>()
                 .HasKey(pc => new { pc.CartId, pc.ProductId });
 
-            modelBuilder.Entity<Product_Cart>()
-                .HasOne(pc => pc.Cart) // Relación con Cart
-                .WithMany(c => c.Product_Carts)
+            modelBuilder.Entity<ShoppingCartItem>()
+                .HasOne(pc => pc.shoppingCart) // Relación con Cart
+                .WithMany(c => c.shoppingCartItems)
                 .HasForeignKey(pc => pc.CartId); // Clave foránea
 
-            modelBuilder.Entity<Product_Cart>()
+            modelBuilder.Entity<ShoppingCartItem>()
                 .HasOne(pc => pc.Product) // Relación con Product
-                .WithMany(p => p.Product_Carts)
+                .WithMany(p => p.shoppingCartItems)
                 .HasForeignKey(pc => pc.ProductId); // Clave foránea
 
             modelBuilder.Entity<Product_Purchase>()

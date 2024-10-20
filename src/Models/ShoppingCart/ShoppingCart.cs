@@ -6,7 +6,7 @@ using api.src.Models.User;
 
 namespace api.src.Models
 {
-    public class Cart
+    public class ShoppingCart
     {
         public int Id { get; set; }
         public DateTime Create_Date { get; set; }
@@ -15,6 +15,6 @@ namespace api.src.Models
         public string UserId { get; set; } = null!;
         public AppUser User { get; set; } = null!;
 
-        public List<Product_Cart> Product_Carts { get; set; } = [];
+        public List<ShoppingCartItem> shoppingCartItems { get; set; } = [];
     }
 }

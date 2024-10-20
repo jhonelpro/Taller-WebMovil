@@ -147,5 +147,17 @@ namespace api.src.Repositories
             var productUpdated = await _context.Products.Include(p => p.ProductType).FirstOrDefaultAsync(p => p.Id == id);
             return productUpdated;
         }
+
+        public async Task<Product?> GetProductById(int id)
+        {
+            var product = await _context.Products.Include(p => p.ProductType).FirstOrDefaultAsync(p => p.Id == id);
+
+            if (product == null)
+            {
+                throw new Exception("Product not found");
+            }
+            
+            return product;
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.src.Data;
 using api.src.DTOs;
+using api.src.DTOs.Product;
 using api.src.Helpers;
 using api.src.Interfaces;
 using api.src.Mappers;
@@ -12,6 +13,7 @@ using api.src.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace api.src.Controller
 {
@@ -21,6 +23,7 @@ namespace api.src.Controller
     public class ProductController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
+
         public ProductController(IProductRepository productRepository)
         {
             _productRepository = productRepository;
