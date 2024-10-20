@@ -98,6 +98,36 @@ namespace api.src.Controller.Product
             return Ok(products);
         }
 
+        [HttpPut("UpdateCart/{productId}/{quantity}")]
+        public async Task<IActionResult> UpdateProductInCart([FromRoute] int productId, [FromRoute] int quantity, bool? isIncrement)
+        {
+            var cartItems = await Task.Run(() => GetCartItemsFromCookies());
+            var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
+
+            if (product != null)
+            {
+                if (isIncrement == true)
+                {
+                    product.Quantity += quantity;
+                }
+                else if (isIncrement == false)
+                {
+                    product.Quantity -= quantity;
+                }
+                else
+                {
+                    product.Quantity = quantity;
+                }
+                
+                await Task.Run(() => SaveCartItemsToCookies(cartItems.ToList()));
+                return Ok("Product updated in cart");
+            }
+            else
+            {
+                return NotFound(new { Message = "Product not found in cart" });
+            }
+        }
+
         private List<ShoppingCartItem> GetCartItemsFromCookies()
         {
             var cartItems = new List<ShoppingCartItem>();

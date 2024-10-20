@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.src.DTOs;
+using api.src.DTOs.Product;
 using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models;
@@ -85,7 +86,7 @@ namespace api.src.Controller.Product
 
             if (shoppingCart == null)
             {
-                return BadRequest("Cart not found");
+                shoppingCart = await _shoppingCart.CreateShoppingCart(user.Id);
             }
 
             var shoppingCartItem = await _shoppingCartItem.AddNewShoppingCartItem(productId, shoppingCart.Id, quantity);
@@ -127,7 +128,7 @@ namespace api.src.Controller.Product
                 return BadRequest("Cart is empty");
             }
 
-            var products = new List<ProductDto>();
+            var products = new List<ShoppingCartDto>();
 
             foreach (var item in cartItems)
             {
@@ -138,10 +139,47 @@ namespace api.src.Controller.Product
                     return BadRequest("Product not found");
                 }
 
-                products.Add(product.ToProductDto());
+                products.Add(product.ToShoppingCartDto(item));
             }
 
             return Ok(products);
+        }
+
+        [HttpPut("UpdateCart/{productId}/{quantity}")]
+        public async Task<IActionResult> UpdateProductInCart([FromRoute] int productId, [FromRoute] int quantity, bool? isIncrement)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (productId == 0 || quantity == 0)
+            {
+                return BadRequest("Product not found");
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return BadRequest("User not found");
+            }
+
+            var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
+
+            if (shoppingCart == null)
+            {
+                return BadRequest("Cart not found");
+            }
+
+            var shoppingCartItem = await _shoppingCartItem.UpdateShoppingCartItem(productId, quantity, isIncrement);
+
+            if (shoppingCartItem == null)
+            {
+                return BadRequest("Failed to update product in cart");
+            }
+
+            return Ok("Product updated in cart");
         }
 
         [HttpDelete("RemoveFromCart/{productId}")]

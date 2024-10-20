@@ -141,5 +141,38 @@ namespace api.src.Repositories
 
             return existingCartItem;
         }
+
+        public async Task<ShoppingCartItem> UpdateShoppingCartItem(int productId, int quantity, bool? isIncrement)
+        {
+            if (productId == 0 || quantity == 0)
+            {
+                throw new Exception("Product not found");
+            }
+
+            var shoppingCartItem = GetShoppingCartItem(productId).Result;
+
+            if (shoppingCartItem == null)
+            {
+                throw new Exception("Product not found");
+            }
+
+            if (isIncrement == true)
+            {
+                shoppingCartItem.Quantity += quantity;
+            }
+            else if (!isIncrement == false)
+            {
+                shoppingCartItem.Quantity -= quantity;
+            }
+            else
+            {
+                shoppingCartItem.Quantity = quantity;
+            }
+
+            _context.ShoppingCartItems.Update(shoppingCartItem);
+            await _context.SaveChangesAsync();
+
+            return shoppingCartItem;
+        }
     }
 }
