@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace api.src.Models
 {
-    public class Product_Purchase
+    public class SaleItem
     {     
         public int Quantity { get; set; }
         public double UnitPrice { get; set; }

@@ -18,6 +18,6 @@ namespace api.src.Models
         //EtityFramework relationship
         public string UserId { get; set; } = null!;
         public AppUser User { get; set; } = null!;
-        public List<Product_Purchase> product_Purchases { get; set; } = [];
+        public List<SaleItem> SaleItems { get; set; } = [];
     }
 }
