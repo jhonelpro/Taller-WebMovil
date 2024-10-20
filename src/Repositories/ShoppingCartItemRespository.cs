@@ -25,9 +25,17 @@ namespace api.src.Repositories
                 throw new Exception("Product not found");
             }
 
+            var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
+
+            if (product == null)
+            {
+                throw new Exception("Product not found");
+            }
+            
             var shoppingCartItem = new ShoppingCartItem
             {
                 ProductId = productId,
+                Product = product,
                 CartId = cartId,
                 Quantity = quantity
                 
@@ -58,6 +66,14 @@ namespace api.src.Repositories
 
             foreach (var item in cartItems)
             {
+                var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == item.ProductId);
+
+                if (product == null)
+                {
+                    throw new Exception("Product not found");
+                }
+
+                shoppingCartItem.Product = product;
                 shoppingCartItem.ProductId = item.ProductId;
                 shoppingCartItem.Quantity = item.Quantity;
         
@@ -75,9 +91,17 @@ namespace api.src.Repositories
                 throw new Exception("Product not found");
             }
 
+            var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
+
+            if (product == null)
+            {
+                throw new Exception("Product not found");
+            }
+
             var shoppingCartItem = new ShoppingCartItem
             {
                 ProductId = productId,
+                Product = product,
                 CartId = cartId,
                 Quantity = quantity
             };
