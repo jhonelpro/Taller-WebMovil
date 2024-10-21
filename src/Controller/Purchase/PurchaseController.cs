@@ -93,5 +93,26 @@ namespace api.src.Controller.Purchase
             return Ok("Purchase created successfully");
         }
 
+        [HttpGet("GetPurchaseRecipt/{purchaseId}")]
+        public async Task<IActionResult> GetPurchaseRecipt(int purchaseId)
+        {
+            if (purchaseId <= 0)
+            {
+                return BadRequest("Invalid purchase id");
+            }
+
+            var purchase = await _purchase.getPurchase(purchaseId);
+
+            if (purchase == null)
+            {
+                return BadRequest("Purchase not found");
+            }
+
+            var purchaseRecipt = await _purchase.getPurchaseRecipt(purchaseId);
+
+            var fileName = $"BoletaCompra_{purchaseId}.pdf";
+            return File(purchaseRecipt, "application/pdf", fileName);
+        }
+
     }
 }

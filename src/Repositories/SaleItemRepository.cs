@@ -49,6 +49,7 @@ namespace api.src.Repositories
                     UnitPrice = product.Price,
                     TotalPrice = product.Price * item.Quantity,
                     ProductId = item.ProductId,
+                    Product = product
                 };
 
                 saleItems.Add(saleItem);
