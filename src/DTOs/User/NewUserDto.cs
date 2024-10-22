@@ -1,6 +1,4 @@
 
-using System.ComponentModel.DataAnnotations;
-
 namespace api.src.DTOs.Auth
 {
     public class NewUserDto

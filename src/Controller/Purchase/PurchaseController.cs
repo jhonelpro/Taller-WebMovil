@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using api.src.DTOs.Purchase;
 using api.src.Interfaces;
 using api.src.Mappers;
-using api.src.Models;
 using api.src.Models.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -93,7 +88,7 @@ namespace api.src.Controller.Purchase
             return Ok("Purchase created successfully");
         }
 
-        [HttpGet("GetPurchaseRecipt/{purchaseId}")]
+        [HttpGet("GetPurchaseRecipt/{purchaseId:int}")]
         public async Task<IActionResult> GetPurchaseRecipt(int purchaseId)
         {
             if (purchaseId <= 0)
