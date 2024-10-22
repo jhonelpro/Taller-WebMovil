@@ -2,6 +2,7 @@ using api.src.DTOs.Auth;
 using api.src.DTOs.User;
 using api.src.Interfaces;
 using api.src.Models.User;
+using Api.src.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +33,11 @@ namespace api.src.Controller
 
                 if (await _userManager.Users.AnyAsync(p => p.Email == registerDto.Email)) return BadRequest("Email already exists");
 
+                if (string.IsNullOrEmpty(registerDto.Rut)) return BadRequest("RUT is required.");
+
                 if (await _userManager.Users.AnyAsync(p => p.Rut == registerDto.Rut)) return BadRequest("Rut already exists");
+
+                if (!RutValidations.IsValidRut(registerDto.Rut)) return BadRequest("Invalid Rut format or verification digit");
 
                 if (registerDto.DateOfBirth >= DateTime.Now) return BadRequest("Date of birth must be in the past");
 
