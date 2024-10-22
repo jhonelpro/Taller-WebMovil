@@ -57,7 +57,7 @@ namespace api.src.Controller.Product
             }
         }
 
-        [HttpPost("AddToCart/{productId}/{quantity}")]
+        [HttpPost("AddToCart/{productId:int}/{quantity:int}")]
         public async Task<IActionResult> AddProductToShoppingCart([FromRoute] int productId, [FromRoute] int quantity)
         {
             if (!ModelState.IsValid)
@@ -140,7 +140,7 @@ namespace api.src.Controller.Product
             return Ok(products);
         }
 
-        [HttpPut("UpdateCart/{productId}/{quantity}")]
+        [HttpPut("UpdateCart/{productId:int}/{quantity:int}")]
         public async Task<IActionResult> UpdateProductInCart([FromRoute] int productId, [FromRoute] int quantity, bool? isIncrement)
         {
             if (!ModelState.IsValid)
@@ -177,7 +177,7 @@ namespace api.src.Controller.Product
             return Ok("Product updated in cart");
         }
 
-        [HttpDelete("RemoveFromCart/{productId}")]
+        [HttpDelete("RemoveFromCart/{productId:int}")]
         public async Task<IActionResult> RemoveProductFromShoopinCart([FromRoute] int productId)
         {
             if (!ModelState.IsValid)

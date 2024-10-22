@@ -27,7 +27,7 @@ namespace api.src.Controller.Product
             _userManager = userManager;
         }
         
-        [HttpPost("AddTocart/{productId}/{quantity}")]
+        [HttpPost("AddTocart/{productId:int}/{quantity:int}")]
         public async Task<IActionResult> AddProductToShoppingCart([FromRoute] int productId,[FromRoute] int quantity)
         {
             var cartItems = await Task.Run(() => GetCartItemsFromCookies());
@@ -51,7 +51,7 @@ namespace api.src.Controller.Product
             return Ok("Product added to cart");
         }
 
-        [HttpDelete("RemoveFromCart/{productId}")]
+        [HttpDelete("RemoveFromCart/{productId:int}")]
         public async Task<IActionResult> RemoveProductFromShoopingCart([FromRoute] int productId)
         {
             var cartItems = await Task.Run(() => GetCartItemsFromCookies());
@@ -93,7 +93,7 @@ namespace api.src.Controller.Product
             return Ok(products);
         }
 
-        [HttpPut("UpdateCart/{productId}/{quantity}")]
+        [HttpPut("UpdateCart/{productId:int}/{quantity:int}")]
         public async Task<IActionResult> UpdateProductInCart([FromRoute] int productId, [FromRoute] int quantity, bool? isIncrement)
         {
             var cartItems = await Task.Run(() => GetCartItemsFromCookies());
