@@ -23,7 +23,7 @@ namespace api.src.Data
         public DbSet<ShoppingCart> ShoppingCarts { get; set; } = null!;
         public DbSet<Purchase> Purchases { get; set; } = null!;
         public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; } = null!;
-        public DbSet<Product_Purchase> Product_Purchases { get; set; } = null!;
+        public DbSet<SaleItem> SaleItems { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,17 +52,17 @@ namespace api.src.Data
                 .WithMany(p => p.shoppingCartItems)
                 .HasForeignKey(pc => pc.ProductId); // Clave foránea
 
-            modelBuilder.Entity<Product_Purchase>()
+            modelBuilder.Entity<SaleItem>()
             .HasKey(pp => new { pp.PurchaseId, pp.ProductId }); // Clave compuesta
 
-            modelBuilder.Entity<Product_Purchase>()
+            modelBuilder.Entity<SaleItem>()
                 .HasOne(pp => pp.Purchase) // Relación con Purchase
-                .WithMany(p => p.product_Purchases)
+                .WithMany(p => p.SaleItems)
                 .HasForeignKey(pp => pp.PurchaseId); // Clave foránea
 
-            modelBuilder.Entity<Product_Purchase>()
+            modelBuilder.Entity<SaleItem>()
                 .HasOne(pp => pp.Product) // Relación con Product
-                .WithMany(p => p.product_Purchases)
+                .WithMany(p => p.SaleItems)
                 .HasForeignKey(pp => pp.ProductId); // Clave foránea
         }
     }

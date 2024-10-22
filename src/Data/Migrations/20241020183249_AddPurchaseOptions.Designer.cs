@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.src.Data;
 
@@ -10,9 +11,11 @@ using api.src.Data;
 namespace api.src.Data.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241020183249_AddPurchaseOptions")]
+    partial class AddPurchaseOptions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -45,13 +48,13 @@ namespace api.src.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "881bff06-7fe5-4ba2-b46b-e9b745686b33",
+                            Id = "8f565475-c0bd-45fe-a9b4-2f870d166013",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "0003ce65-cefe-4747-b257-c8c633e246fd",
+                            Id = "a400edeb-0f70-4733-9cbe-1635b8e8fc98",
                             Name = "User",
                             NormalizedName = "USER"
                         });

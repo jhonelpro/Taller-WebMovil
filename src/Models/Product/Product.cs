@@ -29,6 +29,6 @@ namespace api.src.Models
         public ProductType ProductType { get; set; } = null!;
 
         public List<ShoppingCartItem> shoppingCartItems { get; } = [];
-        public List<Product_Purchase> product_Purchases { get; } = [];
+        public List<SaleItem> SaleItems { get; } = [];
     }
 }
