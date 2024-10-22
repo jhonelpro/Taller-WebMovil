@@ -114,5 +114,30 @@ namespace api.src.Controller.Purchase
             return File(purchaseRecipt, "application/pdf", fileName);
         }
 
+        [HttpGet("GetPurchases")]
+        public async Task<IActionResult> GetPurchases()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return BadRequest("User not found");
+            }
+
+            var purchases = await _saleItem.GetPurchasesAsync(user.Id);
+
+            if (purchases == null)
+            {
+                return BadRequest("Purchases not found");
+            }   
+
+            return Ok(purchases);
+        }
+
     }
 }

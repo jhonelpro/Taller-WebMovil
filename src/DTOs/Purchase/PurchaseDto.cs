@@ -11,6 +11,8 @@ namespace api.src.DTOs.Purchase
     public class PurchaseDto
     {
         [Required]
+        public int PurchaseId { get; set; }
+        [Required]
         public DateTime Transaction_Date { get; set; }
         [Required]
         public string Country { get; set; } = string.Empty;
@@ -20,10 +22,7 @@ namespace api.src.DTOs.Purchase
         public string Commune { get; set; } = string.Empty;
         [Required]
         public string Street { get; set; } = string.Empty;
-
-        //EtityFramework relationship
-        public string UserId { get; set; } = null!;
-        public AppUser User { get; set; } = null!;
-        public List<SaleItem> SaleItems { get; set; } = [];
+        [Required]
+        public List<SaleItemDto> saleItemDtos { get; set; } = new List<SaleItemDto>();    
     }
 }

@@ -68,30 +68,20 @@ namespace api.src.Repositories
             var purchase = await _context.Purchases
                 .Include(p => p.SaleItems)
                 .FirstOrDefaultAsync(p => p.Id == purchaseId);
-            
-            var saleItems = await _context.SaleItems
-                .Include(s => s.Product)
-                .Where(s => s.PurchaseId == purchaseId)
-                .ToListAsync();
-            
+
             if (purchase == null)
             {
                 throw new ArgumentNullException(nameof(purchase), "No se encontró la compra con el ID especificado.");
             }
 
-            using (var ms = new MemoryStream())
+            using (MemoryStream ms = new MemoryStream())
             {
-                var document = new PdfDocument();
-                document.Info.Title = "Boleta de compra";
-
-                var page = document.AddPage();
-                page.Size = PageSize.A4;
-                page.Orientation = PageOrientation.Portrait;
-
+                PdfDocument document = new PdfDocument();
+                PdfPage page = document.AddPage();
                 XGraphics gfx = XGraphics.FromPdfPage(page);
 
-                XFont titleFont = new XFont("Verdana", 16, XFontStyle.Bold);
-                XFont regularFont = new XFont("Verdana", 12, XFontStyle.Regular);
+                XFont titleFont = new XFont("Arial", 16, XFontStyle.Bold);
+                XFont regularFont = new XFont("Arial", 12, XFontStyle.Regular);
 
                 gfx.DrawString("Boleta de compra", titleFont, XBrushes.Black, 20, 40);
 
@@ -104,40 +94,93 @@ namespace api.src.Repositories
 
                 gfx.DrawString("\n", regularFont, XBrushes.Black, 20, 200);
 
-                // Agregar detalle de productos
                 gfx.DrawString("Detalle de Productos:", titleFont, XBrushes.Black, 20, 220);
                 gfx.DrawString("Producto", regularFont, XBrushes.Black, 20, 250);
-                gfx.DrawString("Cantidad", regularFont, XBrushes.Black, 200, 250);
-                gfx.DrawString("Precio Unitario", regularFont, XBrushes.Black, 300, 250);
-                gfx.DrawString("Total", regularFont, XBrushes.Black, 400, 250);
+                gfx.DrawString("Tipo", regularFont, XBrushes.Black, 200, 250);
+                gfx.DrawString("Cantidad", regularFont, XBrushes.Black, 300, 250);
+                gfx.DrawString("Precio Unitario", regularFont, XBrushes.Black, 400, 250);
+                gfx.DrawString("Total", regularFont, XBrushes.Black, 500, 250);
 
-                int yPosition = 270; // Ajusta la posición vertical inicial para los productos
+                int yPosition = 270;
 
-                foreach (var item in saleItems)
+                double maxWidth = 100;
+                int maxChars = 20; 
+
+                void DrawStringWrapped(string text, XGraphics gfx, XFont font, XBrush brush, double x, double y, double maxWidth)
                 {
-                    var product = await _context.Products.FindAsync(item.ProductId);
+                    var words = text.Split(' ');
+                    string currentLine = "";
+                    double currentY = y;
+
+                    foreach (var word in words)
+                    {
+                        string testLine = currentLine.Length > 0 ? $"{currentLine} {word}" : word;
+                        var size = gfx.MeasureString(testLine, font);
+
+                        if (size.Width > maxWidth)
+                        {
+                            gfx.DrawString(currentLine, font, brush, x, currentY);
+                            currentLine = word;
+                            currentY += font.Height + 2; 
+                        }
+                        else
+                        {
+                            currentLine = testLine;
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(currentLine))
+                    {
+                        gfx.DrawString(currentLine, font, brush, x, currentY);
+                    }
+                }
+
+                foreach (var item in purchase.SaleItems)
+                {
+                    var product = await _context.Products.Include(p => p.ProductType).FirstOrDefaultAsync(p => p.Id == item.ProductId);
 
                     if (product == null)
                     {
                         throw new ArgumentNullException(nameof(product), "No se encontró el producto asociado al item de venta.");
                     }
 
-                    gfx.DrawString(product.Name, regularFont, XBrushes.Black, 20, yPosition);
-                    gfx.DrawString(item.Quantity.ToString(), regularFont, XBrushes.Black, 200, yPosition);
-                    gfx.DrawString(item.Product.Price.ToString("C"), regularFont, XBrushes.Black, 300, yPosition);
-                    gfx.DrawString((item.Quantity * product.Price).ToString("C"), regularFont, XBrushes.Black, 400, yPosition);
-                    yPosition += 20; // Espacio entre filas
+                    string productName = product.Name.Length > maxChars ? product.Name.Substring(0, maxChars) + "..." : product.Name;
+
+                    DrawStringWrapped(productName, gfx, regularFont, XBrushes.Black, 20, yPosition, maxWidth);
+                    gfx.DrawString(product.ProductType.Name, regularFont, XBrushes.Black, 200, yPosition);
+                    gfx.DrawString(item.Quantity.ToString(), regularFont, XBrushes.Black, 300, yPosition);
+                    gfx.DrawString(item.Product.Price.ToString("C"), regularFont, XBrushes.Black, 400, yPosition);
+                    gfx.DrawString((item.Quantity * product.Price).ToString("C"), regularFont, XBrushes.Black, 500, yPosition);
+
+                    yPosition += 20; 
                 }
 
-                // Calcular y agregar precio total
                 var totalPrice = purchase.SaleItems.Sum(p => p.TotalPrice);
                 gfx.DrawString($"Precio Total: {totalPrice:C}", titleFont, XBrushes.Black, 20, yPosition + 20);
 
-                // Guardar el documento en el MemoryStream
                 document.Save(ms, false);
-                
                 return ms.ToArray();
             }
+        }
+
+        public async Task<List<Purchase>> getPurchases(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentNullException(nameof(userId), "El ID de usuario no puede ser nulo o vacío.");
+            }
+
+            var purchases = await _context.Purchases
+                .Include(p => p.SaleItems)
+                .Where(p => p.UserId == userId)
+                .ToListAsync();
+            
+            if (purchases == null)
+            {
+                throw new ArgumentNullException(nameof(purchases), "No se encontraron compras asociadas al usuario.");
+            }
+
+            return purchases;
         }
     }
 }
