@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using api.src.DTOs;
 using api.src.DTOs.Product;
 using api.src.Interfaces;
 using api.src.Mappers;
