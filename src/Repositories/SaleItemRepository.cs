@@ -124,6 +124,59 @@ namespace api.src.Repositories
             return purchasesDtos;
         }
 
+        public async Task<List<PurchaseDto>> GetPurchasesAsyncForAdmin()
+        {
+            var purchases = await _context.Purchases.ToListAsync();
+
+            if (purchases == null)
+            {
+                throw new ArgumentNullException(nameof(purchases));
+            }
+
+            var saleItems = await _context.SaleItems.Where(x => purchases.Select(y => y.Id).Contains(x.PurchaseId)).ToListAsync();
+
+            if (saleItems == null)
+            {
+                throw new ArgumentNullException(nameof(saleItems));
+            }
+
+            var purchasesDtos = new List<PurchaseDto>();
+
+            foreach (var purchase in purchases)
+            {
+                var saleItem = saleItems.Where(x => x.PurchaseId == purchase.Id).ToList();
+
+                if (saleItem == null)
+                {
+                    throw new ArgumentNullException(nameof(saleItem));
+                }
+
+                var products = await _context.Products
+                                               .Where(x => saleItem.Select(y => y.ProductId).Contains(x.Id))
+                                               .Include(x => x.ProductType)
+                                               .ToListAsync();
+
+                if (products == null)
+                {
+                    throw new ArgumentNullException(nameof(products));
+                }
+
+                var purchaseDto = new PurchaseDto
+                {
+                    PurchaseId = purchase.Id,
+                    Transaction_Date = purchase.Transaction_Date,
+                    Country = purchase.Country,
+                    City = purchase.City,
+                    Commune = purchase.Commune,
+                    Street = purchase.Street,
+                    saleItemDtos = PurchaseMapper.ToSaleItemDto(saleItem, products)
+                };
+
+                purchasesDtos.Add(purchaseDto);
+            }
+
+            return purchasesDtos;
+        }
 
         public async Task<List<SaleItem>> getSaleItem(int purchaseId)
         {

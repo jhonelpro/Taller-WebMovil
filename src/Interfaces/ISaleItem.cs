@@ -11,6 +11,7 @@ namespace api.src.Interfaces
     {
         Task<List<SaleItem>> createSaleItem(List<ShoppingCartItem> shoppingCartItems, Purchase purchase);
         Task<List<PurchaseDto>> GetPurchasesAsync(string userId);
+        Task<List<PurchaseDto>> GetPurchasesAsyncForAdmin();
         Task<List<SaleItem>> getSaleItem(int purchaseId);
     }
 }
