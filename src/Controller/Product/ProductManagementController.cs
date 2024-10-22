@@ -72,7 +72,7 @@ namespace api.src.Controller.Product
             return Ok(ProductAdded.ToProductDto());
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateProduct([FromRoute] int id, [FromForm] UpdateProductRequestDto product)
         {
@@ -119,7 +119,7 @@ namespace api.src.Controller.Product
             return Ok(existingProduct.ToProductDto());
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteProduct([FromRoute] int id)
         {
             var product = await _productRepository.DeleteProduct(id);
