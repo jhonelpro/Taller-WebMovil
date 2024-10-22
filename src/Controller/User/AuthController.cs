@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using api.src.DTOs.Auth;
 using api.src.DTOs.User;
 using api.src.Interfaces;

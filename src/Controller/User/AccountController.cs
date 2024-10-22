@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using api.src.DTOs.User;
 using api.src.Models.User;
 using Microsoft.AspNetCore.Authorization;

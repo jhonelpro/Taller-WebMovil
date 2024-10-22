@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using api.src.Data;
 using api.src.DTOs;
 using api.src.Helpers;
 using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models;
-using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.src.Repositories
