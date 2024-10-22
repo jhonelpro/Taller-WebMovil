@@ -15,6 +15,7 @@ namespace api.src.DTOs.Product
         public string ImageUrl { get; set; } = null!;
         public ProductType ProductType { get; set; } = null!;
 
+        [Required]
         public int Quantity { get; set; }
     }
 }
