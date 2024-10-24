@@ -38,9 +38,20 @@ namespace api.src.Data
                             IsActive = 1
                         };
 
-                        var result = await userManager.CreateAsync(user, "Password1234!");
+                        var createUser = await userManager.CreateAsync(user, "Password1234!");
 
-                        if (!result.Succeeded)
+                        if (!createUser.Succeeded)
+                        {
+                            throw new Exception("Error creating user");
+                        }
+
+                        var roleResult = userManager.AddToRoleAsync(user, "User");
+
+                        if (roleResult.Result.Succeeded)
+                        {
+                            Console.WriteLine($"User {user.Email} created successfully");
+                        }
+                        else
                         {
                             throw new Exception("Error creating user");
                         }

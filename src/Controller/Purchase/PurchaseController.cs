@@ -2,6 +2,7 @@ using api.src.DTOs.Purchase;
 using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models.User;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,7 @@ namespace api.src.Controller.Purchase
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "User")]
     public class PurchaseController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
@@ -33,16 +34,15 @@ namespace api.src.Controller.Purchase
         [HttpPost("NewPurchase")]
         public async Task<IActionResult> NewPurchase([FromBody] CreatePurchaseDto purchaseDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             return await CreatePurchase(purchaseDto);
         }
 
         private async Task<IActionResult> CreatePurchase(CreatePurchaseDto purchaseDto)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var user = await _userManager.GetUserAsync(User);
 
             if (user == null) 
@@ -91,6 +91,8 @@ namespace api.src.Controller.Purchase
         [HttpGet("GetPurchaseRecipt/{purchaseId:int}")]
         public async Task<IActionResult> GetPurchaseRecipt(int purchaseId)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             if (purchaseId <= 0)
             {
                 return BadRequest("Invalid purchase id");
@@ -112,11 +114,8 @@ namespace api.src.Controller.Purchase
         [HttpGet("GetPurchases")]
         public async Task<IActionResult> GetPurchases()
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            
             var user = await _userManager.GetUserAsync(User);
 
             if (user == null)

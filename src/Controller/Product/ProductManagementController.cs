@@ -26,6 +26,8 @@ namespace api.src.Controller.Product
         [HttpGet]
         public async Task<IActionResult> GetProducts([FromQuery] QueryObjectProduct query)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var products = await _productRepository.GetProducts(query);
             return Ok(products);
         }
@@ -34,10 +36,7 @@ namespace api.src.Controller.Product
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AddProduct([FromForm] CreateProductRequestDto productDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             if (productDto.Image == null || productDto.Image.Length == 0)
             {
@@ -76,10 +75,7 @@ namespace api.src.Controller.Product
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateProduct([FromRoute] int id, [FromForm] UpdateProductRequestDto product)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             if (product.Image == null || product.Image.Length == 0)
             {
@@ -122,6 +118,8 @@ namespace api.src.Controller.Product
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteProduct([FromRoute] int id)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var product = await _productRepository.DeleteProduct(id);
 
             if (product == null)
