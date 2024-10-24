@@ -19,10 +19,8 @@ namespace api.src.Controller
         [HttpGet("available")]
         public async Task<IActionResult> GetAvailableProducts([FromQuery] QueryObject query)
         {
-            if(!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if(!ModelState.IsValid) return BadRequest(ModelState);
+
             try
             {
                 var products = await _productRepository.GetAvailableProducts(query);

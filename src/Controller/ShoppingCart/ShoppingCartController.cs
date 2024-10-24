@@ -30,6 +30,8 @@ namespace api.src.Controller.Product
         [HttpPost("AddTocart/{productId:int}/{quantity:int}")]
         public async Task<IActionResult> AddProductToShoppingCart([FromRoute] int productId,[FromRoute] int quantity)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var cartItems = await Task.Run(() => GetCartItemsFromCookies());
             
             var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
@@ -54,6 +56,8 @@ namespace api.src.Controller.Product
         [HttpDelete("RemoveFromCart/{productId:int}")]
         public async Task<IActionResult> RemoveProductFromShoopingCart([FromRoute] int productId)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var cartItems = await Task.Run(() => GetCartItemsFromCookies());
 
             var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
@@ -73,6 +77,8 @@ namespace api.src.Controller.Product
         [HttpGet("ProductsInCart")]
         public async Task<IActionResult> GetProductsInCart()
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var cartItems = await Task.Run(() => GetCartItemsFromCookies());
             var products = new List<ShoppingCartDto>();
             
@@ -96,6 +102,8 @@ namespace api.src.Controller.Product
         [HttpPut("UpdateCart/{productId:int}/{quantity:int}")]
         public async Task<IActionResult> UpdateProductInCart([FromRoute] int productId, [FromRoute] int quantity, bool? isIncrement)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var cartItems = await Task.Run(() => GetCartItemsFromCookies());
             var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
 
@@ -138,7 +146,7 @@ namespace api.src.Controller.Product
         {
             var options = new CookieOptions
             {
-                Expires = DateTime.Now.AddMinutes(5)
+                Expires = DateTime.Now.AddDays(7),
             };
             Response.Cookies.Append("ShoppingCart", JsonConvert.SerializeObject(cartItems), options);
         }

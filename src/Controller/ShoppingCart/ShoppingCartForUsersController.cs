@@ -12,7 +12,7 @@ namespace api.src.Controller.Product
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "User")]
     public class ShoppingCartForUsersController : ControllerBase
     {
 

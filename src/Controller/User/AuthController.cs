@@ -103,12 +103,16 @@ namespace api.src.Controller
 
                 if(user.IsActive == 0) return Unauthorized("User is not active.");
 
+                var token = _tokenService.CreateToken(user);
+
+                if (string.IsNullOrEmpty(token)) return Unauthorized("Invalid token.");
+
                 return Ok(
                     new NewUserDto
                     {
                         UserName = user.UserName!,
                         Email = user.Email!,
-                        Token = _tokenService.CreateToken(user)
+                        Token = token
                     }
                 );
                 

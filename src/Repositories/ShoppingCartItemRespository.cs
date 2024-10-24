@@ -61,7 +61,7 @@ namespace api.src.Repositories
             };
 
             foreach (var item in cartItems)
-            {
+            { 
                 var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == item.ProductId);
 
                 if (product == null)
@@ -69,12 +69,22 @@ namespace api.src.Repositories
                     throw new Exception("Product not found");
                 }
 
-                shoppingCartItem.Product = product;
-                shoppingCartItem.ProductId = item.ProductId;
-                shoppingCartItem.Quantity = item.Quantity;
-        
-                await _context.ShoppingCartItems.AddAsync(shoppingCartItem);
-                await _context.SaveChangesAsync();
+                var existingCartItem = await _context.ShoppingCartItems.FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
+
+                if (existingCartItem == null)
+                {
+                    shoppingCartItem.Product = product;
+                    shoppingCartItem.ProductId = item.ProductId;
+                    shoppingCartItem.Quantity = item.Quantity;
+            
+                    await _context.ShoppingCartItems.AddAsync(shoppingCartItem);
+                    await _context.SaveChangesAsync();
+                }else
+                {
+                    existingCartItem.Quantity += item.Quantity;
+                    await _context.SaveChangesAsync();
+                }
+                
             }
 
             return shoppingCartItem;

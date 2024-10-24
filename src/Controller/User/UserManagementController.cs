@@ -23,10 +23,7 @@ namespace api.src.Controller
         [HttpPost("GetUsers")]
         public async Task<IActionResult> GetUsers([FromQuery] QueryObjectUsers query)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             try
             {
@@ -49,10 +46,7 @@ namespace api.src.Controller
         [HttpPost("ChangeStateUser/{email}")]
         public async Task<IActionResult> ChangeStateUser(string email)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             try
             {
