@@ -51,6 +51,8 @@ namespace api.src.Repositories
                 ImageUrl = uploadResult.SecureUrl.AbsoluteUri
             };
 
+            newProduct.ProductType = await _context.ProductTypes.FirstOrDefaultAsync(p => p.Id == product.ProductTypeId) ?? throw new Exception("ProductType not found");
+
             await _context.Products.AddAsync(newProduct);
             await _context.SaveChangesAsync();
 
@@ -135,6 +137,7 @@ namespace api.src.Repositories
             existingProduct.Price = product.Price;
             existingProduct.Stock = product.Stock;
             existingProduct.ImageUrl = uploadResult.SecureUrl.AbsoluteUri;
+            existingProduct.ProductType = await _context.ProductTypes.FirstOrDefaultAsync(p => p.Id == product.ProductTypeId) ?? throw new Exception("ProductType not found");
             
             await _context.SaveChangesAsync();
 
