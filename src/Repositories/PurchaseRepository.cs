@@ -27,6 +27,15 @@ namespace api.src.Repositories
                 throw new ArgumentNullException(nameof(purchase));
             }
 
+            var shoppingCart = await _context.ShoppingCarts
+                .Include(s => s.shoppingCartItems)
+                .FirstOrDefaultAsync(s => s.UserId == user.Id);
+            
+            if (shoppingCart == null)
+            {
+                throw new Exception(nameof(shoppingCart));
+            }
+
             purchase.UserId = user.Id;
             purchase.Transaction_Date = DateTime.Now;
 
@@ -57,7 +66,7 @@ namespace api.src.Repositories
         {
             if (purchaseId <= 0)
             {
-                throw new ArgumentNullException(nameof(purchaseId), "El ID de compra debe ser mayor que cero.");
+                throw new ArgumentNullException(nameof(purchaseId), "Purchase ID cannot be null.");
             }
 
             var purchase = await _context.Purchases
@@ -66,7 +75,7 @@ namespace api.src.Repositories
 
             if (purchase == null)
             {
-                throw new ArgumentNullException(nameof(purchase), "No se encontró la compra con el ID especificado.");
+                throw new ArgumentNullException(nameof(purchase), "Purchase not found.");
             }
 
             using (MemoryStream ms = new MemoryStream())
@@ -136,7 +145,7 @@ namespace api.src.Repositories
 
                     if (product == null)
                     {
-                        throw new ArgumentNullException(nameof(product), "No se encontró el producto asociado al item de venta.");
+                        throw new ArgumentNullException(nameof(product), "product not found.");
                     }
 
                     string productName = product.Name.Length > maxChars ? product.Name.Substring(0, maxChars) + "..." : product.Name;
@@ -162,7 +171,7 @@ namespace api.src.Repositories
         {
             if (string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentNullException(nameof(userId), "El ID de usuario no puede ser nulo o vacío.");
+                throw new ArgumentNullException(nameof(userId), "User id cannot be null or empty.");
             }
 
             var purchases = await _context.Purchases
@@ -172,7 +181,7 @@ namespace api.src.Repositories
             
             if (purchases == null)
             {
-                throw new ArgumentNullException(nameof(purchases), "No se encontraron compras asociadas al usuario.");
+                throw new ArgumentNullException(nameof(purchases), "purchase not found.");
             }
 
             return purchases;
