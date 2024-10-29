@@ -1,5 +1,5 @@
 
-namespace Api.src.Helpers
+namespace api.src.Helpers
 {
     public class RutValidations
     {

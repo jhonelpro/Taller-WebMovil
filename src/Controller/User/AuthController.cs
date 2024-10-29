@@ -2,7 +2,7 @@ using api.src.DTOs.Auth;
 using api.src.DTOs.User;
 using api.src.Interfaces;
 using api.src.Models.User;
-using Api.src.Helpers;
+using api.src.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -103,6 +103,8 @@ namespace api.src.Controller
 
                 if(user.IsActive == 0) return Unauthorized("User is not active.");
 
+                await _signInManager.SignInAsync(user, isPersistent: true);
+
                 var token = _tokenService.CreateToken(user);
 
                 if (string.IsNullOrEmpty(token)) return Unauthorized("Invalid token.");
@@ -120,5 +122,25 @@ namespace api.src.Controller
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                if (User.Identity?.IsAuthenticated != true)
+                {
+                    return BadRequest(new { message = "No active session found." });
+                }
+
+                await _signInManager.SignOutAsync();
+                return Ok(new { message = "Logout successful." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred during logout.", error = ex.Message });
+            }
+        }
+
     }
 }
