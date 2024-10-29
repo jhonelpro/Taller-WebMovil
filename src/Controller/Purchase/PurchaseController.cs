@@ -2,7 +2,6 @@ using api.src.DTOs.Purchase;
 using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models.User;
-using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

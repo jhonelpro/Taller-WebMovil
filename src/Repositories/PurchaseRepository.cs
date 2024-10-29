@@ -33,7 +33,7 @@ namespace api.src.Repositories
             
             if (shoppingCart == null)
             {
-                throw new Exception(nameof(shoppingCart));
+                throw new ArgumentNullException(nameof(shoppingCart));
             }
 
             purchase.UserId = user.Id;
@@ -165,26 +165,6 @@ namespace api.src.Repositories
                 document.Save(ms, false);
                 return ms.ToArray();
             }
-        }
-
-        public async Task<List<Purchase>> getPurchases(string userId)
-        {
-            if (string.IsNullOrEmpty(userId))
-            {
-                throw new ArgumentNullException(nameof(userId), "User id cannot be null or empty.");
-            }
-
-            var purchases = await _context.Purchases
-                .Include(p => p.SaleItems)
-                .Where(p => p.UserId == userId)
-                .ToListAsync();
-            
-            if (purchases == null)
-            {
-                throw new ArgumentNullException(nameof(purchases), "purchase not found.");
-            }
-
-            return purchases;
         }
     }
 }
