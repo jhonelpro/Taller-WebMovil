@@ -19,19 +19,39 @@ namespace api.src.Controller.Purchase
         [HttpGet("SaleDisplay")]
         public async Task<IActionResult> SaleDisplay()
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
             {
-                return BadRequest(ModelState);
+                var saleItems = await _saleItem.GetPurchasesAsyncForAdmin();
+
+                if (saleItems == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(saleItems);
             }
-
-            var saleItems = await _saleItem.GetPurchasesAsyncForAdmin();
-
-            if (saleItems == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                if (ex.Message == "Purchases not found.")
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+                else if (ex.Message == "Sale Items not found.")
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+                else if (ex.Message == "Products not found.")
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, new { message = "Internal Server Error." });
+                }
             }
-
-            return Ok(saleItems);
+            
         }
     }
 }

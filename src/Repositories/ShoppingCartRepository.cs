@@ -16,9 +16,9 @@ namespace api.src.Repositories
 
         public async Task<ShoppingCart> CreateShoppingCart(string userId)
         {
-            if (userId == null)
+            if (userId == null || string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentNullException(nameof(userId));
+                throw new ArgumentNullException("User id cannot be null or empty.");
             }
 
             var shoppingCart = new ShoppingCart
@@ -35,9 +35,9 @@ namespace api.src.Repositories
 
         public async Task<ShoppingCart?> GetShoppingCart(string userId)
         {
-            if (userId == null) 
+            if (userId == null || string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentNullException(nameof(userId));
+                throw new ArgumentNullException("User id cannot be null or empty.");
             }
 
             var shoppingCart = await _context.ShoppingCarts.FirstOrDefaultAsync(x => x.UserId == userId);

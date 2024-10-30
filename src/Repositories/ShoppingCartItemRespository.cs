@@ -16,16 +16,16 @@ namespace api.src.Repositories
 
         public async Task<ShoppingCartItem> AddNewShoppingCartItem(int productId, int cartId, int quantity)
         {
-            if (productId == 0 || quantity == 0)
+            if (productId <= 0 || quantity <= 0 || cartId <= 0)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product id, quantity and cart id cannot be less than or equal to zero.");
             }
 
             var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
 
             if (product == null)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product not found.");
             }
             
             var shoppingCartItem = new ShoppingCartItem
@@ -39,7 +39,7 @@ namespace api.src.Repositories
 
             if (shoppingCartItem == null)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product not found.");
             }
 
             await _context.ShoppingCartItems.AddAsync(shoppingCartItem);
@@ -50,9 +50,14 @@ namespace api.src.Repositories
 
         public async Task<ShoppingCartItem> AddShoppingCarItem(List<ShoppingCartItem> cartItems, int cartId)
         {
-            if (cartId == 0 || cartItems == null)
+            if (cartId <= 0)
             {
-                throw new Exception("Cart not found");
+                throw new Exception("Cart id cannot be less than or equal to zero.");
+            }
+
+            if (cartItems == null)
+            {
+                throw new Exception("Cart items cannot be null.");
             }
             
             var shoppingCartItem = new ShoppingCartItem
@@ -66,7 +71,7 @@ namespace api.src.Repositories
 
                 if (product == null)
                 {
-                    throw new Exception("Product not found");
+                    throw new Exception("Product not found.");
                 }
 
                 var existingCartItem = await _context.ShoppingCartItems.FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
@@ -92,16 +97,16 @@ namespace api.src.Repositories
 
         public async Task<ShoppingCartItem> CreateShoppingCartItem(int productId, int cartId, int quantity)
         {
-            if (productId == 0 || cartId == 0 || quantity == 0)
+            if (productId <= 0 || cartId <= 0 || quantity <= 0)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product id, cart id and quantity cannot be less than or equal to zero.");
             }
 
             var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
 
             if (product == null)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product not found.");
             }
 
             var shoppingCartItem = new ShoppingCartItem
@@ -114,7 +119,7 @@ namespace api.src.Repositories
 
             if (shoppingCartItem == null)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product not found.");
             }
 
             await _context.ShoppingCartItems.AddAsync(shoppingCartItem);
@@ -125,16 +130,16 @@ namespace api.src.Repositories
 
         public async Task<ShoppingCartItem> GetShoppingCartItem(int productId)
         {
-            if (productId == 0)
+            if (productId <= 0)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product id cannot be less than or equal to zero.");
             }
 
             var shoppingCartItem = await _context.ShoppingCartItems.FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (shoppingCartItem == null)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product not found.");
             }
 
             return shoppingCartItem;
@@ -142,16 +147,16 @@ namespace api.src.Repositories
 
         public async Task<List<ShoppingCartItem>> GetShoppingCartItems(int cartId)
         {
-            if (cartId == 0)
+            if (cartId <= 0)
             {
-                throw new Exception("Cart not found");
+                throw new Exception("Cart id cannot be less than or equal to zero.");
             }
 
             var shoppingCartItems = await _context.ShoppingCartItems.Where(x => x.CartId == cartId).ToListAsync();
 
             if (shoppingCartItems == null)
             {
-                throw new Exception("Cart not found");
+                throw new Exception("Cart not found.");
             }
 
             return shoppingCartItems;
@@ -159,11 +164,16 @@ namespace api.src.Repositories
 
         public async Task<ShoppingCartItem> RemoveShoppingCartItem(int productId)
         {
+            if (productId <= 0)
+            {
+                throw new Exception("Product id cannot be less than or equal to zero.");
+            } 
+
             var existingCartItem = await GetShoppingCartItem(productId);
 
             if (existingCartItem == null)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product not found.");
             }
 
             _context.ShoppingCartItems.Remove(existingCartItem);
@@ -174,16 +184,16 @@ namespace api.src.Repositories
 
         public async Task<ShoppingCartItem> UpdateShoppingCartItem(int productId, int quantity, bool? isIncrement)
         {
-            if (productId == 0 || quantity == 0)
+            if (productId <= 0 || quantity <= 0)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product id and quantity cannot be less than or equal to zero.");
             }
 
             var shoppingCartItem = GetShoppingCartItem(productId).Result;
 
             if (shoppingCartItem == null)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product not found.");
             }
 
             if (isIncrement == true)

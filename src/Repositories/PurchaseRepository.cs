@@ -24,7 +24,7 @@ namespace api.src.Repositories
         {
             if (purchase == null)
             {
-                throw new ArgumentNullException(nameof(purchase));
+                throw new ArgumentNullException("Purchase cannot be null.");
             }
 
             var shoppingCart = await _context.ShoppingCarts
@@ -33,7 +33,7 @@ namespace api.src.Repositories
             
             if (shoppingCart == null)
             {
-                throw new ArgumentNullException(nameof(shoppingCart));
+                throw new ArgumentNullException("Shopping Cart not found.");
             }
 
             purchase.UserId = user.Id;
@@ -47,16 +47,11 @@ namespace api.src.Repositories
 
         public async Task<Purchase> getPurchase(int id)
         {
-            if (id == 0)
-            {
-                throw new ArgumentNullException(nameof(id));
-            }
-
             var purchase = await _context.Purchases.FindAsync(id);
 
             if (purchase == null)
             {
-                throw new ArgumentNullException(nameof(purchase));
+                throw new ArgumentNullException("Purchase not found.");
             }
 
             return purchase;
@@ -66,7 +61,7 @@ namespace api.src.Repositories
         {
             if (purchaseId <= 0)
             {
-                throw new ArgumentNullException(nameof(purchaseId), "Purchase ID cannot be null.");
+                throw new ArgumentNullException("Purchase ID cannot be null.");
             }
 
             var purchase = await _context.Purchases
@@ -75,7 +70,7 @@ namespace api.src.Repositories
 
             if (purchase == null)
             {
-                throw new ArgumentNullException(nameof(purchase), "Purchase not found.");
+                throw new ArgumentNullException("Purchase not found.");
             }
 
             using (MemoryStream ms = new MemoryStream())
@@ -145,7 +140,7 @@ namespace api.src.Repositories
 
                     if (product == null)
                     {
-                        throw new ArgumentNullException(nameof(product), "product not found.");
+                        throw new ArgumentNullException("product not found.");
                     }
 
                     string productName = product.Name.Length > maxChars ? product.Name.Substring(0, maxChars) + "..." : product.Name;

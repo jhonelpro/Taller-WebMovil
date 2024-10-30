@@ -46,54 +46,60 @@ namespace api.src.Controller.Purchase
 
                 if (user == null) 
                 {
-                    return BadRequest("User not found");
+                    return BadRequest("User not found.");
                 }
 
                 var purchase = purchaseDto.ToPurchaseFromCreateDto();
 
                 if (purchase == null)
                 {
-                    return BadRequest("Error creating purchase");
+                    return BadRequest("Error creating purchase.");
                 }
                 
                 var newPurchase = await _purchase.createPurchase(purchase, user); 
 
                 if (newPurchase == null)
                 {
-                    return BadRequest("Purchase not created");
+                    return BadRequest("Purchase not created.");
                 }
 
                 var cart = await _shoppingCart.GetShoppingCart(user.Id);
 
                 if (cart == null)
                 {
-                    return BadRequest("Cart not found");
+                    return BadRequest("Cart not found.");
                 }
 
                 var shoppingCartItems = await _shoppingCartItem.GetShoppingCartItems(cart.Id);
 
                 if (shoppingCartItems == null)
                 {
-                    return BadRequest("Cart items not found");
+                    return BadRequest("Cart items not found.");
                 }
 
                 var saleItem = await _saleItem.createSaleItem(shoppingCartItems, newPurchase);
 
                 if (saleItem == null)
                 {
-                    return BadRequest("Sale item not created");
+                    return BadRequest("Sale item not created.");
                 }
 
-                return Ok("Purchase created successfully");
-                }
-            
-            catch (ArgumentNullException)
-            {
-                return BadRequest("Error creating purchase");
+                return Ok("Purchase created successfully.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, "Internal server error");
+                if (ex.Message == "Purchase cannot be null.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Shopping Cart not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
+                }
             }
             
         }
@@ -101,20 +107,20 @@ namespace api.src.Controller.Purchase
         [HttpGet("GetPurchaseRecipt/{purchaseId:int}")]
         public async Task<IActionResult> GetPurchaseRecipt(int purchaseId)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             try
             {
-                if (!ModelState.IsValid) return BadRequest(ModelState);
-            
                 if (purchaseId <= 0)
                 {
-                    return BadRequest("Invalid purchase id");
+                    return BadRequest("Invalid purchase id.");
                 }
 
                 var purchase = await _purchase.getPurchase(purchaseId);
 
                 if (purchase == null)
                 {
-                    return BadRequest("Purchase not found");
+                    return BadRequest("Purchase not found.");
                 }
 
                 var purchaseRecipt = await _purchase.getPurchaseRecipt(purchaseId);
@@ -122,45 +128,67 @@ namespace api.src.Controller.Purchase
                 var fileName = $"BoletaCompra_{purchaseId}.pdf";
                 return File(purchaseRecipt, "application/pdf", fileName);
             }
-            catch (ArgumentNullException)
+            catch (Exception ex)
             {
-                return BadRequest("Error getting purchase recipt");
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "Internal server error");
+                if (ex.Message == "Purchase ID cannot be null.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Purchase not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "product not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
+                }
             }
         }
 
         [HttpGet("GetPurchases")]
         public async Task<IActionResult> GetPurchases()
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             try{
-                if (!ModelState.IsValid) return BadRequest(ModelState);
-            
                 var user = await _userManager.GetUserAsync(User);
 
                 if (user == null)
                 {
-                    return BadRequest("User not found");
+                    return BadRequest("User not found.");
                 }
 
                 var purchases = await _saleItem.GetPurchasesAsync(user.Id);
 
                 if (purchases == null)
                 {
-                    return BadRequest("Purchases not found");
+                    return BadRequest("Purchases not found.");
                 }   
 
                 return Ok(purchases);
             }
-            catch (ArgumentNullException)
+            catch (Exception ex)
             {
-                return BadRequest("Error getting purchases");
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "Internal server error");
+                if (ex.Message == "User ID cannot be null.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Purchases not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Products not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
+                }
             }
         }
     }

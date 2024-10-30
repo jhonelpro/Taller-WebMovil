@@ -60,208 +60,345 @@ namespace api.src.Controller.Product
         [HttpPost("AddToCart/{productId:int}/{quantity:int}")]
         public async Task<IActionResult> AddProductToShoppingCart([FromRoute] int productId, [FromRoute] int quantity)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try 
             {
-                return BadRequest(ModelState);
-            }
+                var user = await _userManager.GetUserAsync(User);
 
-            if (productId == 0 || quantity == 0)
+                if (user == null)
+                {
+                    return BadRequest("User not found");
+                }
+
+                var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
+
+                if (shoppingCart == null)
+                {
+                    return BadRequest("Cart not found");
+                }
+
+                var shoppingCartItem = await _shoppingCartItem.AddNewShoppingCartItem(productId, shoppingCart.Id, quantity);
+
+                if (shoppingCartItem == null)
+                {
+                    return BadRequest("Failed to add product to cart");
+                }
+
+                return Ok("Product added to cart");
+            }
+            catch (Exception ex)
             {
-                return BadRequest("Product not found");
+                if (ex.Message == "User id cannot be null or empty.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Product id, quantity and cart id cannot be less than or equal to zero.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Product not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, "Internal server error");
+                }
+    
             }
-
-            var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
-            {
-                return BadRequest("User not found");
-            }
-
-            var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
-
-            if (shoppingCart == null)
-            {
-                shoppingCart = await _shoppingCart.CreateShoppingCart(user.Id);
-            }
-
-            var shoppingCartItem = await _shoppingCartItem.AddNewShoppingCartItem(productId, shoppingCart.Id, quantity);
-
-            if (shoppingCartItem == null)
-            {
-                return BadRequest("Failed to add product to cart");
-            }
-
-            return Ok("Product added to cart");
+            
         }
 
         [HttpGet("ProductsInCart")]
         public async Task<IActionResult> GetProductsInCart()
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try 
             {
-                return BadRequest(ModelState);
-            }
+                var user = await _userManager.GetUserAsync(User);
 
-            var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
-            {
-                return BadRequest("User not found");
-            }
-
-            var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
-
-            if (shoppingCart == null)
-            {
-                return BadRequest("Cart not found");
-            }
-
-            var cartItems = await _shoppingCartItem.GetShoppingCartItems(shoppingCart.Id);
-
-            if (cartItems == null)
-            {
-                return BadRequest("Cart is empty");
-            }
-
-            var products = new List<ShoppingCartDto>();
-
-            foreach (var item in cartItems)
-            {
-                var product = await _productRepository.GetProductById(item.ProductId);
-
-                if (product == null)
+                if (user == null)
                 {
-                    return BadRequest("Product not found");
+                    return BadRequest("User not found");
                 }
 
-                products.Add(product.ToShoppingCartDto(item));
-            }
+                var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
 
-            return Ok(products);
+                if (shoppingCart == null)
+                {
+                    return BadRequest("Cart not found");
+                }
+
+                var cartItems = await _shoppingCartItem.GetShoppingCartItems(shoppingCart.Id);
+
+                if (cartItems == null)
+                {
+                    return BadRequest("Cart is empty");
+                }
+
+                var products = new List<ShoppingCartDto>();
+
+                foreach (var item in cartItems)
+                {
+                    var product = await _productRepository.GetProductById(item.ProductId);
+
+                    if (product == null)
+                    {
+                        return BadRequest("Product not found");
+                    }
+
+                    products.Add(product.ToShoppingCartDto(item));
+                }
+
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "User id cannot be null or empty.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Cart not found.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Product not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, "Internal server error");
+                }
+            }
+            
         }
 
         [HttpPut("UpdateCart/{productId:int}/{quantity:int}")]
         public async Task<IActionResult> UpdateProductInCart([FromRoute] int productId, [FromRoute] int quantity, bool? isIncrement)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
             {
-                return BadRequest(ModelState);
-            }
+                var user = await _userManager.GetUserAsync(User);
 
-            if (productId == 0 || quantity == 0)
+                if (user == null)
+                {
+                    return BadRequest("User not found");
+                }
+
+                var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
+
+                if (shoppingCart == null)
+                {
+                    return BadRequest("Cart not found");
+                }
+
+                var shoppingCartItem = await _shoppingCartItem.UpdateShoppingCartItem(productId, quantity, isIncrement);
+
+                if (shoppingCartItem == null)
+                {
+                    return BadRequest("Failed to update product in cart");
+                }
+
+                return Ok("Product updated in cart");
+            }
+            catch (Exception ex)
             {
-                return BadRequest("Product not found");
+                if (ex.Message == "User id cannot be null or empty.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Product id and quantity cannot be less than or equal to zero.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Product not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, "Internal server error");
+                }
             }
-
-            var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
-            {
-                return BadRequest("User not found");
-            }
-
-            var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
-
-            if (shoppingCart == null)
-            {
-                return BadRequest("Cart not found");
-            }
-
-            var shoppingCartItem = await _shoppingCartItem.UpdateShoppingCartItem(productId, quantity, isIncrement);
-
-            if (shoppingCartItem == null)
-            {
-                return BadRequest("Failed to update product in cart");
-            }
-
-            return Ok("Product updated in cart");
+            
         }
 
         [HttpDelete("RemoveFromCart/{productId:int}")]
         public async Task<IActionResult> RemoveProductFromShoopinCart([FromRoute] int productId)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try 
             {
-                return BadRequest(ModelState);
-            }
+                var result = await _shoppingCartItem.RemoveShoppingCartItem(productId);
 
-            if (productId == 0)
+                if (result == null)
+                {
+                    return BadRequest("Failed to remove product from cart.");
+                }
+
+                return Ok("Product removed from cart");
+            }
+            catch (Exception ex)
             {
-                return BadRequest("Product not found");
+                if (ex.Message == "Product id cannot be less than or equal to zero.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Product not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, "Internal server error");
+                }
             }
-
-            var result = await _shoppingCartItem.RemoveShoppingCartItem(productId);
-
-            if (result == null)
-            {
-                return BadRequest("Failed to remove product from cart");
-            }
-
-            return Ok("Product removed from cart");
+            
         }
 
         private async Task<IActionResult> HandleNewCartCreation(AppUser user)
         {
-            var existingCart = await _shoppingCart.GetShoppingCart(user.Id);
-
-            if (existingCart != null)
+            try
             {
-                return Ok("Cart already exists");
+                var existingCart = await _shoppingCart.GetShoppingCart(user.Id);
+
+                if (existingCart != null)
+                {
+                    return Ok("Cart already exists");
+                }
+
+                var shoppingCart = await _shoppingCart.CreateShoppingCart(user.Id);
+
+                if (shoppingCart == null)
+                {
+                    return BadRequest("Failed to create cart.");
+                }
+
+                return Ok("Cart created successfully.");
             }
-
-            var shoppingCart = await _shoppingCart.CreateShoppingCart(user.Id);
-
-            if (shoppingCart == null)
+            catch (Exception ex)
             {
-                return BadRequest("Failed to create cart");
+                if (ex.Message == "User id cannot be null or empty.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "User id cannot be null or empty.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, "Internal server error.");
+                }
             }
-
-            return Ok("Cart created successfully"); 
         }
 
         private async Task<IActionResult> HandleCartFromCookie(AppUser user, List<ShoppingCartItem> cartItems)
         {
-            var existingCart = await _shoppingCart.GetShoppingCart(user.Id);
-
-            if (existingCart != null)
+            try
             {
-                var cartItemsFromDb = await _shoppingCartItem.AddShoppingCarItem(cartItems, existingCart.Id);
+                var existingCart = await _shoppingCart.GetShoppingCart(user.Id);
 
-                if (cartItemsFromDb == null)
+                if (existingCart != null)
                 {
-                    return BadRequest("Failed to add items to cart");
-                }
+                    var cartItemsFromDb = await _shoppingCartItem.AddShoppingCarItem(cartItems, existingCart.Id);
 
-                return Ok("Items added to cart successfully");
+                    if (cartItemsFromDb == null)
+                    {
+                        return BadRequest("Failed to add items to cart");
+                    }
+
+                    return Ok("Items added to cart successfully");
+                }
+                else
+                {
+                    return await CreateCartWhithItems(user, cartItems);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return await CreateCartWhithItems(user, cartItems);
+                if (ex.Message == "User id cannot be null or empty.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Cart items cannot be null.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Product not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, "Internal server error");
+                }
             }
         }
 
         private async Task<IActionResult> CreateCartWhithItems(AppUser user, List<ShoppingCartItem> cartItems)
         {
-            if (cartItems == null || cartItems.Count == 0)
+            try
             {
-                return BadRequest(new { Message = "Cart is empty" });
+                if (cartItems == null || cartItems.Count == 0)
+                {
+                    return BadRequest(new { Message = "Cart is empty" });
+                }
+
+                var shoppingCart = await _shoppingCart.CreateShoppingCart(user.Id);
+
+                if (shoppingCart == null)
+                {
+                    return BadRequest(new { Message = "Failed to create cart" });
+                }
+
+                var shoppingCartItems = await _shoppingCartItem.AddShoppingCarItem(cartItems, shoppingCart.Id);
+
+                if (shoppingCartItems == null)
+                {
+                    return BadRequest(new { Message = "Failed to add items to cart" });
+                }
+
+                return Ok("Cart created successfully");
             }
-
-            var shoppingCart = await _shoppingCart.CreateShoppingCart(user.Id);
-
-            if (shoppingCart == null)
+            catch (Exception ex)
             {
-                return BadRequest(new { Message = "Failed to create cart" });
+                if (ex.Message == "User id cannot be null or empty.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Cart items cannot be null.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Product not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }   
+                else
+                {
+                    return StatusCode(500, "Internal server error");
+                }
             }
-
-            var shoppingCartItems = await _shoppingCartItem.AddShoppingCarItem(cartItems, shoppingCart.Id);
-
-            if (shoppingCartItems == null)
-            {
-                return BadRequest(new { Message = "Failed to add items to cart" });
-            }
-
-            return Ok("Cart created successfully");
+            
         }
         
         private List<ShoppingCartItem> GetCartItemsFromCookies()

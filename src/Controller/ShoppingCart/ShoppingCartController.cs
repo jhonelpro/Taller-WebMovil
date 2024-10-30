@@ -14,17 +14,11 @@ namespace api.src.Controller.Product
     public class ShoppingCartController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
-        private readonly IShoppingCart _shoppingCart;
-        private readonly IShoppingCartItem _shoppingCartItem;
-        private readonly UserManager<AppUser> _userManager;
 
-        public ShoppingCartController(IProductRepository productRepository, IShoppingCart shoppingCart, 
-        IShoppingCartItem shoppingCartItem, UserManager<AppUser> userManager)
+        public ShoppingCartController(IProductRepository productRepository)
         {
             _productRepository = productRepository;
-            _shoppingCart = shoppingCart;
-            _shoppingCartItem = shoppingCartItem;
-            _userManager = userManager;
+
         }
         
         [HttpPost("AddTocart/{productId:int}/{quantity:int}")]

@@ -28,6 +28,10 @@ namespace api.src.Repositories
                                                p.ProductType.Name.Contains(query.textFilter) ||
                                                p.Price.ToString().Contains(query.textFilter) ||
                                                p.Stock.ToString().Contains(query.textFilter));
+                if (!products.Any())
+                {
+                    throw new Exception("Product not found.");
+                }
             }
 
             var skipNumber = (query.pageNumber - 1) * query.pageSize;
@@ -40,7 +44,7 @@ namespace api.src.Repositories
 
         public async Task<Product> AddProduct(Product product, ImageUploadResult uploadResult)
         {
-            if (product == null || uploadResult == null) throw new ArgumentNullException("Product or UploadResult cannot be null");
+            if (product == null || uploadResult == null) throw new ArgumentNullException("Product or UploadResult cannot be null.");
             
             var newProduct = new Product
             {
@@ -67,7 +71,7 @@ namespace api.src.Repositories
 
             if (product == null)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product not found.");
             }
             
             _context.Products.Remove(product);
@@ -88,7 +92,7 @@ namespace api.src.Repositories
                 
                 if(!products.Any())
                 {
-                    throw new Exception("Product not found");
+                    throw new Exception("Product not found.");
                 }
             }
 
@@ -97,13 +101,13 @@ namespace api.src.Repositories
                 var validProductTypes = new[] { "Poleras", "Gorros", "Juguetería", "Alimentación", "Libros" };
                 if (!validProductTypes.Contains(query.productType))
                 {
-                    throw new Exception("Product Type incorrect");
+                    throw new Exception("Product Type incorrect.");
                 }
                 products = products.Where(p => p.ProductType.Name.ToLower() == query.productType.ToLower());
 
                 if(!products.Any())
                 {
-                    throw new Exception("Product not found");
+                    throw new Exception("Product not found.");
                 }
             }
 
@@ -129,7 +133,7 @@ namespace api.src.Repositories
             
             if (existingProduct == null)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product not found.");
             }
 
             existingProduct.Name = product.Name;
@@ -151,7 +155,7 @@ namespace api.src.Repositories
 
             if (product == null)
             {
-                throw new Exception("Product not found");
+                throw new Exception("Product not found.");
             }
             
             return product;
