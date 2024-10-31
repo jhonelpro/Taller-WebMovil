@@ -10,7 +10,7 @@ namespace api.src.Controller.MobileClient
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "User")]
 
     public class MobileClientController: ControllerBase
     {
@@ -108,8 +108,8 @@ namespace api.src.Controller.MobileClient
             return Ok(tickets);
         }
 /**
-        [HttpGet("view products")]
-        public async Task<IActionResult> ViewTickets()
+        [HttpGet("get products client")]
+        public async Task<IActionResult> GetProductsClient()
         {
             
         }
