@@ -11,6 +11,6 @@ namespace api.src.Models
         public double Purchase_TotalPrice { get; set; } = 0;
         public string UserId { get; set; } = null!;
         public AppUser User { get; set; } = null!;
-        public List<SaleItem> SaleItems { get; } = [];
+        public List<SaleItem> SaleItems { get; set; } = [];
     }
 }

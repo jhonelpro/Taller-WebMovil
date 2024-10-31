@@ -20,8 +20,9 @@ namespace api.src.Controller.Purchase
         private readonly IPurchase _purchase;
         private readonly ISaleItem _saleItem;
         private readonly UserManager<AppUser> _userManager;
+        private readonly ITicket _ticket;
 
-        public PurchaseController(IProductRepository productRepository, IShoppingCart shoppingCart, IShoppingCartItem shoppingCartItem, IPurchase purchase, ISaleItem saleItem, UserManager<AppUser> userManager)
+        public PurchaseController(IProductRepository productRepository, IShoppingCart shoppingCart, IShoppingCartItem shoppingCartItem, IPurchase purchase, ISaleItem saleItem, UserManager<AppUser> userManager, ITicket ticket)
         {
             _productRepository = productRepository;
             _shoppingCart = shoppingCart;
@@ -29,6 +30,7 @@ namespace api.src.Controller.Purchase
             _purchase = purchase;
             _userManager = userManager;
             _saleItem = saleItem;
+            _ticket = ticket;
         }
 
         [HttpPost("NewPurchase")]
@@ -84,6 +86,8 @@ namespace api.src.Controller.Purchase
             {
                 return BadRequest("Sale item not created");
             }
+
+            var newTicket = await _ticket.CreateTicket(user, saleItem);
 
             return Ok("Purchase created successfully");
         }

@@ -4,6 +4,7 @@ using api.src.Interfaces;
 using api.src.Models;
 using api.src.Models.User;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using Microsoft.Win32.SafeHandles;
 
 namespace api.src.Repositories
 {
@@ -15,16 +16,25 @@ namespace api.src.Repositories
             _context = context;
         }
 
-        public Task<Ticket> CreateTicket(AppUser user)
+        public async Task<Ticket> CreateTicket(AppUser user, List<SaleItem> saleItems)
         {
-            new Ticket
+            Ticket ticket = new Ticket
             {
                 Purchase_Date = DateTime.Now,
                 UserId = user.Id,
                 User = user,
+                SaleItems = saleItems,
             };
+
+            foreach (var saleItem in saleItems)
+            {
+                ticket.Purchase_TotalPrice += saleItem.TotalPrice;
+            }
             
-            throw new NotImplementedException();
+            await _context.Tickets.AddAsync(ticket);
+            await _context.SaveChangesAsync();
+
+            return ticket;
         }
 
         public Task<List<Ticket>> GetTickets(string idUser)
