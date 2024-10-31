@@ -121,22 +121,9 @@ namespace api.src.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<ProductDto>> GetProductsClient(QueryObject query)
+        public async Task<List<ProductDto>> GetProductsClient(QueryObjectProductClient query)
         {
             var products = _context.Products.Include(p => p.ProductType).AsQueryable();
-
-            if (!string.IsNullOrEmpty(query.textFilter))
-            {
-                products = products.Where(p => p.Name.Contains(query.textFilter) ||
-                                               p.ProductType.Name.Contains(query.textFilter) ||
-                                               p.Price.ToString().Contains(query.textFilter) ||
-                                               p.Stock.ToString().Contains(query.textFilter));
-                
-                if(!products.Any())
-                {
-                    throw new Exception("Product not found");
-                }
-            }
 
             if (!string.IsNullOrEmpty(query.productType))
             {
@@ -161,9 +148,7 @@ namespace api.src.Repositories
                 }
             }
 
-            var skipNumber = (query.pageNumber - 1) * query.pageSize;
-
-            return await products.Skip(skipNumber).Take(query.pageSize)
+            return await products
                 .Include(p => p.ProductType)
                 .Select(p => p.ToProductDto())
                 .ToListAsync();
