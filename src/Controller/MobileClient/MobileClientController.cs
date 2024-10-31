@@ -1,10 +1,12 @@
 using System.Security.Claims;
 using api.src.DTOs.User;
+using api.src.Helpers;
 using api.src.Interfaces;
 using api.src.Models.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace api.src.Controller.MobileClient
 {
@@ -18,13 +20,15 @@ namespace api.src.Controller.MobileClient
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IPasswordHasher<AppUser> _passwordHasher;
         private readonly ITicket _ticket;
+        private readonly IProductRepository _productRepository;
         
-        public MobileClientController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IPasswordHasher<AppUser> passwordHasher, ITicket ticket)
+        public MobileClientController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IPasswordHasher<AppUser> passwordHasher, ITicket ticket, IProductRepository productRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _passwordHasher = passwordHasher;
             _ticket = ticket;
+            _productRepository = productRepository;
         }
 
         [HttpPost("logout")]
@@ -107,12 +111,32 @@ namespace api.src.Controller.MobileClient
 
             return Ok(tickets);
         }
-/**
+
         [HttpGet("get products client")]
-        public async Task<IActionResult> GetProductsClient()
+        public async Task<IActionResult> GetProductsClient([FromQuery] QueryObjectProductClient query)
         {
-            
+            if(!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var products = await _productRepository.GetProductsClient(query);
+                return Ok(products);
+            }
+            catch (Exception ex) 
+            {
+                if (ex.Message == "Product not found")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Product Type incorrect")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
+                }
+            }
         }
-**/
     }
 }

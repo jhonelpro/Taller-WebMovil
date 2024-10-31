@@ -10,6 +10,7 @@ namespace api.src.Interfaces
         Task<Product?> GetProductById(int id);
         Task<List<ProductDto>> GetProducts(QueryObjectProduct query);
         Task<List<ProductDto>> GetAvailableProducts(QueryObject query);
+        Task<List<ProductDto>> GetProductsClient(QueryObjectProductClient query);
         Task<Product> AddProduct(Product product, ImageUploadResult uploadResult);
         Task<Product?> UpdateProduct(int id, UpdateProductRequestDto updateProductRequestDto, ImageUploadResult uploadResult);
         Task<Product?> DeleteProduct(int id);
