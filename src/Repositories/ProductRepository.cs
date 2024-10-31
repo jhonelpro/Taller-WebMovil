@@ -148,7 +148,9 @@ namespace api.src.Repositories
                 }
             }
 
-            return await products
+            var skipNumber = (query.pageNumber - 1) * query.pageSize;
+
+            return await products.Skip(skipNumber).Take(query.pageSize)
                 .Include(p => p.ProductType)
                 .Select(p => p.ToProductDto())
                 .ToListAsync();

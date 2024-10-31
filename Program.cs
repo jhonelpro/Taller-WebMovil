@@ -37,6 +37,7 @@ builder.Services.AddScoped<IShoppingCart, ShoppingCartRepository>();
 builder.Services.AddScoped<IShoppingCartItem, ShoppingCartItemRespository>();
 builder.Services.AddScoped<IPurchase, PurchaseRepository>();
 builder.Services.AddScoped<ISaleItem, SaleItemRepository>();
+builder.Services.AddScoped<ITicket, TicketRepository>();
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(
     opt => {
