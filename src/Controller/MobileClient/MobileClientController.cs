@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using api.src.DTOs.User;
+using api.src.Interfaces;
 using api.src.Models.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,12 +17,14 @@ namespace api.src.Controller.MobileClient
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IPasswordHasher<AppUser> _passwordHasher;
+        private readonly ITicket _ticket;
         
-        public MobileClientController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IPasswordHasher<AppUser> passwordHasher)
+        public MobileClientController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IPasswordHasher<AppUser> passwordHasher, ITicket ticket)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _passwordHasher = passwordHasher;
+            _ticket = ticket;
         }
 
         [HttpPost("logout")]
@@ -82,13 +85,29 @@ namespace api.src.Controller.MobileClient
                 return StatusCode(500, new { message = "An error occurred while deleting the account.", error = ex.Message });
             }
         }
-/**
-        [HttpGet("view tickets")]
-        public async Task<IActionResult> ViewTickets()
-        {
-            
-        }
 
+        [HttpGet("get tickets")]
+        public async Task<IActionResult> GetTickets()
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return BadRequest("User not found");
+            }
+
+            var tickets = await _ticket.GetTickets(user.Id);
+
+            if (tickets == null)
+            {
+                return BadRequest("Tickets not found");
+            }   
+
+            return Ok(tickets);
+        }
+/**
         [HttpGet("view products")]
         public async Task<IActionResult> ViewTickets()
         {
