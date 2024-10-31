@@ -82,5 +82,17 @@ namespace api.src.Controller.MobileClient
                 return StatusCode(500, new { message = "An error occurred while deleting the account.", error = ex.Message });
             }
         }
+
+        [HttpGet("view tickets")]
+        public async Task<IActionResult> ViewTickets()
+        {
+            
+        }
+
+        [HttpGet("view products")]
+        public async Task<IActionResult> ViewTickets()
+        {
+            
+        }
     }
 }
