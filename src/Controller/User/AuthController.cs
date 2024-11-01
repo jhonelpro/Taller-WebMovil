@@ -6,6 +6,7 @@ using api.src.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using api.src.Controller.Product;
 
 namespace api.src.Controller
 {
@@ -16,12 +17,14 @@ namespace api.src.Controller
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenService _tokenService;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly IShoppingCart _shoppingCart;
 
-        public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager)
+        public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager, IShoppingCart shoppingCart)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _signInManager = signInManager;
+            _shoppingCart = shoppingCart;
         }
 
         [HttpPost("register")]
@@ -64,6 +67,8 @@ namespace api.src.Controller
 
                     if (roleResult.Succeeded)
                     {
+                        await _shoppingCart.CreateShoppingCart(user.Id);
+
                         return Ok(new NewUserDto
                         {
                             UserName = user.UserName!,
@@ -71,6 +76,7 @@ namespace api.src.Controller
                             Token = _tokenService.CreateToken(user)
                         });
                     }
+
                     else
                     {
                         return StatusCode(500, roleResult.Errors);

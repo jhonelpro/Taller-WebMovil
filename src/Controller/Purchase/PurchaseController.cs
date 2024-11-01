@@ -20,11 +20,7 @@ namespace api.src.Controller.Purchase
         private readonly UserManager<AppUser> _userManager;
         private readonly ITicket _ticket;
 
-<<<<<<< HEAD
-        public PurchaseController(IShoppingCart shoppingCart, IShoppingCartItem shoppingCartItem, IPurchase purchase, ISaleItem saleItem, UserManager<AppUser> userManager)
-=======
-        public PurchaseController(IProductRepository productRepository, IShoppingCart shoppingCart, IShoppingCartItem shoppingCartItem, IPurchase purchase, ISaleItem saleItem, UserManager<AppUser> userManager, ITicket ticket)
->>>>>>> 5eac231a8ac42add4c216b27ac28844fdcaaa0a2
+        public PurchaseController(IShoppingCart shoppingCart, IShoppingCartItem shoppingCartItem, IPurchase purchase, ISaleItem saleItem, UserManager<AppUser> userManager, ITicket ticket)
         {
             _shoppingCart = shoppingCart;
             _shoppingCartItem = shoppingCartItem;
@@ -90,6 +86,13 @@ namespace api.src.Controller.Purchase
                     return BadRequest("Sale item not created.");
                 }
 
+                var newTicket = await _ticket.CreateTicket(user, saleItem);
+
+                if (newTicket == null)
+                {
+                    return BadRequest("Ticket not created.");
+                }
+
                 return Ok("Purchase created successfully.");
             }
             catch (Exception ex)
@@ -108,40 +111,6 @@ namespace api.src.Controller.Purchase
                 }
             }
             
-<<<<<<< HEAD
-=======
-            var newPurchase = await _purchase.createPurchase(purchase, user); 
-
-            if (newPurchase == null)
-            {
-                return BadRequest("Purchase not created");
-            }
-
-            var cart = await _shoppingCart.GetShoppingCart(user.Id);
-
-            if (cart == null)
-            {
-                return BadRequest("Cart not found");
-            }
-
-            var shoppingCartItems = await _shoppingCartItem.GetShoppingCartItems(cart.Id);
-
-            if (shoppingCartItems == null)
-            {
-                return BadRequest("Cart items not found");
-            }
-
-            var saleItem = await _saleItem.createSaleItem(shoppingCartItems, newPurchase);
-
-            if (saleItem == null)
-            {
-                return BadRequest("Sale item not created");
-            }
-
-            var newTicket = await _ticket.CreateTicket(user, saleItem);
-
-            return Ok("Purchase created successfully");
->>>>>>> 5eac231a8ac42add4c216b27ac28844fdcaaa0a2
         }
 
         [HttpGet("GetPurchaseRecipt/{purchaseId:int}")]
