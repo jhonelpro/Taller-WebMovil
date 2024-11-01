@@ -50,13 +50,13 @@ namespace api.src.Controller
 
             try
             {
-                if (string.IsNullOrEmpty(email)) return BadRequest("Email is required");
+                if (string.IsNullOrEmpty(email)) return BadRequest("Email is required.");
 
                 var user = await _userManager.FindByEmailAsync(email);
 
                 if (user == null)
                 {
-                    return BadRequest("User not found");
+                    return BadRequest("User not found.");
                 }
 
                 if (user.IsActive == 1){

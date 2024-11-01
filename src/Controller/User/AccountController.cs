@@ -25,11 +25,11 @@ namespace api.src.Controller
             {
                 if (!ModelState.IsValid) return BadRequest(ModelState);
 
-                if (editProfileDto.DateOfBirth >= DateTime.Now) return BadRequest("Date of birth must be in the past");
+                if (editProfileDto.DateOfBirth >= DateTime.Now) return BadRequest("Date of birth must be in the past.");
 
                 var user = await _userManager.GetUserAsync(User);
 
-                if (user == null) return Unauthorized("User not found");
+                if (user == null) return Unauthorized("User not found.");
 
                 user.Name = editProfileDto.Name;
                 user.DateOfBirth = editProfileDto.DateOfBirth;
@@ -42,7 +42,7 @@ namespace api.src.Controller
                     return BadRequest(result.Errors);
                 }
 
-                return Ok("Profile updated successfully");
+                return Ok("Profile updated successfully.");
             }
             catch (Exception ex)
             {
@@ -58,11 +58,11 @@ namespace api.src.Controller
                 if (!ModelState.IsValid) return BadRequest(ModelState);
 
                 var user = await _userManager.GetUserAsync(User);
-                if (user == null) return Unauthorized("User not found");
+                if (user == null) return Unauthorized("User not found.");
 
                 var passwordVerification = await _userManager.CheckPasswordAsync(user, changePasswordDto.CurrentPassword);
 
-                if (!passwordVerification) return BadRequest("Current password is incorrect");
+                if (!passwordVerification) return BadRequest("Current password is incorrect.");
 
                 if (!string.Equals(changePasswordDto.NewPassword, changePasswordDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest("Passwords do not match");
 
@@ -73,7 +73,7 @@ namespace api.src.Controller
                     return BadRequest(result.Errors);
                 }
 
-                return Ok("Password changed successfully");
+                return Ok("Password changed successfully.");
             }
             catch (Exception ex)
             {

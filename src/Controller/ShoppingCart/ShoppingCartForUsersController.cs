@@ -42,7 +42,7 @@ namespace api.src.Controller.Product
 
             if (user == null)
             {
-                return BadRequest("User not found");
+                return BadRequest("User not found.");
             }
 
             var cartItems = GetCartItemsFromCookies();
@@ -68,24 +68,24 @@ namespace api.src.Controller.Product
 
                 if (user == null)
                 {
-                    return BadRequest("User not found");
+                    return BadRequest("User not found.");
                 }
 
                 var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
 
                 if (shoppingCart == null)
                 {
-                    return BadRequest("Cart not found");
+                    return BadRequest("Cart not found.");
                 }
 
                 var shoppingCartItem = await _shoppingCartItem.AddNewShoppingCartItem(productId, shoppingCart.Id, quantity);
 
                 if (shoppingCartItem == null)
                 {
-                    return BadRequest("Failed to add product to cart");
+                    return BadRequest("Failed to add product to cart.");
                 }
 
-                return Ok("Product added to cart");
+                return Ok("Product added to cart.");
             }
             catch (Exception ex)
             {
@@ -191,24 +191,24 @@ namespace api.src.Controller.Product
 
                 if (user == null)
                 {
-                    return BadRequest("User not found");
+                    return BadRequest("User not found.");
                 }
 
                 var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
 
                 if (shoppingCart == null)
                 {
-                    return BadRequest("Cart not found");
+                    return BadRequest("Cart not found.");
                 }
 
                 var shoppingCartItem = await _shoppingCartItem.UpdateShoppingCartItem(productId, quantity, isIncrement);
 
                 if (shoppingCartItem == null)
                 {
-                    return BadRequest("Failed to update product in cart");
+                    return BadRequest("Failed to update product in cart.");
                 }
 
-                return Ok("Product updated in cart");
+                return Ok("Product updated in cart.");
             }
             catch (Exception ex)
             {
@@ -274,7 +274,7 @@ namespace api.src.Controller.Product
 
                 if (existingCart != null)
                 {
-                    return Ok("Cart already exists");
+                    return Ok("Cart already exists.");
                 }
 
                 var shoppingCart = await _shoppingCart.CreateShoppingCart(user.Id);
@@ -315,10 +315,10 @@ namespace api.src.Controller.Product
 
                     if (cartItemsFromDb == null)
                     {
-                        return BadRequest("Failed to add items to cart");
+                        return BadRequest("Failed to add items to cart.");
                     }
 
-                    return Ok("Items added to cart successfully");
+                    return Ok("Items added to cart successfully.");
                 }
                 else
                 {
@@ -356,24 +356,24 @@ namespace api.src.Controller.Product
             {
                 if (cartItems == null || cartItems.Count == 0)
                 {
-                    return BadRequest(new { Message = "Cart is empty" });
+                    return BadRequest(new { Message = "Cart is empty." });
                 }
 
                 var shoppingCart = await _shoppingCart.CreateShoppingCart(user.Id);
 
                 if (shoppingCart == null)
                 {
-                    return BadRequest(new { Message = "Failed to create cart" });
+                    return BadRequest(new { Message = "Failed to create cart." });
                 }
 
                 var shoppingCartItems = await _shoppingCartItem.AddShoppingCarItem(cartItems, shoppingCart.Id);
 
                 if (shoppingCartItems == null)
                 {
-                    return BadRequest(new { Message = "Failed to add items to cart" });
+                    return BadRequest(new { Message = "Failed to add items to cart." });
                 }
 
-                return Ok("Cart created successfully");
+                return Ok("Cart created successfully.");
             }
             catch (Exception ex)
             {

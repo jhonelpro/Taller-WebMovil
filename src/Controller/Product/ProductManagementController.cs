@@ -35,7 +35,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Product not found")
+                if (ex.Message == "Product not found.")
                 {
                     return NotFound(new { Message = ex.Message });
                 }
@@ -55,17 +55,17 @@ namespace api.src.Controller.Product
             try{
                 if (productDto.Image == null || productDto.Image.Length == 0)
                 {
-                    return BadRequest("Image is required");
+                    return BadRequest("Image is required.");
                 }
 
                 if (productDto.Image.ContentType != "image/jpeg" && productDto.Image.ContentType != "image/png")
                 {
-                    return BadRequest("Image must be a jpeg or png file");
+                    return BadRequest("Image must be a jpeg or png file.");
                 }
 
                 if (productDto.Image.Length > 2 * 1024 * 1024)
                 {
-                    return BadRequest("Image must be less than 2MB");
+                    return BadRequest("Image must be less than 2MB.");
                 }
 
                 var uploadParams = new ImageUploadParams
@@ -87,7 +87,11 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "ProductType not found")
+                if (ex.Message == "Product or UploadResult cannot be null.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "ProductType not found.")
                 {
                     return NotFound(new { Message = ex.Message });
                 }
@@ -109,17 +113,17 @@ namespace api.src.Controller.Product
                 {
                     if (product.Image == null || product.Image.Length == 0)
                 {
-                    return BadRequest("Image is required");
+                    return BadRequest("Image is required.");
                 }
 
                 if (product.Image.ContentType != "image/jpeg" && product.Image.ContentType != "image/png")
                 {
-                    return BadRequest("Image must be a jpeg or png file");
+                    return BadRequest("Image must be a jpeg or png file.");
                 }
 
                 if (product.Image.Length > 2 * 1024 * 1024)
                 {
-                    return BadRequest("Image must be less than 2MB");
+                    return BadRequest("Image must be less than 2MB.");
                 }
 
                 var uploadParams = new ImageUploadParams
@@ -139,18 +143,18 @@ namespace api.src.Controller.Product
                 
                 if (existingProduct == null)
                 {
-                    return NotFound("Product not found");
+                    return NotFound("Product not found.");
                 }
 
                 return Ok(existingProduct.ToProductDto());
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Product not found")
+                if (ex.Message == "Product not found.")
                 {
                     return NotFound(new { Message = ex.Message });
                 }
-                else if (ex.Message == "ProductType not found")
+                else if (ex.Message == "ProductType not found.")
                 {
                     return NotFound(new { Message = ex.Message });
                 }
@@ -173,14 +177,14 @@ namespace api.src.Controller.Product
 
                 if (product == null)
                 {
-                    return NotFound("Product not found");
+                    return NotFound("Product not found.");
                 }
                 
                 return Ok(product.ToProductDto());
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Product not found")
+                if (ex.Message == "Product not found.")
                 {
                     return NotFound(new { Message = ex.Message });
                 }

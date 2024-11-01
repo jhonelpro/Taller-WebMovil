@@ -44,7 +44,7 @@ namespace api.src.Controller.Product
             }
 
             await Task.Run(() => SaveCartItemsToCookies(cartItems.ToList()));
-            return Ok("Product added to cart");
+            return Ok("Product added to cart.");
         }
 
         [HttpDelete("RemoveFromCart/{productId:int}")]
@@ -60,11 +60,11 @@ namespace api.src.Controller.Product
             {
                 cartItems.Remove(product);
                 await Task.Run(() => SaveCartItemsToCookies(cartItems.ToList()));
-                return Ok("Product removed from cart");
+                return Ok("Product removed from cart.");
             }
             else
             {
-                return NotFound(new { Message = "Product not found in cart" });
+                return NotFound(new { Message = "Product not found in cart." });
             }
         }
 
@@ -86,7 +86,7 @@ namespace api.src.Controller.Product
                 }
                 else
                 {
-                    return NotFound(new { Message = "Product not found" });
+                    return NotFound(new { Message = "Product not found." });
                 }
             }
             
@@ -117,11 +117,11 @@ namespace api.src.Controller.Product
                 }
                 
                 await Task.Run(() => SaveCartItemsToCookies(cartItems.ToList()));
-                return Ok("Product updated in cart");
+                return Ok("Product updated in cart.");
             }
             else
             {
-                return NotFound(new { Message = "Product not found in cart" });
+                return NotFound(new { Message = "Product not found in cart." });
             }
         }
 

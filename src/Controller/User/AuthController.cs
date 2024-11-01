@@ -31,19 +31,19 @@ namespace api.src.Controller
             {
                 if (!ModelState.IsValid) return BadRequest(ModelState);
 
-                if (await _userManager.Users.AnyAsync(p => p.Email == registerDto.Email)) return BadRequest("Email already exists");
+                if (await _userManager.Users.AnyAsync(p => p.Email == registerDto.Email)) return BadRequest("Email already exists.");
 
                 if (string.IsNullOrEmpty(registerDto.Rut)) return BadRequest("RUT is required.");
 
-                if (await _userManager.Users.AnyAsync(p => p.Rut == registerDto.Rut)) return BadRequest("Rut already exists");
+                if (await _userManager.Users.AnyAsync(p => p.Rut == registerDto.Rut)) return BadRequest("Rut already exists.");
 
-                if (!RutValidations.IsValidRut(registerDto.Rut)) return BadRequest("Invalid Rut format or verification digit");
+                if (!RutValidations.IsValidRut(registerDto.Rut)) return BadRequest("Invalid Rut format or verification digit.");
 
-                if (registerDto.DateOfBirth >= DateTime.Now) return BadRequest("Date of birth must be in the past");
+                if (registerDto.DateOfBirth >= DateTime.Now) return BadRequest("Date of birth must be in the past.");
 
-                if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.ConfirmPassword)) return BadRequest("Password is required");
+                if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.ConfirmPassword)) return BadRequest("Password is required.");
 
-                if (!string.Equals(registerDto.Password, registerDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest("Passwords do not match");
+                if (!string.Equals(registerDto.Password, registerDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest("Passwords do not match.");
 
                 var user = new AppUser
                 {
