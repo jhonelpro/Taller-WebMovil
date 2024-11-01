@@ -46,6 +46,7 @@ namespace api.src.Repositories
             }
 
             var tickets = await _context.Tickets
+                .Include(p => p.SaleItems)
                 .Where(p => p.UserId == userId)
                 .ToListAsync();
             
