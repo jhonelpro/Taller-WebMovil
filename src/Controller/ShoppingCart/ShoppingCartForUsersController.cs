@@ -152,7 +152,7 @@ namespace api.src.Controller.Product
                     products.Add(product.ToShoppingCartDto(item));
                 }
 
-                return Ok(products);
+                return Ok(products.toCartDto());
             }
             catch (Exception ex)
             {

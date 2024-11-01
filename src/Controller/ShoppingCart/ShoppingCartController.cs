@@ -90,7 +90,7 @@ namespace api.src.Controller.Product
                 }
             }
             
-            return Ok(products);
+            return Ok(products.toCartDto());
         }
 
         [HttpPut("UpdateCart/{productId:int}/{quantity:int}")]
