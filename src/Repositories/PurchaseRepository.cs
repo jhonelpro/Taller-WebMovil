@@ -45,10 +45,12 @@ namespace api.src.Repositories
             return purchase;
         }
 
-        public async Task<Purchase> getPurchase(int id)
+        public async Task<Purchase> getPurchase(int purchaseId, string userId)
         {
-            var purchase = await _context.Purchases.FindAsync(id);
-
+            var purchase = await _context.Purchases.Where(p => p.UserId == userId)
+                .Include(p => p.SaleItems)
+                .FirstOrDefaultAsync(p => p.Id == purchaseId);
+            
             if (purchase == null)
             {
                 throw new ArgumentNullException("Purchase not found.");
@@ -57,7 +59,7 @@ namespace api.src.Repositories
             return purchase;
         }
 
-        public async Task<byte[]> getPurchaseRecipt(int purchaseId)
+        public async Task<byte[]> getPurchaseRecipt(int purchaseId, string userId)
         {
             if (purchaseId <= 0)
             {

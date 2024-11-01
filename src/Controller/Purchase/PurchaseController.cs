@@ -120,19 +120,27 @@ namespace api.src.Controller.Purchase
 
             try
             {
+
+                var user = await _userManager.GetUserAsync(User);
+
+                if (user == null)
+                {
+                    return BadRequest("User not found.");
+                }
+
                 if (purchaseId <= 0)
                 {
                     return BadRequest("Invalid purchase id.");
                 }
 
-                var purchase = await _purchase.getPurchase(purchaseId);
+                var purchase = await _purchase.getPurchase(purchaseId, user.Id);
 
                 if (purchase == null)
                 {
                     return BadRequest("Purchase not found.");
                 }
 
-                var purchaseRecipt = await _purchase.getPurchaseRecipt(purchaseId);
+                var purchaseRecipt = await _purchase.getPurchaseRecipt(purchaseId, user.Id);
 
                 var fileName = $"BoletaCompra_{purchaseId}.pdf";
                 return File(purchaseRecipt, "application/pdf", fileName);

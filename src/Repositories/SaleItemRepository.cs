@@ -148,7 +148,14 @@ namespace api.src.Repositories
 
             foreach (var purchase in purchases)
             {
+                var TotalPrice = 0.0;
+
                 var saleItem = saleItems.Where(x => x.PurchaseId == purchase.Id).ToList();
+
+                foreach (var item in saleItem)
+                {
+                    TotalPrice += item.TotalPrice;
+                }
 
                 if (saleItem == null)
                 {
@@ -173,6 +180,7 @@ namespace api.src.Repositories
                     City = purchase.City,
                     Commune = purchase.Commune,
                     Street = purchase.Street,
+                    Purchase_TotalPrice = TotalPrice,
                     saleItemDtos = PurchaseMapper.ToSaleItemDto(saleItem, products)
                 };
 
