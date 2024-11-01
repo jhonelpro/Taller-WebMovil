@@ -20,6 +20,7 @@ namespace api.src.Data
         public DbSet<Purchase> Purchases { get; set; } = null!;
         public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; } = null!;
         public DbSet<SaleItem> SaleItems { get; set; } = null!;
+        public DbSet<Ticket> Tickets { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

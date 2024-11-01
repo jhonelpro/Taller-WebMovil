@@ -2,7 +2,7 @@ using api.src.DTOs.Auth;
 using api.src.DTOs.User;
 using api.src.Interfaces;
 using api.src.Models.User;
-using Api.src.Helpers;
+using api.src.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -102,6 +102,8 @@ namespace api.src.Controller
                 if(!result.Succeeded) return Unauthorized("Invalid username or password.");
 
                 if(user.IsActive == 0) return Unauthorized("User is not active.");
+
+                await _signInManager.SignInAsync(user, isPersistent: true);
 
                 var token = _tokenService.CreateToken(user);
 
