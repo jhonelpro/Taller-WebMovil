@@ -172,9 +172,13 @@ namespace api.src.Repositories
                     throw new ArgumentNullException("Products not found.");
                 }
 
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == purchase.UserId);
+
                 var purchaseDto = new PurchaseDto
                 {
                     PurchaseId = purchase.Id,
+                    Username = user?.UserName ?? "Unknown",
+                    Email = user?.Email ?? "Unknown",
                     Transaction_Date = purchase.Transaction_Date,
                     Country = purchase.Country,
                     City = purchase.City,
