@@ -86,7 +86,7 @@ namespace api.src.Repositories
                 {
                     Purchase_Date = ticket.Purchase_Date,
                     Purchase_TotalPrice = ticket.Purchase_TotalPrice,
-                    saleItemDtos = PurchaseMapper.ToSaleItemDtoTicket(saleItems, products)
+                    saleItemDtos = PurchaseMapper.ToSaleItemDto(saleItems, products)
                 };
 
                 ticketsDtos.Add(ticketDto);
