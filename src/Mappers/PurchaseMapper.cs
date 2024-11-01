@@ -55,5 +55,31 @@ namespace api.src.Mappers
 
             return saleItemDtos;
         }
+
+        public static List<SaleItemDto> ToSaleItemDtoTicket(List<SaleItem> saleItems, List<Product> products)
+        {
+            var saleItemDtos = new List<SaleItemDto>();
+
+            foreach (var saleItem in saleItems)
+            {
+                var product = products.FirstOrDefault(x => x.Id == saleItem.ProductId);
+
+                if (product == null)
+                {
+                    throw new ArgumentNullException(nameof(product));
+                }
+
+                saleItemDtos.Add(new SaleItemDto
+                {
+                    ProductName = product.Name,
+                    ProductType = product.ProductType.Name,
+                    Quantity = saleItem.Quantity,
+                    UnitPrice = saleItem.UnitPrice,
+                    TotalPrice = saleItem.TotalPrice
+                });
+            }
+
+            return saleItemDtos;
+        }
     }
 }

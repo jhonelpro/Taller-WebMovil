@@ -1,5 +1,6 @@
 using System.Data;
 using api.src.Data;
+using api.src.DTOs.Purchase;
 using api.src.Interfaces;
 using api.src.Models;
 using api.src.Models.User;
@@ -42,6 +43,59 @@ namespace api.src.Repositories
         {
             if (string.IsNullOrEmpty(userId))
             {
+                throw new ArgumentNullException(nameof(userId));
+            }
+
+            var tickets = await _context.Tickets
+                                        .Where(x => x.UserId == userId)
+                                        .ToListAsync();
+
+            if (tickets == null)
+            {
+                throw new ArgumentNullException(nameof(tickets));
+            }
+
+            var ticketsDtos = new List<TicketDto>();
+
+            foreach (var ticket in tickets)
+            {
+                var saleItems = await _context.Tickets
+                            .Where(x => x.UserId == userId)
+                            .Where(x => x.Id == ticket.Id)
+                            .Include(p => p.SaleItems)
+                            .SelectMany(t => t.SaleItems)
+                            .ToListAsync();
+
+                if (saleItems == null)
+                {
+                    throw new ArgumentNullException(nameof(saleItems));
+                }
+
+                var products = await _context.Products
+                                               .Where(x => saleItems.Select(y => y.ProductId).Contains(x.Id))
+                                               .Include(x => x.ProductType)
+                                               .ToListAsync();
+
+                if (products == null)
+                {
+                    throw new ArgumentNullException(nameof(products));
+                }
+
+                var ticketDto = new TicketDto
+                {
+                    Purchase_Date = ticket.Purchase_Date,
+                    Purchase_TotalPrice = ticket.Purchase_TotalPrice,
+                    saleItemDtos = PurchaseMapper.ToSaleItemDto(saleItems, products)
+                };
+
+                ticketsDtos.Add(ticketDto);
+            }
+
+            return ticketsDtos;
+
+            /**
+            if (string.IsNullOrEmpty(userId))
+            {
                 throw new ArgumentNullException(nameof(userId), "El ID de usuario no puede ser nulo o vacío.");
             }
 
@@ -55,7 +109,7 @@ namespace api.src.Repositories
                 throw new ArgumentNullException(nameof(tickets), "No se encontraron compras asociadas al usuario.");
             }
 
-            return tickets;
+            return tickets; **/
         }
     }
 }
