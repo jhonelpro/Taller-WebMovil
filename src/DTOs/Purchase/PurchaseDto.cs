@@ -17,6 +17,8 @@ namespace api.src.DTOs.Purchase
         [Required]
         public string Street { get; set; } = string.Empty;
         [Required]
+        public double Purchase_TotalPrice { get; set; } = 0;
+        [Required]
         public List<SaleItemDto> saleItemDtos { get; set; } = new List<SaleItemDto>();    
     }
 }
