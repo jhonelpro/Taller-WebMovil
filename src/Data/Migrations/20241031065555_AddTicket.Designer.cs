@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.src.Data;
 
@@ -10,9 +11,11 @@ using api.src.Data;
 namespace api.src.Data.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241031065555_AddTicket")]
+    partial class AddTicket
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -45,13 +48,13 @@ namespace api.src.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "6c1cd9b3-5fe4-4283-8024-ff8409f70254",
+                            Id = "eba673d3-c0f2-45cb-b88c-11426bb22d88",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "f5ad7ecf-ea5c-4797-a992-bbd43fe343b0",
+                            Id = "30e3f868-843b-42c7-a989-c48a6dbe08ac",
                             Name = "User",
                             NormalizedName = "USER"
                         });

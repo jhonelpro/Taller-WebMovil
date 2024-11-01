@@ -1,11 +1,19 @@
 
-namespace Api.src.Helpers
+namespace api.src.Helpers
 {
     public class RutValidations
     {
         public static bool IsValidRut(string rut)
         {
             if (string.IsNullOrWhiteSpace(rut))
+                return false;
+
+            int dashIndex = rut.LastIndexOf('-');
+            if (dashIndex < 0 || rut.Length - dashIndex != 2)
+                return false;
+
+            int pointIndex = rut.LastIndexOf('.');
+            if (pointIndex < 0)
                 return false;
 
             rut = rut.Replace(".", "").Replace("-", "");
