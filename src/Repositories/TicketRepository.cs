@@ -2,6 +2,7 @@ using System.Data;
 using api.src.Data;
 using api.src.DTOs.Purchase;
 using api.src.Interfaces;
+using api.src.Mappers;
 using api.src.Models;
 using api.src.Models.User;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +40,7 @@ namespace api.src.Repositories
             return ticket;
         }
 
-        public async Task<List<Ticket>> GetTickets(string userId)
+        public async Task<List<TicketDto>> GetTickets(string userId)
         {
             if (string.IsNullOrEmpty(userId))
             {
@@ -85,31 +86,13 @@ namespace api.src.Repositories
                 {
                     Purchase_Date = ticket.Purchase_Date,
                     Purchase_TotalPrice = ticket.Purchase_TotalPrice,
-                    saleItemDtos = PurchaseMapper.ToSaleItemDto(saleItems, products)
+                    saleItemDtos = PurchaseMapper.ToSaleItemDtoTicket(saleItems, products)
                 };
 
                 ticketsDtos.Add(ticketDto);
             }
 
             return ticketsDtos;
-
-            /**
-            if (string.IsNullOrEmpty(userId))
-            {
-                throw new ArgumentNullException(nameof(userId), "El ID de usuario no puede ser nulo o vacío.");
-            }
-
-            var tickets = await _context.Tickets
-                .Include(p => p.SaleItems)
-                .Where(p => p.UserId == userId)
-                .ToListAsync();
-            
-            if (tickets == null)
-            {
-                throw new ArgumentNullException(nameof(tickets), "No se encontraron compras asociadas al usuario.");
-            }
-
-            return tickets; **/
         }
     }
 }
