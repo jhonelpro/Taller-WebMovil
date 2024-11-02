@@ -14,17 +14,11 @@ namespace api.src.Controller.Product
     public class ShoppingCartController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
-        private readonly IShoppingCart _shoppingCart;
-        private readonly IShoppingCartItem _shoppingCartItem;
-        private readonly UserManager<AppUser> _userManager;
 
-        public ShoppingCartController(IProductRepository productRepository, IShoppingCart shoppingCart, 
-        IShoppingCartItem shoppingCartItem, UserManager<AppUser> userManager)
+        public ShoppingCartController(IProductRepository productRepository)
         {
             _productRepository = productRepository;
-            _shoppingCart = shoppingCart;
-            _shoppingCartItem = shoppingCartItem;
-            _userManager = userManager;
+
         }
         
         [HttpPost("AddTocart/{productId:int}/{quantity:int}")]
@@ -50,7 +44,7 @@ namespace api.src.Controller.Product
             }
 
             await Task.Run(() => SaveCartItemsToCookies(cartItems.ToList()));
-            return Ok("Product added to cart");
+            return Ok("Product added to cart.");
         }
 
         [HttpDelete("RemoveFromCart/{productId:int}")]
@@ -66,11 +60,11 @@ namespace api.src.Controller.Product
             {
                 cartItems.Remove(product);
                 await Task.Run(() => SaveCartItemsToCookies(cartItems.ToList()));
-                return Ok("Product removed from cart");
+                return Ok("Product removed from cart.");
             }
             else
             {
-                return NotFound(new { Message = "Product not found in cart" });
+                return NotFound(new { Message = "Product not found in cart." });
             }
         }
 
@@ -92,11 +86,11 @@ namespace api.src.Controller.Product
                 }
                 else
                 {
-                    return NotFound(new { Message = "Product not found" });
+                    return NotFound(new { Message = "Product not found." });
                 }
             }
             
-            return Ok(products);
+            return Ok(products.toCartDto());
         }
 
         [HttpPut("UpdateCart/{productId:int}/{quantity:int}")]
@@ -123,11 +117,11 @@ namespace api.src.Controller.Product
                 }
                 
                 await Task.Run(() => SaveCartItemsToCookies(cartItems.ToList()));
-                return Ok("Product updated in cart");
+                return Ok("Product updated in cart.");
             }
             else
             {
-                return NotFound(new { Message = "Product not found in cart" });
+                return NotFound(new { Message = "Product not found in cart." });
             }
         }
 

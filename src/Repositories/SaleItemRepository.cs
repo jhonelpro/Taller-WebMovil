@@ -20,12 +20,12 @@ namespace api.src.Repositories
         {
             if (shoppingCartItems == null)
             {
-                throw new ArgumentNullException(nameof(shoppingCartItems));
+                throw new ArgumentNullException("Shopping Cart Items cannot be null.");
             }
 
             if (purchase == null)
             {
-                throw new ArgumentNullException(nameof(purchase));
+                throw new ArgumentNullException("Purchase cannot be null.");
             }
 
             var saleItems = new List<SaleItem>();
@@ -37,7 +37,7 @@ namespace api.src.Repositories
 
                 if (product == null)
                 {
-                    throw new Exception("Product not found");
+                    throw new Exception("Product not found.");
                 }
 
                 var saleItem = new SaleItem
@@ -63,7 +63,7 @@ namespace api.src.Repositories
         {
             if (string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentNullException(nameof(userId));
+                throw new ArgumentNullException("User ID cannot be null.");
             }
 
             var purchases = await _context.Purchases
@@ -72,21 +72,28 @@ namespace api.src.Repositories
 
             if (purchases == null)
             {
-                throw new ArgumentNullException(nameof(purchases));
+                throw new ArgumentNullException("Purchases not found.");
             }
 
             var saleItems = await _context.SaleItems.Where(x => purchases.Select(y => y.Id).Contains(x.PurchaseId)).ToListAsync();
 
             if (saleItems == null)
             {
-                throw new ArgumentNullException(nameof(saleItems));
+                throw new ArgumentNullException("Sale Items not found.");
             }
 
             var purchasesDtos = new List<PurchaseDto>();
 
             foreach (var purchase in purchases)
             {
+                var TotalPrice = 0.0;
+
                 var saleItem = saleItems.Where(x => x.PurchaseId == purchase.Id).ToList();
+
+                foreach (var item in saleItem)
+                {
+                    TotalPrice += item.TotalPrice;
+                }
 
                 if (saleItem == null)
                 {
@@ -100,7 +107,7 @@ namespace api.src.Repositories
 
                 if (products == null)
                 {
-                    throw new ArgumentNullException(nameof(products));
+                    throw new ArgumentNullException("Products not found.");
                 }
 
                 var purchaseDto = new PurchaseDto
@@ -111,6 +118,7 @@ namespace api.src.Repositories
                     City = purchase.City,
                     Commune = purchase.Commune,
                     Street = purchase.Street,
+                    Purchase_TotalPrice = TotalPrice,
                     saleItemDtos = PurchaseMapper.ToSaleItemDto(saleItem, products)
                 };
 
@@ -126,25 +134,32 @@ namespace api.src.Repositories
 
             if (purchases == null)
             {
-                throw new ArgumentNullException(nameof(purchases));
+                throw new ArgumentNullException("Purchases not found.");
             }
 
             var saleItems = await _context.SaleItems.Where(x => purchases.Select(y => y.Id).Contains(x.PurchaseId)).ToListAsync();
 
             if (saleItems == null)
             {
-                throw new ArgumentNullException(nameof(saleItems));
+                throw new ArgumentNullException("Sale Items not found.");
             }
 
             var purchasesDtos = new List<PurchaseDto>();
 
             foreach (var purchase in purchases)
             {
+                var TotalPrice = 0.0;
+
                 var saleItem = saleItems.Where(x => x.PurchaseId == purchase.Id).ToList();
+
+                foreach (var item in saleItem)
+                {
+                    TotalPrice += item.TotalPrice;
+                }
 
                 if (saleItem == null)
                 {
-                    throw new ArgumentNullException(nameof(saleItem));
+                    throw new ArgumentNullException("Sale Items not found.");
                 }
 
                 var products = await _context.Products
@@ -154,17 +169,22 @@ namespace api.src.Repositories
 
                 if (products == null)
                 {
-                    throw new ArgumentNullException(nameof(products));
+                    throw new ArgumentNullException("Products not found.");
                 }
+
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == purchase.UserId);
 
                 var purchaseDto = new PurchaseDto
                 {
                     PurchaseId = purchase.Id,
+                    Username = user?.UserName ?? "Unknown",
+                    Email = user?.Email ?? "Unknown",
                     Transaction_Date = purchase.Transaction_Date,
                     Country = purchase.Country,
                     City = purchase.City,
                     Commune = purchase.Commune,
                     Street = purchase.Street,
+                    Purchase_TotalPrice = TotalPrice,
                     saleItemDtos = PurchaseMapper.ToSaleItemDto(saleItem, products)
                 };
 

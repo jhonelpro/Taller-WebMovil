@@ -2,7 +2,6 @@ using api.src.DTOs.Purchase;
 using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models.User;
-using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +13,6 @@ namespace api.src.Controller.Purchase
     [Authorize(Roles = "User")]
     public class PurchaseController : ControllerBase
     {
-        private readonly IProductRepository _productRepository;
         private readonly IShoppingCart _shoppingCart;
         private readonly IShoppingCartItem _shoppingCartItem;
         private readonly IPurchase _purchase;
@@ -22,9 +20,8 @@ namespace api.src.Controller.Purchase
         private readonly UserManager<AppUser> _userManager;
         private readonly ITicket _ticket;
 
-        public PurchaseController(IProductRepository productRepository, IShoppingCart shoppingCart, IShoppingCartItem shoppingCartItem, IPurchase purchase, ISaleItem saleItem, UserManager<AppUser> userManager, ITicket ticket)
+        public PurchaseController(IShoppingCart shoppingCart, IShoppingCartItem shoppingCartItem, IPurchase purchase, ISaleItem saleItem, UserManager<AppUser> userManager, ITicket ticket)
         {
-            _productRepository = productRepository;
             _shoppingCart = shoppingCart;
             _shoppingCartItem = shoppingCartItem;
             _purchase = purchase;
@@ -45,51 +42,75 @@ namespace api.src.Controller.Purchase
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var user = await _userManager.GetUserAsync(User);
-
-            if (user == null) 
+            try
             {
-                return BadRequest("User not found");
+                var user = await _userManager.GetUserAsync(User);
+
+                if (user == null) 
+                {
+                    return BadRequest("User not found.");
+                }
+
+                var purchase = purchaseDto.ToPurchaseFromCreateDto();
+
+                if (purchase == null)
+                {
+                    return BadRequest("Error creating purchase.");
+                }
+                
+                var newPurchase = await _purchase.createPurchase(purchase, user); 
+
+                if (newPurchase == null)
+                {
+                    return BadRequest("Purchase not created.");
+                }
+
+                var cart = await _shoppingCart.GetShoppingCart(user.Id);
+
+                if (cart == null)
+                {
+                    return BadRequest("Cart not found.");
+                }
+
+                var shoppingCartItems = await _shoppingCartItem.GetShoppingCartItems(cart.Id);
+
+                if (shoppingCartItems == null)
+                {
+                    return BadRequest("Cart items not found.");
+                }
+
+                var saleItem = await _saleItem.createSaleItem(shoppingCartItems, newPurchase);
+
+                if (saleItem == null)
+                {
+                    return BadRequest("Sale item not created.");
+                }
+
+                var newTicket = await _ticket.CreateTicket(user, saleItem);
+
+                if (newTicket == null)
+                {
+                    return BadRequest("Ticket not created.");
+                }
+
+                return Ok("Purchase created successfully.");
             }
-
-            var purchase = purchaseDto.ToPurchaseFromCreateDto();
-
-            if (purchase == null)
+            catch (Exception ex)
             {
-                return BadRequest("Purchase not found");
+                if (ex.Message == "Purchase cannot be null.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Shopping Cart not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
+                }
             }
             
-            var newPurchase = await _purchase.createPurchase(purchase, user); 
-
-            if (newPurchase == null)
-            {
-                return BadRequest("Purchase not created");
-            }
-
-            var cart = await _shoppingCart.GetShoppingCart(user.Id);
-
-            if (cart == null)
-            {
-                return BadRequest("Cart not found");
-            }
-
-            var shoppingCartItems = await _shoppingCartItem.GetShoppingCartItems(cart.Id);
-
-            if (shoppingCartItems == null)
-            {
-                return BadRequest("Cart items not found");
-            }
-
-            var saleItem = await _saleItem.createSaleItem(shoppingCartItems, newPurchase);
-
-            if (saleItem == null)
-            {
-                return BadRequest("Sale item not created");
-            }
-
-            var newTicket = await _ticket.CreateTicket(user, saleItem);
-
-            return Ok("Purchase created successfully");
         }
 
         [HttpGet("GetPurchaseRecipt/{purchaseId:int}")]
@@ -97,45 +118,95 @@ namespace api.src.Controller.Purchase
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if (purchaseId <= 0)
+            try
             {
-                return BadRequest("Invalid purchase id");
+
+                var user = await _userManager.GetUserAsync(User);
+
+                if (user == null)
+                {
+                    return BadRequest("User not found.");
+                }
+
+                if (purchaseId <= 0)
+                {
+                    return BadRequest("Invalid purchase id.");
+                }
+
+                var purchase = await _purchase.getPurchase(purchaseId, user.Id);
+
+                if (purchase == null)
+                {
+                    return BadRequest("Purchase not found.");
+                }
+
+                var purchaseRecipt = await _purchase.getPurchaseRecipt(purchaseId, user.Id);
+
+                var fileName = $"BoletaCompra_{purchaseId}.pdf";
+                return File(purchaseRecipt, "application/pdf", fileName);
             }
-
-            var purchase = await _purchase.getPurchase(purchaseId);
-
-            if (purchase == null)
+            catch (Exception ex)
             {
-                return BadRequest("Purchase not found");
+                if (ex.Message == "Purchase ID cannot be null.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Purchase not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "product not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
+                }
             }
-
-            var purchaseRecipt = await _purchase.getPurchaseRecipt(purchaseId);
-
-            var fileName = $"BoletaCompra_{purchaseId}.pdf";
-            return File(purchaseRecipt, "application/pdf", fileName);
         }
 
         [HttpGet("GetPurchases")]
         public async Task<IActionResult> GetPurchases()
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            
-            var user = await _userManager.GetUserAsync(User);
 
-            if (user == null)
-            {
-                return BadRequest("User not found");
+            try{
+                var user = await _userManager.GetUserAsync(User);
+
+                if (user == null)
+                {
+                    return BadRequest("User not found.");
+                }
+
+                var purchases = await _saleItem.GetPurchasesAsync(user.Id);
+
+                if (purchases == null)
+                {
+                    return BadRequest("Purchases not found.");
+                }   
+
+                return Ok(purchases);
             }
-
-            var purchases = await _saleItem.GetPurchasesAsync(user.Id);
-
-            if (purchases == null)
+            catch (Exception ex)
             {
-                return BadRequest("Purchases not found");
-            }   
-
-            return Ok(purchases);
+                if (ex.Message == "User ID cannot be null.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Purchases not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Products not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else
+                {
+                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
+                }
+            }
         }
-
     }
 }

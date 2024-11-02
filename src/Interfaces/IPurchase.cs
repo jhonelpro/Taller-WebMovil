@@ -7,7 +7,7 @@ namespace api.src.Interfaces
     public interface IPurchase
     {
         Task<Purchase> createPurchase(Purchase purchase, AppUser user);
-        Task<byte[]> getPurchaseRecipt(int id);
-        Task<Purchase> getPurchase(int id);
+        Task<byte[]> getPurchaseRecipt(int purchaseId, string userId);
+        Task<Purchase> getPurchase(int purchaseId, string userId);
     }
 }

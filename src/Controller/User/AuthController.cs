@@ -6,6 +6,7 @@ using api.src.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using api.src.Controller.Product;
 
 namespace api.src.Controller
 {
@@ -16,12 +17,14 @@ namespace api.src.Controller
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenService _tokenService;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly IShoppingCart _shoppingCart;
 
-        public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager)
+        public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager, IShoppingCart shoppingCart)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _signInManager = signInManager;
+            _shoppingCart = shoppingCart;
         }
 
         [HttpPost("register")]
@@ -31,19 +34,19 @@ namespace api.src.Controller
             {
                 if (!ModelState.IsValid) return BadRequest(ModelState);
 
-                if (await _userManager.Users.AnyAsync(p => p.Email == registerDto.Email)) return BadRequest("Email already exists");
+                if (await _userManager.Users.AnyAsync(p => p.Email == registerDto.Email)) return BadRequest("Email already exists.");
 
                 if (string.IsNullOrEmpty(registerDto.Rut)) return BadRequest("RUT is required.");
 
-                if (await _userManager.Users.AnyAsync(p => p.Rut == registerDto.Rut)) return BadRequest("Rut already exists");
+                if (await _userManager.Users.AnyAsync(p => p.Rut == registerDto.Rut)) return BadRequest("Rut already exists.");
 
-                if (!RutValidations.IsValidRut(registerDto.Rut)) return BadRequest("Invalid Rut format or verification digit");
+                if (!RutValidations.IsValidRut(registerDto.Rut)) return BadRequest("Invalid Rut format or verification digit.");
 
-                if (registerDto.DateOfBirth >= DateTime.Now) return BadRequest("Date of birth must be in the past");
+                if (registerDto.DateOfBirth >= DateTime.Now) return BadRequest("Date of birth must be in the past.");
 
-                if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.ConfirmPassword)) return BadRequest("Password is required");
+                if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.ConfirmPassword)) return BadRequest("Password is required.");
 
-                if (!string.Equals(registerDto.Password, registerDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest("Passwords do not match");
+                if (!string.Equals(registerDto.Password, registerDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest("Passwords do not match.");
 
                 var user = new AppUser
                 {
@@ -64,6 +67,8 @@ namespace api.src.Controller
 
                     if (roleResult.Succeeded)
                     {
+                        await _shoppingCart.CreateShoppingCart(user.Id);
+
                         return Ok(new NewUserDto
                         {
                             UserName = user.UserName!,
@@ -71,6 +76,7 @@ namespace api.src.Controller
                             Token = _tokenService.CreateToken(user)
                         });
                     }
+
                     else
                     {
                         return StatusCode(500, roleResult.Errors);

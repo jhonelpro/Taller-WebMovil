@@ -28,11 +28,11 @@ namespace api.src.Controller
             }
             catch (Exception ex) 
             {
-                if (ex.Message == "Product not found")
+                if (ex.Message == "Product not found.")
                 {
                     return NotFound(new { Message = ex.Message });
                 }
-                else if (ex.Message == "Product Type incorrect")
+                else if (ex.Message == "Product Type incorrect.")
                 {
                     return BadRequest(new { Message = ex.Message });
                 }

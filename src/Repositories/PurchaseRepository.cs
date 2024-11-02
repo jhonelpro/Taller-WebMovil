@@ -24,7 +24,16 @@ namespace api.src.Repositories
         {
             if (purchase == null)
             {
-                throw new ArgumentNullException(nameof(purchase));
+                throw new ArgumentNullException("Purchase cannot be null.");
+            }
+
+            var shoppingCart = await _context.ShoppingCarts
+                .Include(s => s.shoppingCartItems)
+                .FirstOrDefaultAsync(s => s.UserId == user.Id);
+            
+            if (shoppingCart == null)
+            {
+                throw new ArgumentNullException("Shopping Cart not found.");
             }
 
             purchase.UserId = user.Id;
@@ -36,28 +45,25 @@ namespace api.src.Repositories
             return purchase;
         }
 
-        public async Task<Purchase> getPurchase(int id)
+        public async Task<Purchase> getPurchase(int purchaseId, string userId)
         {
-            if (id == 0)
-            {
-                throw new ArgumentNullException(nameof(id));
-            }
-
-            var purchase = await _context.Purchases.FindAsync(id);
-
+            var purchase = await _context.Purchases.Where(p => p.UserId == userId)
+                .Include(p => p.SaleItems)
+                .FirstOrDefaultAsync(p => p.Id == purchaseId);
+            
             if (purchase == null)
             {
-                throw new ArgumentNullException(nameof(purchase));
+                throw new ArgumentNullException("Purchase not found.");
             }
 
             return purchase;
         }
 
-        public async Task<byte[]> getPurchaseRecipt(int purchaseId)
+        public async Task<byte[]> getPurchaseRecipt(int purchaseId, string userId)
         {
             if (purchaseId <= 0)
             {
-                throw new ArgumentNullException(nameof(purchaseId), "El ID de compra debe ser mayor que cero.");
+                throw new ArgumentNullException("Purchase ID cannot be null.");
             }
 
             var purchase = await _context.Purchases
@@ -66,7 +72,7 @@ namespace api.src.Repositories
 
             if (purchase == null)
             {
-                throw new ArgumentNullException(nameof(purchase), "No se encontró la compra con el ID especificado.");
+                throw new ArgumentNullException("Purchase not found.");
             }
 
             using (MemoryStream ms = new MemoryStream())
@@ -136,7 +142,7 @@ namespace api.src.Repositories
 
                     if (product == null)
                     {
-                        throw new ArgumentNullException(nameof(product), "No se encontró el producto asociado al item de venta.");
+                        throw new ArgumentNullException("product not found.");
                     }
 
                     string productName = product.Name.Length > maxChars ? product.Name.Substring(0, maxChars) + "..." : product.Name;
@@ -156,26 +162,6 @@ namespace api.src.Repositories
                 document.Save(ms, false);
                 return ms.ToArray();
             }
-        }
-
-        public async Task<List<Purchase>> getPurchases(string userId)
-        {
-            if (string.IsNullOrEmpty(userId))
-            {
-                throw new ArgumentNullException(nameof(userId), "El ID de usuario no puede ser nulo o vacío.");
-            }
-
-            var purchases = await _context.Purchases
-                .Include(p => p.SaleItems)
-                .Where(p => p.UserId == userId)
-                .ToListAsync();
-            
-            if (purchases == null)
-            {
-                throw new ArgumentNullException(nameof(purchases), "No se encontraron compras asociadas al usuario.");
-            }
-
-            return purchases;
         }
     }
 }

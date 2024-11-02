@@ -12,10 +12,6 @@ namespace api.src.Helpers
             if (dashIndex < 0 || rut.Length - dashIndex != 2)
                 return false;
 
-            int pointIndex = rut.LastIndexOf('.');
-            if (pointIndex < 0)
-                return false;
-
             rut = rut.Replace(".", "").Replace("-", "");
 
             if (rut.Length < 9 || rut.Length > 10)
