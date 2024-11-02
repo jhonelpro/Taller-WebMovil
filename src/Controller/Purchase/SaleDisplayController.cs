@@ -9,6 +9,7 @@ namespace api.src.Controller.Purchase
     /// </summary>
     /// <remarks>
     /// Solo los usuarios con el rol de Admin pueden acceder a los endpoints de este controlador.
+    /// El controlador cuenta con un único endpoint que permite mostrar todas las compras realizadas por los usuarios del sistema.
     /// </remarks>
     [Route("api/[controller]")]
     [ApiController]

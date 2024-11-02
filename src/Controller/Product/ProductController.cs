@@ -7,6 +7,7 @@ namespace api.src.Controller
     /// <summary>
     /// Controlador de productos que maneja los endpoints asociados a la visualización de productos 
     /// para los usuarios no autenticados.
+    /// Este controlador cuenta con un único endpoint que permite obtener todos los productos disponibles en la base de datos.
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]

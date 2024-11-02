@@ -13,6 +13,7 @@ namespace api.src.Controller.Purchase
     /// </summary>
     /// <remarks>
     /// Solo los usuarios con el rol de User pueden acceder a los endpoints de este controlador.
+    /// Este controlador permite realizar la compra de productos y obtener la boleta de la compra realizada.
     /// </remarks>
     [ApiController]
     [Route("api/[controller]")]

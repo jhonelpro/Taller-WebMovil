@@ -14,6 +14,13 @@ namespace api.src.Controller.Product
     /// </summary>
     /// <remarks>
     /// Solo los usuarios con el rol de Admin pueden acceder a los endpoints de este controlador.
+    /// El controlador permite realizar las siguientes acciones: 
+    /// <list type="bullet">
+    /// <item>Obtener todos los productos disponibles en la base de datos.</item>
+    /// <item>Agregar un nuevo producto a la base de datos.</item>
+    /// <item>Actualizar un producto en la base de datos.</item>
+    /// <item>Eliminar un producto de la base de datos.</item>
+    /// </list>
     /// </remarks>
     [ApiController]
     [Route("api/[controller]")]
