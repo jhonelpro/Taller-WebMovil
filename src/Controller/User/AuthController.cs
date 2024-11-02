@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.src.Controller.Product;
+using Microsoft.AspNetCore.Authorization;
 
 namespace api.src.Controller
 {
@@ -126,6 +127,26 @@ namespace api.src.Controller
                 
             }catch (Exception ex) {
                 return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost("logout")]
+        [Authorize(Roles = "User,Admin")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                if (User.Identity?.IsAuthenticated != true)
+                {
+                    return BadRequest(new { message = "No active session found." });
+                }
+
+                await _signInManager.SignOutAsync();
+                return Ok(new { message = "Logout successful." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred during logout.", error = ex.Message });
             }
         }
     }
