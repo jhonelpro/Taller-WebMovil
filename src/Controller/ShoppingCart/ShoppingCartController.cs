@@ -3,6 +3,7 @@ using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models;
 using api.src.Models.User;
+using api.src.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -14,11 +15,12 @@ namespace api.src.Controller.Product
     public class ShoppingCartController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
+        private readonly ICookieService _cookieService;
 
-        public ShoppingCartController(IProductRepository productRepository)
+        public ShoppingCartController(IProductRepository productRepository, ICookieService cookieService)
         {
             _productRepository = productRepository;
-
+            _cookieService = cookieService;
         }
         
         [HttpPost("AddTocart/{productId:int}/{quantity:int}")]
@@ -26,7 +28,7 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var cartItems = await Task.Run(() => GetCartItemsFromCookies());
+            var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
             
             var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
 
@@ -43,7 +45,7 @@ namespace api.src.Controller.Product
                 });
             }
 
-            await Task.Run(() => SaveCartItemsToCookies(cartItems.ToList()));
+            await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems));
             return Ok("Product added to cart.");
         }
 
@@ -52,14 +54,14 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var cartItems = await Task.Run(() => GetCartItemsFromCookies());
+            var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
 
             var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
 
             if (product != null)
             {
                 cartItems.Remove(product);
-                await Task.Run(() => SaveCartItemsToCookies(cartItems.ToList()));
+                await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems.ToList()));
                 return Ok("Product removed from cart.");
             }
             else
@@ -73,7 +75,7 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var cartItems = await Task.Run(() => GetCartItemsFromCookies());
+            var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
             var products = new List<ShoppingCartDto>();
             
             foreach (var item in cartItems)
@@ -98,7 +100,7 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var cartItems = await Task.Run(() => GetCartItemsFromCookies());
+            var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
             var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
 
             if (product != null)
@@ -116,33 +118,13 @@ namespace api.src.Controller.Product
                     product.Quantity = quantity;
                 }
                 
-                await Task.Run(() => SaveCartItemsToCookies(cartItems.ToList()));
+                await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems.ToList()));
                 return Ok("Product updated in cart.");
             }
             else
             {
                 return NotFound(new { Message = "Product not found in cart." });
             }
-        }
-
-        private List<ShoppingCartItem> GetCartItemsFromCookies()
-        {
-            var cartItems = new List<ShoppingCartItem>();
-            var cartCookie = Request.Cookies["ShoppingCart"];
-            if (!string.IsNullOrEmpty(cartCookie))
-            {
-                cartItems = JsonConvert.DeserializeObject<List<ShoppingCartItem>>(cartCookie);
-            }
-            return cartItems ?? new List<ShoppingCartItem>();
-        }
-
-        private void SaveCartItemsToCookies(List<ShoppingCartItem> cartItems)
-        {
-            var options = new CookieOptions
-            {
-                Expires = DateTime.Now.AddDays(7),
-            };
-            Response.Cookies.Append("ShoppingCart", JsonConvert.SerializeObject(cartItems), options);
         }
     }
 }

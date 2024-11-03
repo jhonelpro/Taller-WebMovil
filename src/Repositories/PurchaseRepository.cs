@@ -24,16 +24,25 @@ namespace api.src.Repositories
         {
             if (purchase == null)
             {
-                throw new ArgumentNullException("Purchase cannot be null.");
+                throw new ArgumentNullException(nameof(purchase), "Purchase cannot be null.");
             }
 
             var shoppingCart = await _context.ShoppingCarts
-                .Include(s => s.shoppingCartItems)
                 .FirstOrDefaultAsync(s => s.UserId == user.Id);
-            
+
             if (shoppingCart == null)
             {
-                throw new ArgumentNullException("Shopping Cart not found.");
+                throw new InvalidOperationException("Shopping Cart not found.");
+            }
+
+            var shoppingCartItems = await _context.ShoppingCartItems
+                .Where(s => s.CartId == shoppingCart.Id)
+                .Include(s => s.Product)
+                .ToListAsync();
+
+            if (!shoppingCartItems.Any())
+            {
+                throw new InvalidOperationException("No items found in the shopping cart.");
             }
 
             purchase.UserId = user.Id;

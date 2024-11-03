@@ -11,5 +11,6 @@ namespace api.src.Interfaces
         Task<ShoppingCartItem> RemoveShoppingCartItem(int productId);
         Task<List<ShoppingCartItem>> GetShoppingCartItems(int cartId);
         Task<ShoppingCartItem> GetShoppingCartItem(int productId);
+        Task<bool> ClearShoppingCart(int cartId);
     }
 }

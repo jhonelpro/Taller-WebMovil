@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.src.Controller.Product;
 using Microsoft.AspNetCore.Authorization;
+using api.src.Repositories;
 
 namespace api.src.Controller
 {
@@ -19,13 +20,18 @@ namespace api.src.Controller
         private readonly ITokenService _tokenService;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IShoppingCart _shoppingCart;
+        private readonly IShoppingCartItem _shoppingCartItem;
+        private readonly ICookieService _cookieService;
 
-        public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager, IShoppingCart shoppingCart)
+        public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager,
+        IShoppingCart shoppingCart, IShoppingCartItem shoppingCartItem, ICookieService cookieService)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _signInManager = signInManager;
             _shoppingCart = shoppingCart;
+            _shoppingCartItem = shoppingCartItem;
+            _cookieService = cookieService;
         }
 
         [HttpPost("register")]
@@ -68,7 +74,22 @@ namespace api.src.Controller
 
                     if (roleResult.Succeeded)
                     {
-                        await _shoppingCart.CreateShoppingCart(user.Id);
+                        var shoppingCart = await _shoppingCart.CreateShoppingCart(user.Id);
+
+                        if (shoppingCart != null)
+                        {
+                            if (Request.Cookies.ContainsKey("ShoppingCart"))
+                            {
+                                var cartItems = _cookieService.GetCartItemsFromCookies();
+
+                                await _shoppingCartItem.AddShoppingCarItem(cartItems, shoppingCart.Id);
+
+                                if (cartItems.Count > 0)
+                                {
+                                    _cookieService.ClearCartItemsInCookie();
+                                }
+                            }
+                        }
 
                         return Ok(new NewUserDto
                         {

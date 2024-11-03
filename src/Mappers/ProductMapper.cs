@@ -38,5 +38,17 @@ namespace api.src.Mappers
                 ProductTypeId = updateProductRequestDto.ProductTypeId,
             };
         }
+
+        public static UpdateProductRequestDto toUpdateProduct(this CreateProductRequestDto createProductRequestDto)
+        {
+            return new UpdateProductRequestDto
+            {
+                Name = createProductRequestDto.Name,
+                Price = createProductRequestDto.Price,
+                Stock = createProductRequestDto.Stock,
+                ProductTypeId = createProductRequestDto.ProductTypeId,
+                Image = createProductRequestDto.Image
+            };
+        }
     }
 }

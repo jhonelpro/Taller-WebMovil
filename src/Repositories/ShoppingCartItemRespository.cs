@@ -2,6 +2,7 @@ using api.src.Data;
 using api.src.Interfaces;
 using api.src.Models;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace api.src.Repositories
 {
@@ -95,6 +96,26 @@ namespace api.src.Repositories
             return shoppingCartItem;
         }
 
+        public async Task<bool> ClearShoppingCart(int cartId)
+        {
+            if (cartId <= 0)
+            {
+                throw new ArgumentException("Cart id cannot be less than or equal to zero.", nameof(cartId));
+            }
+
+            var shoppingCartItems = await GetShoppingCartItems(cartId);
+            
+            if (shoppingCartItems == null || !shoppingCartItems.Any())
+            {
+                throw new InvalidOperationException("Cart items not found.");
+            }
+
+            _context.ShoppingCartItems.RemoveRange(shoppingCartItems);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<ShoppingCartItem> CreateShoppingCartItem(int productId, int cartId, int quantity)
         {
             if (productId <= 0 || cartId <= 0 || quantity <= 0)
@@ -126,6 +147,19 @@ namespace api.src.Repositories
             await _context.SaveChangesAsync();
 
             return shoppingCartItem;
+        }
+
+        public List<ShoppingCartItem> GetCartItemsFromCookies(HttpRequest request)
+        {
+            var cartItems = new List<ShoppingCartItem>();
+
+            var cartCookie = request.Cookies["ShoppingCart"];
+            if (!string.IsNullOrEmpty(cartCookie))
+            {
+                cartItems = JsonConvert.DeserializeObject<List<ShoppingCartItem>>(cartCookie);
+            }
+
+            return cartItems ?? new List<ShoppingCartItem>();
         }
 
         public async Task<ShoppingCartItem> GetShoppingCartItem(int productId)

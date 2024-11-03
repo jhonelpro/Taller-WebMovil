@@ -116,7 +116,7 @@ namespace api.src.Controller.Product
 
             try
             {
-                    if (product.Image == null || product.Image.Length == 0)
+                if (product.Image == null || product.Image.Length == 0)
                 {
                     return BadRequest("Image is required.");
                 }

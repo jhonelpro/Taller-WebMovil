@@ -93,15 +93,38 @@ namespace api.src.Controller.Purchase
                     return BadRequest("Ticket not created.");
                 }
 
+                var clearCart = await _shoppingCartItem.ClearShoppingCart(cart.Id);
+
+                if (!clearCart)
+                {
+                    return BadRequest("Cart not cleared.");
+                }
+
                 return Ok("Purchase created successfully.");
             }
             catch (Exception ex)
             {
                 if (ex.Message == "Purchase cannot be null.")
                 {
-                    return NotFound(new { Message = ex.Message });
+                    return BadRequest(new { Message = ex.Message });
                 }
                 else if (ex.Message == "Shopping Cart not found.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Shopping Cart is empty.")
+                {
+                    return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "No items found in the shopping cart.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
+                {
+                    return BadRequest(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Shopping Cart Items not found.")
                 {
                     return NotFound(new { Message = ex.Message });
                 }
