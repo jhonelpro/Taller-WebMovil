@@ -52,7 +52,8 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            try{
+            try
+            {
                 if (productDto.Image == null || productDto.Image.Length == 0)
                 {
                     return BadRequest("Image is required.");
@@ -94,6 +95,10 @@ namespace api.src.Controller.Product
                 else if (ex.Message == "ProductType not found.")
                 {
                     return NotFound(new { Message = ex.Message });
+                } 
+                else if (ex.Message == "Product already exists.")
+                {
+                    return BadRequest(new { Message = ex.Message });
                 }
                 else
                 {
@@ -110,7 +115,7 @@ namespace api.src.Controller.Product
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             try
-                {
+            {
                     if (product.Image == null || product.Image.Length == 0)
                 {
                     return BadRequest("Image is required.");
@@ -157,6 +162,10 @@ namespace api.src.Controller.Product
                 else if (ex.Message == "ProductType not found.")
                 {
                     return NotFound(new { Message = ex.Message });
+                }
+                else if (ex.Message == "Product already exists.")
+                {
+                    return BadRequest(new { Message = ex.Message });
                 }
                 else
                 {
