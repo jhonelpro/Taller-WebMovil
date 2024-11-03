@@ -12,13 +12,35 @@ using api.src.Repositories;
 
 namespace api.src.Controller
 {
+    /// <summary>
+    /// Controlador de autenticación de usuarios.
+    /// </summary>
+    /// <remarks>
+    /// Este controlador se encarga de manejar las peticiones de autenticación de usuarios.
+    /// las acciones que se pueden realizar son: registro, login y logout.
+    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
+        /// <summary>
+        /// Atributo de tipo UserManager<AppUser> que se encarga de manejar las operaciones de los usuarios.
+        /// </summary>
         private readonly UserManager<AppUser> _userManager;
+
+        /// <summary>
+        /// Atributo de tipo ITokenService que se encarga de manejar la creación de tokens.
+        /// </summary>
         private readonly ITokenService _tokenService;
+
+        /// <summary>
+        /// Atributo de tipo SignInManager<AppUser> que se encarga de manejar las operaciones de inicio de sesión.
+        /// </summary>
         private readonly SignInManager<AppUser> _signInManager;
+
+        /// <summary>
+        /// Atributo de tipo IShoppingCart que se encarga de manejar las operaciones de carrito de compras.
+        /// </summary>
         private readonly IShoppingCart _shoppingCart;
         private readonly IShoppingCartItem _shoppingCartItem;
         private readonly ICookieService _cookieService;
@@ -26,14 +48,26 @@ namespace api.src.Controller
         public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager,
         IShoppingCart shoppingCart, IShoppingCartItem shoppingCartItem, ICookieService cookieService)
         {
+            // Inicializa el atributo _userManager con el valor del parámetro userManager
             _userManager = userManager;
+            // Inicializa el atributo _tokenService con el valor del parámetro tokenService
             _tokenService = tokenService;
+            // Inicializa el atributo _signInManager con el valor del parámetro signInManager
             _signInManager = signInManager;
+            // Inicializa el atributo _shoppingCart con el valor del parámetro shoppingCart
             _shoppingCart = shoppingCart;
             _shoppingCartItem = shoppingCartItem;
             _cookieService = cookieService;
         }
 
+        /// <summary>
+        /// Endpoint para registrar un nuevo usuario.
+        /// </summary>
+        /// <param name="registerDto">Parámetro que representa un usuario el cual se registrara en el sistema.</param>
+        /// <returns>
+        /// Retorna un objeto de tipo IActionResult con el resultado de la operación.
+        /// Retorna un objeto de tipo NewUserDto con los datos del usuario y el token de autenticación.
+        /// </returns>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
@@ -67,11 +101,13 @@ namespace api.src.Controller
                     Gender = registerDto.Gender,
                     IsActive = 1
                 };
-
+                
                 var createUser = await _userManager.CreateAsync(user, registerDto.Password);
 
+                // Si el usuario se crea correctamente
                 if (createUser.Succeeded)
                 {
+                    // Asignar rol de usuario
                     var roleResult = await _userManager.AddToRoleAsync(user, "User");
 
                     if (roleResult.Succeeded)
@@ -117,6 +153,14 @@ namespace api.src.Controller
             }
         }
 
+        /// <summary>
+        /// Endpoint para iniciar sesión en el sistema.
+        /// </summary>
+        /// <param name="loginDto">Parámetro que representa un usuario que quiere iniciar sesión en el sistema.</param>
+        /// <returns>
+        /// Retorna un objeto de tipo IActionResult con el resultado de la operación.
+        /// Retorna un objeto de tipo NewUserDto con los datos del usuario y el token de autenticación.
+        /// </returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
@@ -127,14 +171,17 @@ namespace api.src.Controller
                 var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
                 if(user == null) return Unauthorized("Invalid username or password.");
 
-
+                // Verificar si la contraseña es correcta
                 var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
                 if(!result.Succeeded) return Unauthorized("Invalid username or password.");
 
+                // Verificar si el usuario esta activo
                 if(user.IsActive == 0) return Unauthorized("User is not active.");
 
+                // Iniciar sesión
                 await _signInManager.SignInAsync(user, isPersistent: true);
 
+                // Crear token
                 var token = _tokenService.CreateToken(user);
 
                 if (string.IsNullOrEmpty(token)) return Unauthorized("Invalid token.");
@@ -170,6 +217,13 @@ namespace api.src.Controller
             }
         }
 
+        /// <summary>
+        /// Endpoint para cerrar sesión en el sistema.
+        /// </summary>
+        /// <returns>
+        /// Retorna un objeto de tipo IActionResult con el resultado de la operación.
+        /// Retorna un mensaje que indica si se cerro sesión correctamente.
+        /// </returns>
         [HttpPost("logout")]
         [Authorize(Roles = "User,Admin")]
         public async Task<IActionResult> Logout()
