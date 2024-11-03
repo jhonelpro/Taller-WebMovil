@@ -1,5 +1,6 @@
 using api.src.Data;
 using api.src.DTOs;
+using api.src.DTOs.Product;
 using api.src.Helpers;
 using api.src.Interfaces;
 using api.src.Mappers;
@@ -29,13 +30,7 @@ namespace api.src.Repositories
             _context = context;
         }
 
-        /// <summary>
-        /// Obtiene una lista de productos según los criterios de búsqueda especificados en el objeto de consulta.
-        /// </summary>
-        /// <param name="query">Parámetro de tipo QueryObjectProduct que representa los criterios de búsqueda para los productos.</param>
-        /// <returns>Una tarea que representa la operación asincrónica, conteniendo una lista de objetos ProductDto que representan los productos encontrados.</returns>
-        /// <exception cref="Exception">Lanzado si no se encuentran productos que coincidan con la búsqueda.</exception>
-        public async Task<List<ProductDto>> GetProducts(QueryObjectProduct query)
+        public async Task<List<ProductDtoForAdmin>> GetProducts(QueryObjectProduct query)
         {
             // Obtiene los productos incluyendo su tipo.
             var products = _context.Products.Include(p => p.ProductType).AsQueryable();
@@ -60,7 +55,7 @@ namespace api.src.Repositories
             // Se retornan los productos.
             return await products.Skip(skipNumber).Take(query.pageSize)
                 .Include(p => p.ProductType)
-                .Select(p => p.ToProductDto())
+                .Select(p => p.ToProductDtoForAdmin())
                 .ToListAsync();
         }
 
@@ -76,6 +71,13 @@ namespace api.src.Repositories
         {
             // Si el producto es nulo o el uploadResult es nulo.
             if (product == null || uploadResult == null) throw new ArgumentNullException("Product or UploadResult cannot be null.");
+
+            var existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.Name == product.Name);
+
+            if (existingProduct != null && existingProduct.ProductTypeId == product.ProductTypeId)
+            {
+                throw new Exception("Product already exists.");
+            }
             
             // Se crea la instancia del producto, con los datos ingresados.
             var newProduct = new Product
@@ -264,7 +266,21 @@ namespace api.src.Repositories
                 throw new Exception("Product not found.");
             }
 
-            // Se actualizan los atributos del producto.
+            bool nameChanged = existingProduct.Name != product.Name;
+            bool typeChanged = existingProduct.ProductTypeId != product.ProductTypeId;
+
+            if (nameChanged || typeChanged)
+            {
+                var productValidation = await _context.Products
+                    .Where(p => p.Name == product.Name && p.ProductTypeId == product.ProductTypeId)
+                    .FirstOrDefaultAsync();
+
+                if (productValidation != null)
+                {
+                    throw new Exception("Product already exists.");
+                }
+            }
+
             existingProduct.Name = product.Name;
             existingProduct.ProductTypeId = product.ProductTypeId;
             existingProduct.Price = product.Price;

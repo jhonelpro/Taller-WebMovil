@@ -54,6 +54,8 @@ namespace api.src.Controller
             {
                 if (editProfileDto.DateOfBirth >= DateTime.Now) return BadRequest("Date of birth must be in the past.");
 
+                if ((DateTime.Now.Year - editProfileDto.DateOfBirth.Year) < 13) return BadRequest("You must be at least 13 years old to register.");
+
                 var user = await _userManager.GetUserAsync(User);
 
                 if (user == null) return Unauthorized("User not found.");

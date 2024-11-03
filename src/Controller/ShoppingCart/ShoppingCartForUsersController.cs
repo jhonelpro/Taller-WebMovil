@@ -3,6 +3,7 @@ using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models;
 using api.src.Models.User;
+using api.src.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,7 @@ namespace api.src.Controller.Product
         /// Atributo de tipo UserManager<AppUser> que permite el manejo de usuarios a través de IdentityFramework.
         /// </summary>
         private readonly UserManager<AppUser> _userManager;
+        private readonly ICookieService _cookieService;
 
         /// <summary>
         /// Constructor de la clase ShoppingCartForUsersController que recibe un objeto de tipo IProductRepository, IShoppingCart, IShoppingCartItem, UserManager<AppUser>.
@@ -51,7 +53,7 @@ namespace api.src.Controller.Product
         /// <param name="shoppingCartItem">Parámetro de tipo IShoppingCartItem que sirve para inicializar el atributo _shoppingCartItem</param>
         /// <param name="userManager">Parámetro de tipo UserManager<AppUser> que sirve para inicializar el atributo _userManager</param>
         public ShoppingCartForUsersController(IProductRepository productRepository, IShoppingCart shoppingCart, 
-        IShoppingCartItem shoppingCartItem, UserManager<AppUser> userManager)
+        IShoppingCartItem shoppingCartItem, UserManager<AppUser> userManager, ICookieService cookieService)
         {
             // Inicializa el atributo _productRepository.
             _productRepository = productRepository;
@@ -61,6 +63,7 @@ namespace api.src.Controller.Product
             _shoppingCartItem = shoppingCartItem;
             // Inicializa el atributo _userManager.
             _userManager = userManager;
+            _cookieService = cookieService;
         }
         
         /// <summary>
@@ -72,11 +75,8 @@ namespace api.src.Controller.Product
         [HttpPost("CreateCartForUser")]
         public async Task<IActionResult> CreateCartForUser()
         { 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            
             var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
@@ -84,8 +84,7 @@ namespace api.src.Controller.Product
                 return BadRequest("User not found.");
             }
 
-            // Obtiene los productos de la cookie que contiene el carrito de compras.
-            var cartItems = GetCartItemsFromCookies();
+            var cartItems = _cookieService.GetCartItemsFromCookies();
 
             // Si la cookie no está vacía, se crea el carrito con los productos de la cookie.
             if (Request.Cookies["ShoppingCart"] != null)
@@ -148,23 +147,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product id, quantity and cart id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
-    
+                return StatusCode(500, new { Message = ex.Message });
             }
             
         }
@@ -229,26 +212,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart not found.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
             
         }
@@ -303,24 +267,8 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product id and quantity cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
-            
         }
 
         /// <summary>
@@ -355,20 +303,8 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Product id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
-            }
-            
+                return StatusCode(500, new { Message = ex.Message });
+            }      
         }
 
         /// <summary>
@@ -409,18 +345,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error.");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
         }
 
@@ -455,6 +380,8 @@ namespace api.src.Controller.Product
                         return BadRequest("Failed to add items to cart.");
                     }
 
+                    _cookieService.ClearCartItemsInCookie();
+
                     return Ok("Items added to cart successfully.");
                 }
                 else
@@ -464,26 +391,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart items cannot be null.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
         }
 
@@ -530,48 +438,8 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart items cannot be null.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }   
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
-            
-        }
-        
-        /// <summary>
-        /// Método para obtener los productos en el carrito de compras desde las cookies.
-        /// </summary>
-        /// <returns>
-        /// Retorna una lista de productos en el carrito de compras.
-        /// </returns>
-        private List<ShoppingCartItem> GetCartItemsFromCookies()
-        {
-            var cartItems = new List<ShoppingCartItem>();
-            // Obtiene los productos del carrito de compras desde las cookies.
-            var cartCookie = Request.Cookies["ShoppingCart"];
-            if (!string.IsNullOrEmpty(cartCookie))
-            {
-                // Deserializa los productos del carrito de compras.
-                cartItems = JsonConvert.DeserializeObject<List<ShoppingCartItem>>(cartCookie);
-            }
-            // Retorna los productos del carrito de compras.
-            return cartItems ?? new List<ShoppingCartItem>();
         }
     }
 }

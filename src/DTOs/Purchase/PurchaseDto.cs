@@ -10,14 +10,6 @@ namespace api.src.DTOs.Purchase
         /// </summary>
         public int PurchaseId { get; set; }
 
-        /// <summary>
-        /// Atributo de tipo string que representa el nombre de usuario asociado a la compra.
-        /// </summary>
-        public string Username { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Atributo de tipo string que representa el correo electrónico del usuario asociado a la compra.
-        /// </summary>
         public string Email { get; set; } = string.Empty;
 
         /// <summary>

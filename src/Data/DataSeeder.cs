@@ -35,17 +35,19 @@ namespace api.src.Data
                     {
                         var email = faker.Internet.Email();
 
+                        var rut = faker.Random.Number(10000000, 99999999).ToString() + "-" + faker.Random.Number(0, 9).ToString();
+                        
                         var user = new AppUser
                         {
                             UserName = email,
                             Email = email,
                             Name = faker.Name.FullName(),
-                            Rut = faker.Random.Number(10000000, 99999999).ToString(),
+                            Rut = rut,
                             DateOfBirth = faker.Date.Past(18),
                             Gender = genders[random.Next(0, genders.Count)],
                             IsActive = 1
                         };
-
+                    
                         var createUser = await userManager.CreateAsync(user, "Password1234!");
 
                         if (!createUser.Succeeded)
@@ -71,7 +73,7 @@ namespace api.src.Data
                         UserName = "admin@idwm.cl",
                         Email = "admin@idwm.cl",
                         Name = "Ignacio Mancilla",
-                        Rut = "20.416.699-4",
+                        Rut = "20416699-4",
                         Gender = "Masculino",
                         DateOfBirth = new DateTime(2000, 10, 25),
                         IsActive = 1

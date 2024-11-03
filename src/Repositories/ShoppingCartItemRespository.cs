@@ -2,6 +2,7 @@ using api.src.Data;
 using api.src.Interfaces;
 using api.src.Models;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace api.src.Repositories
 {
@@ -42,8 +43,9 @@ namespace api.src.Repositories
                 throw new Exception("Product id, quantity, and cart id cannot be less than or equal to zero.");
             }
 
-            // Buscar el producto en la base de datos
-            var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
+            var product = await _context.Products
+                .Include(p => p.ProductType)
+                .FirstOrDefaultAsync(x => x.Id == productId);
 
             // Si el producto no existe, lanzar una excepción
             if (product == null)
@@ -51,7 +53,28 @@ namespace api.src.Repositories
                 throw new Exception("Product not found.");
             }
 
-            // Crear un nuevo objeto ShoppingCartItem
+            var shoppingCart = await _context.ShoppingCarts
+                .Include(s => s.shoppingCartItems)
+                .FirstOrDefaultAsync(x => x.Id == cartId);
+
+            if (shoppingCart == null)
+            {
+                throw new Exception("Cart not found.");
+            }
+
+            var existingCartItem = await _context.ShoppingCartItems
+                .Include(s => s.Product)
+                .Include(s => s.shoppingCart)
+                .FirstOrDefaultAsync(x => x.ProductId == productId);
+
+            if (existingCartItem != null)
+            {
+                existingCartItem.Quantity += quantity;
+                await _context.SaveChangesAsync();
+
+                return existingCartItem;
+            }
+            
             var shoppingCartItem = new ShoppingCartItem
             {
                 ProductId = productId,
@@ -80,14 +103,27 @@ namespace api.src.Repositories
             // Validar que el ID del carrito es mayor a cero
             if (cartId <= 0)
             {
-                throw new Exception("Cart id cannot be less than or equal to zero.");
+                throw new ArgumentException("Cart ID must be greater than zero.", nameof(cartId));
             }
 
-            // Validar que la lista de items no sea nula
-            if (cartItems == null)
+            if (cartItems == null || !cartItems.Any())
             {
-                throw new Exception("Cart items cannot be null.");
+                throw new ArgumentException("Cart items cannot be null or empty.", nameof(cartItems));
             }
+
+            // Obtiene el carrito y sus elementos en una sola consulta
+            var shoppingCart = await _context.ShoppingCarts
+                .Include(s => s.shoppingCartItems)
+                .ThenInclude(ci => ci.Product)
+                .FirstOrDefaultAsync(x => x.Id == cartId);
+
+            if (shoppingCart == null)
+            {
+                throw new KeyNotFoundException("Cart not found.");
+            }
+
+            // Convierte los elementos existentes en un diccionario para búsqueda rápida
+            var existingCartItems = shoppingCart.shoppingCartItems.ToDictionary(ci => ci.ProductId);
 
             // Crear un nuevo objeto ShoppingCartItem con el ID del carrito
             var shoppingCartItem = new ShoppingCartItem { CartId = cartId };
@@ -95,39 +131,55 @@ namespace api.src.Repositories
             // Iterar sobre cada item en la lista proporcionada
             foreach (var item in cartItems)
             {
-                // Buscar el producto en la base de datos
-                var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == item.ProductId);
-
-                // Si el producto no existe, lanzar una excepción
-                if (product == null)
-                {
-                    throw new Exception("Product not found.");
-                }
-
-                // Verificar si el item ya existe en el carrito
-                var existingCartItem = await _context.ShoppingCartItems.FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
-
-                // Si el item no existe, se agrega como nuevo
-                if (existingCartItem == null)
-                {
-                    shoppingCartItem.Product = product;
-                    shoppingCartItem.ProductId = item.ProductId;
-                    shoppingCartItem.Quantity = item.Quantity;
-
-                    // Agregar el nuevo item al contexto y guardar los cambios
-                    await _context.ShoppingCartItems.AddAsync(shoppingCartItem);
-                    await _context.SaveChangesAsync();
+                if (existingCartItems.TryGetValue(item.ProductId, out var existingCartItem))
+                {        
+                    existingCartItem.Quantity += item.Quantity;
                 }
                 else
                 {
-                    // Si el item ya existe, incrementar su cantidad
-                    existingCartItem.Quantity += item.Quantity;
-                    await _context.SaveChangesAsync();
+                    var product = await _context.Products
+                        .Include(p => p.ProductType)
+                        .FirstOrDefaultAsync(x => x.Id == item.ProductId);
+
+                    if (product == null)
+                    {
+                        throw new KeyNotFoundException($"Product with ID {item.ProductId} not found.");
+                    }
+
+                    var newCartItem = new ShoppingCartItem
+                    {
+                        CartId = cartId,
+                        ProductId = item.ProductId,
+                        Product = product,
+                        Quantity = item.Quantity
+                    };
+                    shoppingCart.shoppingCartItems.Add(newCartItem);
                 }
             }
 
-            // Retornar el último item agregado o actualizado
-            return shoppingCartItem;
+            await _context.SaveChangesAsync();
+
+            return shoppingCart.shoppingCartItems.FirstOrDefault() ?? new ShoppingCartItem();
+        }
+
+        public async Task<bool> ClearShoppingCart(int cartId)
+        {
+            if (cartId <= 0)
+            {
+                throw new ArgumentException("Cart id cannot be less than or equal to zero.", nameof(cartId));
+            }
+
+            var shoppingCartItems = await GetShoppingCartItems(cartId);
+            
+            if (shoppingCartItems == null || !shoppingCartItems.Any())
+            {
+                throw new InvalidOperationException("Cart items not found.");
+            }
+
+            _context.ShoppingCartItems.RemoveRange(shoppingCartItems);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
         /// <summary>
@@ -146,8 +198,9 @@ namespace api.src.Repositories
                 throw new Exception("Product id, cart id, and quantity cannot be less than or equal to zero.");
             }
 
-            // Buscar el producto en la base de datos
-            var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
+            var product = await _context.Products
+                .Include(p => p.ProductType)
+                .FirstOrDefaultAsync(x => x.Id == productId);
 
             // Si el producto no existe, lanzar una excepción
             if (product == null)
@@ -186,8 +239,10 @@ namespace api.src.Repositories
                 throw new Exception("Product id cannot be less than or equal to zero.");
             }
 
-            // Buscar el item en el carrito por el ID del producto
-            var shoppingCartItem = await _context.ShoppingCartItems.FirstOrDefaultAsync(x => x.ProductId == productId);
+            var shoppingCartItem = await _context.ShoppingCartItems
+                .Include(s => s.Product)
+                .Include(s => s.shoppingCart)
+                .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             // Si no se encuentra el item, lanzar una excepción
             if (shoppingCartItem == null)
@@ -213,8 +268,10 @@ namespace api.src.Repositories
                 throw new Exception("Cart id cannot be less than or equal to zero.");
             }
 
-            // Obtener todos los items que pertenecen al carrito indicado
-            var shoppingCartItems = await _context.ShoppingCartItems.Where(x => x.CartId == cartId).ToListAsync();
+            var shoppingCartItems = await _context.ShoppingCartItems.Where(x => x.CartId == cartId)
+                .Include(s => s.shoppingCart)
+                .Include(s => s.Product)
+                .ToListAsync();
 
             // Si no se encuentran items, lanzar una excepción
             if (shoppingCartItems == null || shoppingCartItems.Count == 0)

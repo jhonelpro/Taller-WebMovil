@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.src.Controller.Product;
 using Microsoft.AspNetCore.Authorization;
+using api.src.Repositories;
 
 namespace api.src.Controller
 {
@@ -41,15 +42,11 @@ namespace api.src.Controller
         /// Atributo de tipo IShoppingCart que se encarga de manejar las operaciones de carrito de compras.
         /// </summary>
         private readonly IShoppingCart _shoppingCart;
+        private readonly IShoppingCartItem _shoppingCartItem;
+        private readonly ICookieService _cookieService;
 
-        /// <summary>
-        /// Constructor de la clase AuthController que recibe un objeto de tipo UserManager<AppUser>, ITokenService, SignInManager<AppUser>, IShoppingCart.
-        /// </summary>
-        /// <param name="userManager">Parámetro de tipo UserManager<AppUser> que sirve para inicializar el atributo _userManager</param>
-        /// <param name="tokenService">Parámetro de tipo ITokenService que sirve para inicializar el atributo _tokenService</param>
-        /// <param name="signInManager">Parámetro de tipo SignInManager que sirve para inicializar el atributo _signInManager</param>
-        /// <param name="shoppingCart">Parámetro de tipo IShoppingCart que sirve para inicializar el atributo _shoppingCart</param>
-        public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager, IShoppingCart shoppingCart)
+        public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager,
+        IShoppingCart shoppingCart, IShoppingCartItem shoppingCartItem, ICookieService cookieService)
         {
             // Inicializa el atributo _userManager con el valor del parámetro userManager
             _userManager = userManager;
@@ -59,6 +56,8 @@ namespace api.src.Controller
             _signInManager = signInManager;
             // Inicializa el atributo _shoppingCart con el valor del parámetro shoppingCart
             _shoppingCart = shoppingCart;
+            _shoppingCartItem = shoppingCartItem;
+            _cookieService = cookieService;
         }
 
         /// <summary>
@@ -86,6 +85,8 @@ namespace api.src.Controller
 
                 if (registerDto.DateOfBirth >= DateTime.Now) return BadRequest("Date of birth must be in the past.");
 
+                if ((DateTime.Now.Year - registerDto.DateOfBirth.Year) < 13) return BadRequest("You must be at least 13 years old to register.");
+
                 if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.ConfirmPassword)) return BadRequest("Password is required.");
 
                 if (!string.Equals(registerDto.Password, registerDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest("Passwords do not match.");
@@ -111,8 +112,22 @@ namespace api.src.Controller
 
                     if (roleResult.Succeeded)
                     {
-                        // Crear carrito de compras para el usuario
-                        await _shoppingCart.CreateShoppingCart(user.Id);
+                        var shoppingCart = await _shoppingCart.CreateShoppingCart(user.Id);
+
+                        if (shoppingCart != null)
+                        {
+                            if (Request.Cookies.ContainsKey("ShoppingCart"))
+                            {
+                                var cartItems = _cookieService.GetCartItemsFromCookies();
+
+                                await _shoppingCartItem.AddShoppingCarItem(cartItems, shoppingCart.Id);
+
+                                if (cartItems.Count > 0)
+                                {
+                                    _cookieService.ClearCartItemsInCookie();
+                                }
+                            }
+                        }
 
                         return Ok(new NewUserDto
                         {
@@ -153,8 +168,7 @@ namespace api.src.Controller
 
                 if(!ModelState.IsValid) return BadRequest(ModelState);
 
-                // Buscar usuario por nombre de usuario
-                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == loginDto.UserName);
+                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
                 if(user == null) return Unauthorized("Invalid username or password.");
 
                 // Verificar si la contraseña es correcta
@@ -171,6 +185,23 @@ namespace api.src.Controller
                 var token = _tokenService.CreateToken(user);
 
                 if (string.IsNullOrEmpty(token)) return Unauthorized("Invalid token.");
+
+                var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
+
+                if (shoppingCart != null)
+                {
+                    if (Request.Cookies.ContainsKey("ShoppingCart"))
+                    {
+                        var cartItems = _cookieService.GetCartItemsFromCookies();
+
+                        await _shoppingCartItem.AddShoppingCarItem(cartItems, shoppingCart.Id);
+
+                        if (cartItems.Count > 0)
+                        {
+                            _cookieService.ClearCartItemsInCookie();
+                        }
+                    }
+                }
 
                 return Ok(
                     new NewUserDto

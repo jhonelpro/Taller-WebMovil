@@ -13,7 +13,7 @@ namespace api.src.DTOs.Auth
         /// Este campo es obligatorio.
         /// </summary>
         [Required]
-        public string UserName { get; set; } = null!;
+        public string Email { get; set; } = null!;
 
         /// <summary>
         /// Atributo de tipo string que representa la contraseña del usuario.

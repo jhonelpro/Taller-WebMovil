@@ -1,9 +1,11 @@
 using api.src.Data;
+using api.src.Models; 
 using api.src.DTOs.Purchase;
 using api.src.Interfaces;
 using api.src.Mappers;
-using api.src.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using api.src.Models.User;
 
 namespace api.src.Repositories
 {
@@ -129,7 +131,7 @@ namespace api.src.Repositories
             // Itera sobre cada compra para construir el objeto PurchaseDto correspondiente.
             foreach (var purchase in purchases)
             {
-                double totalPrice = 0.0;
+                double totalPrice = 0;
 
                 // Filtra los items de venta correspondientes a la compra actual.
                 var saleItem = saleItems.Where(x => x.PurchaseId == purchase.Id).ToList();
@@ -161,7 +163,7 @@ namespace api.src.Repositories
                 var purchaseDto = new PurchaseDto
                 {
                     PurchaseId = purchase.Id,
-                    Transaction_Date = purchase.Transaction_Date,
+                    Email = purchase.User?.Email ?? "Unknown",
                     Country = purchase.Country,
                     City = purchase.City,
                     Commune = purchase.Commune,
@@ -183,62 +185,43 @@ namespace api.src.Repositories
         /// <returns>Una lista de objetos PurchaseDto que representa todas las compras en el sistema.</returns>
         public async Task<List<PurchaseDto>> GetPurchasesAsyncForAdmin()
         {
-            // Recupera todas las compras registradas en la base de datos.
-            var purchases = await _context.Purchases.ToListAsync();
+            var purchases = await _context.Purchases.Include(p => p.User).ToListAsync();
 
-            // Verifica si existen compras.
-            if (purchases == null)
+            if (!purchases.Any())
             {
                 throw new ArgumentNullException("Purchases not found.");
             }
 
-            // Recupera los items de venta asociados a las compras.
-            var saleItems = await _context.SaleItems
-                                          .Where(x => purchases.Select(y => y.Id).Contains(x.PurchaseId))
-                                          .ToListAsync();
+            var purchaseIds = purchases.Select(y => y.Id).ToList();
+            var saleItems = await _context.SaleItems.Where(x => purchaseIds.Contains(x.PurchaseId)).ToListAsync();
 
-            // Verifica si existen items de venta para las compras.
-            if (saleItems == null)
+            if (!saleItems.Any())
             {
                 throw new ArgumentNullException("Sale Items not found.");
+            }
+
+            var productIds = saleItems.Select(y => y.ProductId).ToList();
+            var products = await _context.Products
+                                        .Where(x => productIds.Contains(x.Id))
+                                        .Include(x => x.ProductType)
+                                        .ToListAsync();
+
+            if (!products.Any())
+            {
+                throw new ArgumentNullException("Products not found.");
             }
 
             var purchasesDtos = new List<PurchaseDto>();
 
             foreach (var purchase in purchases)
             {
-                double totalPrice = 0.0;
-
                 var saleItem = saleItems.Where(x => x.PurchaseId == purchase.Id).ToList();
-
-                foreach (var item in saleItem)
-                {
-                    totalPrice += item.TotalPrice;
-                }
-
-                if (saleItem == null)
-                {
-                    throw new ArgumentNullException("Sale Items not found.");
-                }
-
-                var products = await _context.Products
-                                             .Where(x => saleItem.Select(y => y.ProductId).Contains(x.Id))
-                                             .Include(x => x.ProductType)
-                                             .ToListAsync();
-
-                if (products == null)
-                {
-                    throw new ArgumentNullException("Products not found.");
-                }
-
-                // Recupera la información del usuario que realizó la compra.
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == purchase.UserId);
+                var totalPrice = saleItem.Sum(item => item.TotalPrice);
 
                 var purchaseDto = new PurchaseDto
                 {
                     PurchaseId = purchase.Id,
-                    Username = user?.UserName ?? "Unknown",
-                    Email = user?.Email ?? "Unknown",
+                    Email = purchase.User?.Email ?? "Unknown",
                     Transaction_Date = purchase.Transaction_Date,
                     Country = purchase.Country,
                     City = purchase.City,

@@ -53,31 +53,15 @@ namespace api.src.Controller.Purchase
 
                 if (saleItems == null)
                 {
-                    return NotFound();
+                    return NotFound("No sales found.");
                 }
 
                 return Ok(saleItems);
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Purchases not found.")
-                {
-                    return NotFound(new { message = ex.Message });
-                }
-                else if (ex.Message == "Sale Items not found.")
-                {
-                    return NotFound(new { message = ex.Message });
-                }
-                else if (ex.Message == "Products not found.")
-                {
-                    return NotFound(new { message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, new { message = "Internal Server Error." });
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
-            
         }
     }
 }

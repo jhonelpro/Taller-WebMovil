@@ -1,4 +1,5 @@
 using api.src.DTOs;
+using api.src.DTOs.Product;
 using api.src.Models;
 
 namespace api.src.Mappers
@@ -25,11 +26,19 @@ namespace api.src.Mappers
             };
         }
 
-        /// <summary>
-        /// Convierte un objeto de tipo CreateProductRequestDto a un objeto de tipo Product.
-        /// </summary>
-        /// <param name="createProductRequestDto">Parametro de tipo CreateProductRequestDto que representa los datos necesarios para crear un nuevo producto.</param>
-        /// <returns>Un objeto de tipo Product que representa el nuevo producto creado.</returns>
+        public static ProductDtoForAdmin ToProductDtoForAdmin(this Product product)
+        {
+            return new ProductDtoForAdmin
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Price = product.Price,
+                Stock = product.Stock,
+                ProductType = product.ProductType,
+                ImageUrl = product.ImageUrl
+            };
+        }
+
         public static Product ToProductFromCreateDto(this CreateProductRequestDto createProductRequestDto)
         {
             return new Product
@@ -54,6 +63,18 @@ namespace api.src.Mappers
                 Price = updateProductRequestDto.Price,
                 Stock = updateProductRequestDto.Stock,
                 ProductTypeId = updateProductRequestDto.ProductTypeId,
+            };
+        }
+
+        public static UpdateProductRequestDto toUpdateProduct(this CreateProductRequestDto createProductRequestDto)
+        {
+            return new UpdateProductRequestDto
+            {
+                Name = createProductRequestDto.Name,
+                Price = createProductRequestDto.Price,
+                Stock = createProductRequestDto.Stock,
+                ProductTypeId = createProductRequestDto.ProductTypeId,
+                Image = createProductRequestDto.Image
             };
         }
     }

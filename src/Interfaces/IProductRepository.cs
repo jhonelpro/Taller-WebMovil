@@ -1,4 +1,5 @@
 using api.src.DTOs;
+using api.src.DTOs.Product;
 using api.src.Helpers;
 using api.src.Models;
 using CloudinaryDotNet.Actions;
@@ -16,19 +17,7 @@ namespace api.src.Interfaces
         /// <param name="id">Parametro int que representa el ID del producto a buscar.</param>
         /// <returns>Producto correspondiente al ID, o null si no se encuentra.</returns>
         Task<Product?> GetProductById(int id);
-
-        /// <summary>
-        /// Obtiene una lista de productos según el objeto de consulta especificado.
-        /// </summary>
-        /// <param name="query">Parametro de tipo QueryObjectProduct que representa la consulta que define los filtros y la paginación.</param>
-        /// <returns>Lista de productos que cumplen con los criterios de la consulta.</returns>
-        Task<List<ProductDto>> GetProducts(QueryObjectProduct query);
-
-        /// <summary>
-        /// Obtiene una lista de productos disponibles (en stock) según los criterios de consulta.
-        /// </summary>
-        /// <param name="query">Parametro de tipo QueryObject que representa la consulta que define los filtros y la paginación.</param>
-        /// <returns>Lista de productos disponibles que cumplen con los criterios de la consulta.</returns>
+        Task<List<ProductDtoForAdmin>> GetProducts(QueryObjectProduct query);
         Task<List<ProductDto>> GetAvailableProducts(QueryObject query);
 
         /// <summary>

@@ -3,6 +3,7 @@ using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models;
 using api.src.Models.User;
+using api.src.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -25,16 +26,13 @@ namespace api.src.Controller.Product
         /// Atributo de tipo IProductRepository que permite la inyección de dependencias.
         /// </summary>
         private readonly IProductRepository _productRepository;
+        private readonly ICookieService _cookieService;
 
-        /// <summary>
-        /// Constructor de la clase ShoppingCartController.
-        /// </summary>
-        /// <param name="productRepository"></param>
-        public ShoppingCartController(IProductRepository productRepository)
+        public ShoppingCartController(IProductRepository productRepository, ICookieService cookieService)
         {
             // Inicializa del atributo _productRepository.
             _productRepository = productRepository;
-
+            _cookieService = cookieService;
         }
 
         /// <summary>
@@ -50,26 +48,45 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var cartItems = await Task.Run(() => GetCartItemsFromCookies());
-            
-            var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
-
-            if (product != null)
+            if (quantity <= 0)
             {
-                product.Quantity++;
+                return BadRequest(new { Message = "Quantity must be greater than 0." });
             }
-            else
+
+            try
             {
-                cartItems.Add(new ShoppingCartItem
+                var existingProduct = await _productRepository.GetProductById(productId);
+
+                if (existingProduct == null)
                 {
-                    ProductId = productId,
-                    Quantity = quantity
-                });
-            }
+                    return NotFound(new { Message = "Product not found." });
+                }
 
-            // Guarda los productos en la cookie.
-            await Task.Run(() => SaveCartItemsToCookies(cartItems.ToList()));
-            return Ok("Product added to cart.");
+                var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
+                
+                var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
+
+                if (product != null)
+                {
+                    product.Quantity += quantity;
+                }
+                else
+                {
+                    cartItems.Add(new ShoppingCartItem
+                    {
+                        ProductId = productId,
+                        Quantity = quantity,
+                        Product = existingProduct
+                    });
+                }
+
+                await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems));
+                return Ok("Product added to cart.");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { Message = e.Message });
+            }
         }
 
         /// <summary>
@@ -84,20 +101,38 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var cartItems = await Task.Run(() => GetCartItemsFromCookies());
-
-            var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
-
-            if (product != null)
+            if (productId <= 0)
             {
-                // Remueve el producto del carrito.
-                cartItems.Remove(product);
-                await Task.Run(() => SaveCartItemsToCookies(cartItems.ToList()));
-                return Ok("Product removed from cart.");
+                return BadRequest(new { Message = "Product Id must be greater than 0." });
             }
-            else
+
+            try
             {
-                return NotFound(new { Message = "Product not found in cart." });
+                var existingProduct = await _productRepository.GetProductById(productId);
+
+                if (existingProduct == null)
+                {
+                    return NotFound(new { Message = "Product not found." });
+                }
+
+                var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
+
+                var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
+
+                if (product != null)
+                {
+                    cartItems.Remove(product);
+                    await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems.ToList()));
+                    return Ok("Product removed from cart.");
+                }
+                else
+                {
+                    return NotFound(new { Message = "Product not found in cart." });
+                }
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { Message = e.Message });
             }
         }
 
@@ -113,24 +148,31 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var cartItems = await Task.Run(() => GetCartItemsFromCookies());
-            var products = new List<ShoppingCartDto>();
-            
-            foreach (var item in cartItems)
+            try
             {
-                var product = await _productRepository.GetProductById(item.ProductId);
+                var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
+                var products = new List<ShoppingCartDto>();
                 
-                if (product != null)
+                foreach (var item in cartItems)
                 {
-                    products.Add(product.ToShoppingCartDto(item));
+                    var product = await _productRepository.GetProductById(item.ProductId);
+                    
+                    if (product != null)
+                    {
+                        products.Add(product.ToShoppingCartDto(item));
+                    }
+                    else
+                    {
+                        return NotFound(new { Message = "Product not found." });
+                    }
                 }
-                else
-                {
-                    return NotFound(new { Message = "Product not found." });
-                }
+                
+                return Ok(products.toCartDto());
             }
-            
-            return Ok(products.toCartDto());
+            catch (Exception e)
+            {
+                return StatusCode(500, new { Message = e.Message });
+            }
         }
 
         /// <summary>
@@ -148,68 +190,66 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var cartItems = await Task.Run(() => GetCartItemsFromCookies());
-            var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
-
-            if (product != null)
+            if (quantity <= 0)
             {
-                if (isIncrement == true)
+                return BadRequest(new { Message = "Quantity must be greater than 0." });
+            }
+
+            try
+            {
+                var existingProduct = await _productRepository.GetProductById(productId);
+
+                if (existingProduct == null)
                 {
-                    product.Quantity += quantity;
+                    return NotFound(new { Message = "Product not found." });
                 }
-                else if (isIncrement == false)
+
+                var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
+                var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
+
+                if (product != null)
                 {
-                    product.Quantity -= quantity;
+                    if (isIncrement == true)
+                    {
+                        product.Quantity += quantity;
+                    }
+                    else if (isIncrement == false)
+                    {
+                        product.Quantity -= quantity;
+                    }
+                    else
+                    {
+                        product.Quantity = quantity;
+                    }
+                    
+                    await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems.ToList()));
+                    return Ok("Product updated in cart.");
                 }
                 else
                 {
-                    product.Quantity = quantity;
+                    return NotFound(new { Message = "Product not found in cart." });
                 }
-
-                // Guarda los productos en la cookie.
-                await Task.Run(() => SaveCartItemsToCookies(cartItems.ToList()));
-                return Ok("Product updated in cart.");
             }
-            else
+            catch (Exception e)
             {
-                return NotFound(new { Message = "Product not found in cart." });
+                return StatusCode(500, new { Message = e.Message });
             }
         }
 
-        /// <summary>
-        /// Método para obtener los productos en el carrito de compras desde las cookies.
-        /// </summary>
-        /// <returns>
-        /// Retorna una lista de productos en el carrito de compras.
-        /// </returns>
-        private List<ShoppingCartItem> GetCartItemsFromCookies()
+        [HttpDelete("ClearCart")]
+        public async Task<IActionResult> ClearCart()
         {
-            var cartItems = new List<ShoppingCartItem>();
-            // Obtiene los productos del carrito de compras desde las cookies.
-            var cartCookie = Request.Cookies["ShoppingCart"];
-            if (!string.IsNullOrEmpty(cartCookie))
-            {
-                // Deserializa los productos del carrito de compras.
-                cartItems = JsonConvert.DeserializeObject<List<ShoppingCartItem>>(cartCookie);
-            }
-            // Retorna los productos del carrito de compras.
-            return cartItems ?? new List<ShoppingCartItem>();
-        }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        /// <summary>
-        /// Método para guardar los productos en el carrito de compras en las cookies.
-        /// </summary>
-        /// <param name="cartItems">Parámetro que representa el carrito de compras.</param>
-        private void SaveCartItemsToCookies(List<ShoppingCartItem> cartItems)
-        {
-            // Configura las opciones de la cookie.
-            var options = new CookieOptions
+            try
             {
-                // La cookie expira en 7 días. 
-                Expires = DateTime.Now.AddDays(7),
-            };
-            // Guarda los productos en la cookie.
-            Response.Cookies.Append("ShoppingCart", JsonConvert.SerializeObject(cartItems), options);
+                await Task.Run(() => _cookieService.ClearCartItemsInCookie());
+                return Ok("Cart cleared.");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { Message = e.Message });
+            }
         }
     }
 }

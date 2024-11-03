@@ -87,6 +87,11 @@ namespace api.src.Controller.Purchase
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
+            {
+                return Unauthorized(new { Message = "Please log in to complete the purchase." });
+            }
+
             return await CreatePurchase(purchaseDto);
         }
 
@@ -158,24 +163,19 @@ namespace api.src.Controller.Purchase
                     return BadRequest("Ticket not created.");
                 }
 
+                var clearCart = await _shoppingCartItem.ClearShoppingCart(cart.Id);
+
+                if (!clearCart)
+                {
+                    return BadRequest("Cart not cleared.");
+                }
+
                 return Ok("Purchase created successfully.");
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Purchase cannot be null.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Shopping Cart not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
-                }
-            }
-            
+                return StatusCode(500, new { Error = ex.Message });
+            }   
         }
 
         /// <summary>
@@ -195,7 +195,6 @@ namespace api.src.Controller.Purchase
 
             try
             {
-
                 var user = await _userManager.GetUserAsync(User);
 
                 if (user == null)
@@ -225,22 +224,7 @@ namespace api.src.Controller.Purchase
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Purchase ID cannot be null.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Purchase not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else if (ex.Message == "product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
         }
 
@@ -279,22 +263,7 @@ namespace api.src.Controller.Purchase
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User ID cannot be null.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Purchases not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Products not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
         }
     }
