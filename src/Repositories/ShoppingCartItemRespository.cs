@@ -28,6 +28,23 @@ namespace api.src.Repositories
             {
                 throw new Exception("Product not found.");
             }
+
+            var shoppingCart = await _context.ShoppingCarts.FirstOrDefaultAsync(x => x.Id == cartId);
+
+            if (shoppingCart == null)
+            {
+                throw new Exception("Cart not found.");
+            }
+
+            var existingCartItem = await _context.ShoppingCartItems.FirstOrDefaultAsync(x => x.ProductId == productId);
+
+            if (existingCartItem != null)
+            {
+                existingCartItem.Quantity += quantity;
+                await _context.SaveChangesAsync();
+
+                return existingCartItem;
+            }
             
             var shoppingCartItem = new ShoppingCartItem
             {
@@ -59,6 +76,29 @@ namespace api.src.Repositories
             if (cartItems == null)
             {
                 throw new Exception("Cart items cannot be null.");
+            }
+
+            var shoppingCart = await _context.ShoppingCarts.FirstOrDefaultAsync(x => x.Id == cartId);
+
+            if (shoppingCart == null)
+            {
+                throw new Exception("Cart not found.");
+            }
+
+            var existingCartItems = await _context.ShoppingCartItems.Where(x => x.CartId == cartId).ToListAsync();
+
+            if (existingCartItems != null)
+            {
+                foreach (var item in cartItems)
+                {
+                    var existingCartItem = await _context.ShoppingCartItems.FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
+
+                    if (existingCartItem != null)
+                    {
+                        existingCartItem.Quantity += item.Quantity;
+                        await _context.SaveChangesAsync();
+                    }
+                }
             }
             
             var shoppingCartItem = new ShoppingCartItem
