@@ -33,9 +33,9 @@ namespace api.src.Repositories
         /// <summary>
         /// Crea una nueva compra y la guarda en la base de datos.
         /// </summary>
-        /// <param name="purchase">Objeto <see cref="Purchase"/> que representa la compra a realizar.</param>
-        /// <param name="user">Usuario de tipo <see cref="AppUser"/> asociado a la compra.</param>
-        /// <returns>La compra creada de tipo <see cref="Purchase"/>.</returns>
+        /// <param name="purchase">Objeto Purchase que representa la compra a realizar.</param>
+        /// <param name="user">Usuario de tipo AppUser asociado a la compra.</param>
+        /// <returns>La compra creada de tipo Purchase.</returns>
         /// <exception cref="ArgumentNullException">Lanzado si la compra o el carrito de compras no existen.</exception>
         public async Task<Purchase> createPurchase(Purchase purchase, AppUser user)
         {
@@ -71,7 +71,7 @@ namespace api.src.Repositories
         /// </summary>
         /// <param name="purchaseId">ID de la compra a buscar.</param>
         /// <param name="userId">ID del usuario propietario de la compra.</param>
-        /// <returns>El objeto <see cref="Purchase"/> encontrado.</returns>
+        /// <returns>El objeto Purchase encontrado.</returns>
         /// <exception cref="ArgumentNullException">Lanzado si la compra no se encuentra.</exception>
         public async Task<Purchase> getPurchase(int purchaseId, string userId)
         {

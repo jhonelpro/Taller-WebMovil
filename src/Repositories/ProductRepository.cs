@@ -20,9 +20,9 @@ namespace api.src.Repositories
         private readonly ApplicationDBContext _context;
 
         /// <summary>
-        /// Inicializa una nueva instancia de la clase <see cref="ProductRepository"/> con el contexto de base de datos especificado.
+        /// Inicializa una nueva instancia de la clase ProductRepository con el contexto de base de datos especificado.
         /// </summary>
-        /// <param name="context">El contexto de base de datos <see cref="ApplicationDBContext"/> que representa la conexión a la base de datos.</param>
+        /// <param name="context">El contexto de base de datos ApplicationDBContext que representa la conexión a la base de datos.</param>
         public ProductRepository(ApplicationDBContext context)
         {
             //Inicializa el atributo _context con el objeto de tipo ApplicationDBContext recibido.
@@ -32,8 +32,8 @@ namespace api.src.Repositories
         /// <summary>
         /// Obtiene una lista de productos según los criterios de búsqueda especificados en el objeto de consulta.
         /// </summary>
-        /// <param name="query">Parámetro de tipo <see cref="QueryObjectProduct"/> que representa los criterios de búsqueda para los productos.</param>
-        /// <returns>Una tarea que representa la operación asincrónica, conteniendo una lista de objetos <see cref="ProductDto"/> que representan los productos encontrados.</returns>
+        /// <param name="query">Parámetro de tipo QueryObjectProduct que representa los criterios de búsqueda para los productos.</param>
+        /// <returns>Una tarea que representa la operación asincrónica, conteniendo una lista de objetos ProductDto que representan los productos encontrados.</returns>
         /// <exception cref="Exception">Lanzado si no se encuentran productos que coincidan con la búsqueda.</exception>
         public async Task<List<ProductDto>> GetProducts(QueryObjectProduct query)
         {
@@ -67,9 +67,9 @@ namespace api.src.Repositories
         /// <summary>
         /// Agrega un nuevo producto a la base de datos.
         /// </summary>
-        /// <param name="product">Parámetro de tipo <see cref="Product"/> que representa el producto a agregar.</param>
-        /// <param name="uploadResult">Parámetro de tipo <see cref="ImageUploadResult"/> que representa el resultado de la carga de la imagen del producto.</param>
-        /// <returns>Una tarea que representa la operación asincrónica, conteniendo el objeto <see cref="Product"/> que fue agregado.</returns>
+        /// <param name="product">Parámetro de tipo Product que representa el producto a agregar.</param>
+        /// <param name="uploadResult">Parámetro de tipo ImageUploadResult que representa el resultado de la carga de la imagen del producto.</param>
+        /// <returns>Una tarea que representa la operación asincrónica, conteniendo el objeto Product que fue agregado.</returns>
         /// <exception cref="ArgumentNullException">Lanzado si el producto o el resultado de carga son nulos.</exception>
         /// <exception cref="Exception">Lanzado si el tipo de producto no se encuentra.</exception>
         public async Task<Product> AddProduct(Product product, ImageUploadResult uploadResult)
@@ -105,7 +105,7 @@ namespace api.src.Repositories
         /// Elimina un producto de la base de datos por su identificador.
         /// </summary>
         /// <param name="id">Parámetro de tipo int que representa el identificador del producto a eliminar.</param>
-        /// <returns>Una tarea que representa la operación asincrónica, conteniendo el objeto <see cref="Product"/> que fue eliminado.</returns>
+        /// <returns>Una tarea que representa la operación asincrónica, conteniendo el objeto Product que fue eliminado.</returns>
         /// <exception cref="Exception">Lanzado si el producto no se encuentra.</exception>
         public async Task<Product?> DeleteProduct(int id)
         {
@@ -128,8 +128,8 @@ namespace api.src.Repositories
         /// <summary>
         /// Obtiene una lista de productos disponibles según los criterios de búsqueda especificados en el objeto de consulta.
         /// </summary>
-        /// <param name="query">Parámetro de tipo <see cref="QueryObject"/> que representa los criterios de búsqueda para los productos.</param>
-        /// <returns>Una tarea que representa la operación asincrónica, conteniendo una lista de objetos <see cref="ProductDto"/> que representan los productos encontrados.</returns>
+        /// <param name="query">Parámetro de tipo QueryObject que representa los criterios de búsqueda para los productos.</param>
+        /// <returns>Una tarea que representa la operación asincrónica, conteniendo una lista de objetos ProductDto que representan los productos encontrados.</returns>
         /// <exception cref="Exception">Lanzado si no se encuentran productos que coincidan con la búsqueda.</exception>
         public async Task<List<ProductDto>> GetAvailableProducts(QueryObject query)
         {
@@ -196,8 +196,8 @@ namespace api.src.Repositories
         /// <summary>
         /// Obtiene una lista de productos para el cliente según los criterios de búsqueda especificados en el objeto de consulta.
         /// </summary>
-        /// <param name="query">Parámetro de tipo <see cref="QueryObjectProductClient"/> que representa los criterios de búsqueda para los productos del cliente.</param>
-        /// <returns>Una tarea que representa la operación asincrónica, conteniendo una lista de objetos <see cref="ProductDto"/> que representan los productos encontrados.</returns>
+        /// <param name="query">Parámetro de tipo QueryObjectProductClient que representa los criterios de búsqueda para los productos del cliente.</param>
+        /// <returns>Una tarea que representa la operación asincrónica, conteniendo una lista de objetos ProductDto que representan los productos encontrados.</returns>
         /// <exception cref="Exception">Lanzado si el tipo de producto es incorrecto o si no se encuentra el producto.</exception>
         public async Task<List<ProductDto>> GetProductsClient(QueryObjectProductClient query)
         {
@@ -250,9 +250,9 @@ namespace api.src.Repositories
         /// Actualiza un producto existente en la base de datos.
         /// </summary>
         /// <param name="id">Parámetro de tipo int que representa el identificador del producto a actualizar.</param>
-        /// <param name="product">Parámetro de tipo <see cref="UpdateProductRequestDto"/> que contiene los nuevos datos del producto.</param>
-        /// <param name="uploadResult">Parámetro de tipo <see cref="ImageUploadResult"/> que representa el resultado de la carga de la nueva imagen del producto.</param>
-        /// <returns>Una tarea que representa la operación asincrónica, conteniendo el objeto <see cref="Product"/> que fue actualizado.</returns>
+        /// <param name="product">Parámetro de tipo UpdateProductRequestDto que contiene los nuevos datos del producto.</param>
+        /// <param name="uploadResult">Parámetro de tipo ImageUploadResult que representa el resultado de la carga de la nueva imagen del producto.</param>
+        /// <returns>Una tarea que representa la operación asincrónica, conteniendo el objeto Product que fue actualizado.</returns>
         /// <exception cref="Exception">Lanzado si el producto no se encuentra o el tipo de producto no se encuentra.</exception>
         public async Task<Product?> UpdateProduct(int id, UpdateProductRequestDto product, ImageUploadResult uploadResult)
         {
@@ -284,7 +284,7 @@ namespace api.src.Repositories
         /// Obtiene un producto por su identificador.
         /// </summary>
         /// <param name="id">Parámetro de tipo int que representa el identificador del producto a obtener.</param>
-        /// <returns>Una tarea que representa la operación asincrónica, conteniendo el objeto <see cref="Product"/> que fue encontrado.</returns>
+        /// <returns>Una tarea que representa la operación asincrónica, conteniendo el objeto Product que fue encontrado.</returns>
         /// <exception cref="Exception">Lanzado si el producto no se encuentra.</exception>
         public async Task<Product?> GetProductById(int id)
         {
