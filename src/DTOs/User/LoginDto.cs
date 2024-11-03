@@ -5,7 +5,7 @@ namespace api.src.DTOs.Auth
     public class LoginDto
     {
         [Required]
-        public string UserName { get; set; } = null!;
+        public string Email { get; set; } = null!;
 
         [Required]
         [StringLength(20, MinimumLength = 8, ErrorMessage = "Password must be between 8 and 20 characters long.")]

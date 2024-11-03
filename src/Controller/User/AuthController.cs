@@ -122,7 +122,7 @@ namespace api.src.Controller
 
                 if(!ModelState.IsValid) return BadRequest(ModelState);
 
-                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == loginDto.UserName);
+                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
                 if(user == null) return Unauthorized("Invalid username or password.");
 
 
