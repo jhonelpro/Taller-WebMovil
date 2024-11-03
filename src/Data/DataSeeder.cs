@@ -6,21 +6,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace api.src.Data
 {
+    /// <summary>
+    /// Clase DataSeeder para poblar la base de datos con datos iniciales.
+    /// </summary>
     public class DataSeeder
     {
+        /// <summary>
+        /// Método estático para inicializar la base de datos con datos de prueba.
+        /// </summary>
+        /// <param name="serviceProvider">Parametro de tipo IServiceProvider que provee acceso a los servicios necesarios, como el contexto de la base de datos y el administrador de usuarios.</param>
         public static async void Initialize(IServiceProvider serviceProvider)
         {
-
             using (var scope = serviceProvider.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 var context = services.GetRequiredService<ApplicationDBContext>();
                 var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
 
+                // Inicialización de Faker para datos en español
                 var faker = new Faker("es");
                 var genders = new List<string> { "Femenino", "Masculino", "Prefiero no decirlo", "Otro" };
                 Random random = new Random();
 
+                // Verifica si existen usuarios, y si no, crea usuarios de prueba
                 if (!await userManager.Users.AnyAsync())
                 {
                     for (int i = 0; i < 10; i++)
@@ -42,21 +50,22 @@ namespace api.src.Data
 
                         if (!createUser.Succeeded)
                         {
-                            throw new Exception("Error creating user");
+                            throw new Exception("Error al crear el usuario");
                         }
 
                         var roleResult = userManager.AddToRoleAsync(user, "User");
 
                         if (roleResult.Result.Succeeded)
                         {
-                            Console.WriteLine($"User {user.Email} created successfully");
+                            Console.WriteLine($"Usuario {user.Email} creado exitosamente");
                         }
                         else
                         {
-                            throw new Exception("Error creating user");
+                            throw new Exception("Error al asignar rol al usuario");
                         }
                     }
 
+                    // Creación de un usuario administrador con credenciales predeterminadas
                     var admin = new AppUser
                     {
                         UserName = "admin@idwm.cl",
@@ -83,6 +92,7 @@ namespace api.src.Data
                     }
                 }
 
+                // Verifica si existen tipos de productos en la base de datos y, si no, los agrega
                 if (!context.ProductTypes.Any())
                 {
                     context.ProductTypes.AddRange(
@@ -94,6 +104,7 @@ namespace api.src.Data
                     );
                 }
 
+                // Verifica si existen productos en la base de datos y, si no, los agrega usando Faker para generar datos aleatorios
                 if (!context.Products.Any())
                 {
                     var ProductFaker = new Faker<Product>()
@@ -105,7 +116,6 @@ namespace api.src.Data
                     var products = ProductFaker.Generate(10);
                     context.Products.AddRange(products);
                 }
-
 
                 context.SaveChanges();
             }
