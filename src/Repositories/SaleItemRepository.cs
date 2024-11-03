@@ -1,9 +1,11 @@
 using api.src.Data;
+using api.src.Models; 
 using api.src.DTOs.Purchase;
 using api.src.Interfaces;
 using api.src.Mappers;
-using api.src.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using api.src.Models.User;
 
 namespace api.src.Repositories
 {
@@ -11,7 +13,7 @@ namespace api.src.Repositories
     {
         private readonly ApplicationDBContext _context;
 
-        public SaleItemRepository(ApplicationDBContext context)
+        public SaleItemRepository(ApplicationDBContext context, UserManager<AppUser> userManager)
         {
             _context = context;
         }
@@ -86,7 +88,7 @@ namespace api.src.Repositories
 
             foreach (var purchase in purchases)
             {
-                var TotalPrice = 0.0;
+                double TotalPrice = 0;
 
                 var saleItem = saleItems.Where(x => x.PurchaseId == purchase.Id).ToList();
 
@@ -113,7 +115,8 @@ namespace api.src.Repositories
                 var purchaseDto = new PurchaseDto
                 {
                     PurchaseId = purchase.Id,
-                    Transaction_Date = purchase.Transaction_Date,
+                    Username = purchase.User?.UserName ?? "Unknown",
+                    Email = purchase.User?.Email ?? "Unknown",
                     Country = purchase.Country,
                     City = purchase.City,
                     Commune = purchase.Commune,
@@ -130,61 +133,50 @@ namespace api.src.Repositories
 
         public async Task<List<PurchaseDto>> GetPurchasesAsyncForAdmin()
         {
-            var purchases = await _context.Purchases.ToListAsync();
+            var purchases = await _context.Purchases.Include(p => p.User).ToListAsync();
 
-            if (purchases == null)
+            if (!purchases.Any())
             {
                 throw new ArgumentNullException("Purchases not found.");
             }
 
-            var saleItems = await _context.SaleItems.Where(x => purchases.Select(y => y.Id).Contains(x.PurchaseId)).ToListAsync();
+            var purchaseIds = purchases.Select(y => y.Id).ToList();
+            var saleItems = await _context.SaleItems.Where(x => purchaseIds.Contains(x.PurchaseId)).ToListAsync();
 
-            if (saleItems == null)
+            if (!saleItems.Any())
             {
                 throw new ArgumentNullException("Sale Items not found.");
+            }
+
+            var productIds = saleItems.Select(y => y.ProductId).ToList();
+            var products = await _context.Products
+                                        .Where(x => productIds.Contains(x.Id))
+                                        .Include(x => x.ProductType)
+                                        .ToListAsync();
+
+            if (!products.Any())
+            {
+                throw new ArgumentNullException("Products not found.");
             }
 
             var purchasesDtos = new List<PurchaseDto>();
 
             foreach (var purchase in purchases)
             {
-                var TotalPrice = 0.0;
-
                 var saleItem = saleItems.Where(x => x.PurchaseId == purchase.Id).ToList();
-
-                foreach (var item in saleItem)
-                {
-                    TotalPrice += item.TotalPrice;
-                }
-
-                if (saleItem == null)
-                {
-                    throw new ArgumentNullException("Sale Items not found.");
-                }
-
-                var products = await _context.Products
-                                               .Where(x => saleItem.Select(y => y.ProductId).Contains(x.Id))
-                                               .Include(x => x.ProductType)
-                                               .ToListAsync();
-
-                if (products == null)
-                {
-                    throw new ArgumentNullException("Products not found.");
-                }
-
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == purchase.UserId);
+                var totalPrice = saleItem.Sum(item => item.TotalPrice);
 
                 var purchaseDto = new PurchaseDto
                 {
                     PurchaseId = purchase.Id,
-                    Username = user?.UserName ?? "Unknown",
-                    Email = user?.Email ?? "Unknown",
+                    Username = purchase.User?.UserName ?? "Unknown",
+                    Email = purchase.User?.Email ?? "Unknown",
                     Transaction_Date = purchase.Transaction_Date,
                     Country = purchase.Country,
                     City = purchase.City,
                     Commune = purchase.Commune,
                     Street = purchase.Street,
-                    Purchase_TotalPrice = TotalPrice,
+                    Purchase_TotalPrice = totalPrice,
                     saleItemDtos = PurchaseMapper.ToSaleItemDto(saleItem, products)
                 };
 

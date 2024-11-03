@@ -46,6 +46,7 @@ namespace api.src.Repositories
             }
 
             purchase.UserId = user.Id;
+            purchase.User = user;
             purchase.Transaction_Date = DateTime.Now;
 
             await _context.Purchases.AddAsync(purchase);
