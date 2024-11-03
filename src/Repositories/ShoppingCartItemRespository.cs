@@ -77,81 +77,59 @@ namespace api.src.Repositories
         {
             if (cartId <= 0)
             {
-                throw new Exception("Cart id cannot be less than or equal to zero.");
+                throw new ArgumentException("Cart ID must be greater than zero.", nameof(cartId));
             }
 
-            if (cartItems == null)
+            if (cartItems == null || !cartItems.Any())
             {
-                throw new Exception("Cart items cannot be null.");
+                throw new ArgumentException("Cart items cannot be null or empty.", nameof(cartItems));
             }
 
+            // Obtiene el carrito y sus elementos en una sola consulta
             var shoppingCart = await _context.ShoppingCarts
                 .Include(s => s.shoppingCartItems)
-                .Include(s => s.User)
+                .ThenInclude(ci => ci.Product)
                 .FirstOrDefaultAsync(x => x.Id == cartId);
 
             if (shoppingCart == null)
             {
-                throw new Exception("Cart not found.");
+                throw new KeyNotFoundException("Cart not found.");
             }
 
-            var existingCartItems = await _context.ShoppingCartItems.Where(x => x.CartId == cartId)
-                .Include(s => s.Product)
-                .Include(s => s.shoppingCart)
-                .ToListAsync();
-
-            if (existingCartItems != null)
-            {
-                foreach (var item in cartItems)
-                {
-                    var existingCartItem = await _context.ShoppingCartItems.FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
-
-                    if (existingCartItem != null)
-                    {
-                        existingCartItem.Quantity += item.Quantity;
-                        await _context.SaveChangesAsync();
-                    }
-                }
-            }
-            
-            var shoppingCartItem = new ShoppingCartItem
-            {
-                CartId = cartId
-            };
+            // Convierte los elementos existentes en un diccionario para búsqueda rápida
+            var existingCartItems = shoppingCart.shoppingCartItems.ToDictionary(ci => ci.ProductId);
 
             foreach (var item in cartItems)
-            { 
-                var product = await _context.Products
-                    .Include(p => p.ProductType)
-                    .FirstOrDefaultAsync(x => x.Id == item.ProductId);
-
-                if (product == null)
-                {
-                    throw new Exception("Product not found.");
-                }
-
-                var existingCartItem = await _context.ShoppingCartItems
-                    .Include(s => s.Product)
-                    .Include(s => s.shoppingCart)
-                    .FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
-
-                if (existingCartItem == null)
-                {
-                    shoppingCartItem.Product = product;
-                    shoppingCartItem.ProductId = item.ProductId;
-                    shoppingCartItem.Quantity = item.Quantity;
-            
-                    await _context.ShoppingCartItems.AddAsync(shoppingCartItem);
-                    await _context.SaveChangesAsync();
-                }else
-                {
+            {
+                if (existingCartItems.TryGetValue(item.ProductId, out var existingCartItem))
+                {        
                     existingCartItem.Quantity += item.Quantity;
-                    await _context.SaveChangesAsync();
                 }
-                
+                else
+                {
+                    var product = await _context.Products
+                        .Include(p => p.ProductType)
+                        .FirstOrDefaultAsync(x => x.Id == item.ProductId);
+
+                    if (product == null)
+                    {
+                        throw new KeyNotFoundException($"Product with ID {item.ProductId} not found.");
+                    }
+
+                    var newCartItem = new ShoppingCartItem
+                    {
+                        CartId = cartId,
+                        ProductId = item.ProductId,
+                        Product = product,
+                        Quantity = item.Quantity
+                    };
+                    shoppingCart.shoppingCartItems.Add(newCartItem);
+                }
             }
 
-            return shoppingCartItem;
+            await _context.SaveChangesAsync();
+
+            return shoppingCart.shoppingCartItems.FirstOrDefault() ?? new ShoppingCartItem();
         }
 
         public async Task<bool> ClearShoppingCart(int cartId)
@@ -207,19 +185,6 @@ namespace api.src.Repositories
             await _context.SaveChangesAsync();
 
             return shoppingCartItem;
-        }
-
-        public List<ShoppingCartItem> GetCartItemsFromCookies(HttpRequest request)
-        {
-            var cartItems = new List<ShoppingCartItem>();
-
-            var cartCookie = request.Cookies["ShoppingCart"];
-            if (!string.IsNullOrEmpty(cartCookie))
-            {
-                cartItems = JsonConvert.DeserializeObject<List<ShoppingCartItem>>(cartCookie);
-            }
-
-            return cartItems ?? new List<ShoppingCartItem>();
         }
 
         public async Task<ShoppingCartItem> GetShoppingCartItem(int productId)

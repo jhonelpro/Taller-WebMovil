@@ -139,6 +139,23 @@ namespace api.src.Controller
 
                 if (string.IsNullOrEmpty(token)) return Unauthorized("Invalid token.");
 
+                var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
+
+                if (shoppingCart != null)
+                {
+                    if (Request.Cookies.ContainsKey("ShoppingCart"))
+                    {
+                        var cartItems = _cookieService.GetCartItemsFromCookies();
+
+                        await _shoppingCartItem.AddShoppingCarItem(cartItems, shoppingCart.Id);
+
+                        if (cartItems.Count > 0)
+                        {
+                            _cookieService.ClearCartItemsInCookie();
+                        }
+                    }
+                }
+
                 return Ok(
                     new NewUserDto
                     {

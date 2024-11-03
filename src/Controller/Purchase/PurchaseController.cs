@@ -35,6 +35,11 @@ namespace api.src.Controller.Purchase
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
+            {
+                return Unauthorized(new { Message = "Please log in to complete the purchase." });
+            }
+
             return await CreatePurchase(purchaseDto);
         }
 
