@@ -28,25 +28,45 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
-            
-            var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
-
-            if (product != null)
+            if (quantity <= 0)
             {
-                product.Quantity++;
+                return BadRequest(new { Message = "Quantity must be greater than 0." });
             }
-            else
+
+            try
             {
-                cartItems.Add(new ShoppingCartItem
+                var existingProduct = await _productRepository.GetProductById(productId);
+
+                if (existingProduct == null)
                 {
-                    ProductId = productId,
-                    Quantity = quantity
-                });
-            }
+                    return NotFound(new { Message = "Product not found." });
+                }
 
-            await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems));
-            return Ok("Product added to cart.");
+                var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
+                
+                var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
+
+                if (product != null)
+                {
+                    product.Quantity += quantity;
+                }
+                else
+                {
+                    cartItems.Add(new ShoppingCartItem
+                    {
+                        ProductId = productId,
+                        Quantity = quantity,
+                        Product = existingProduct
+                    });
+                }
+
+                await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems));
+                return Ok("Product added to cart.");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { Message = e.Message });
+            }
         }
 
         [HttpDelete("RemoveFromCart/{productId:int}")]
@@ -54,19 +74,38 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
-
-            var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
-
-            if (product != null)
+            if (productId <= 0)
             {
-                cartItems.Remove(product);
-                await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems.ToList()));
-                return Ok("Product removed from cart.");
+                return BadRequest(new { Message = "Product Id must be greater than 0." });
             }
-            else
+
+            try
             {
-                return NotFound(new { Message = "Product not found in cart." });
+                var existingProduct = await _productRepository.GetProductById(productId);
+
+                if (existingProduct == null)
+                {
+                    return NotFound(new { Message = "Product not found." });
+                }
+
+                var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
+
+                var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
+
+                if (product != null)
+                {
+                    cartItems.Remove(product);
+                    await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems.ToList()));
+                    return Ok("Product removed from cart.");
+                }
+                else
+                {
+                    return NotFound(new { Message = "Product not found in cart." });
+                }
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { Message = e.Message });
             }
         }
 
@@ -75,24 +114,31 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
-            var products = new List<ShoppingCartDto>();
-            
-            foreach (var item in cartItems)
+            try
             {
-                var product = await _productRepository.GetProductById(item.ProductId);
+                var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
+                var products = new List<ShoppingCartDto>();
                 
-                if (product != null)
+                foreach (var item in cartItems)
                 {
-                    products.Add(product.ToShoppingCartDto(item));
+                    var product = await _productRepository.GetProductById(item.ProductId);
+                    
+                    if (product != null)
+                    {
+                        products.Add(product.ToShoppingCartDto(item));
+                    }
+                    else
+                    {
+                        return NotFound(new { Message = "Product not found." });
+                    }
                 }
-                else
-                {
-                    return NotFound(new { Message = "Product not found." });
-                }
+                
+                return Ok(products.toCartDto());
             }
-            
-            return Ok(products.toCartDto());
+            catch (Exception e)
+            {
+                return StatusCode(500, new { Message = e.Message });
+            }
         }
 
         [HttpPut("UpdateCart/{productId:int}/{quantity:int}")]
@@ -100,30 +146,65 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
-            var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
-
-            if (product != null)
+            if (quantity <= 0)
             {
-                if (isIncrement == true)
+                return BadRequest(new { Message = "Quantity must be greater than 0." });
+            }
+
+            try
+            {
+                var existingProduct = await _productRepository.GetProductById(productId);
+
+                if (existingProduct == null)
                 {
-                    product.Quantity += quantity;
+                    return NotFound(new { Message = "Product not found." });
                 }
-                else if (isIncrement == false)
+
+                var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
+                var product = cartItems.FirstOrDefault(x => x.ProductId == productId);
+
+                if (product != null)
                 {
-                    product.Quantity -= quantity;
+                    if (isIncrement == true)
+                    {
+                        product.Quantity += quantity;
+                    }
+                    else if (isIncrement == false)
+                    {
+                        product.Quantity -= quantity;
+                    }
+                    else
+                    {
+                        product.Quantity = quantity;
+                    }
+                    
+                    await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems.ToList()));
+                    return Ok("Product updated in cart.");
                 }
                 else
                 {
-                    product.Quantity = quantity;
+                    return NotFound(new { Message = "Product not found in cart." });
                 }
-                
-                await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems.ToList()));
-                return Ok("Product updated in cart.");
             }
-            else
+            catch (Exception e)
             {
-                return NotFound(new { Message = "Product not found in cart." });
+                return StatusCode(500, new { Message = e.Message });
+            }
+        }
+
+        [HttpDelete("ClearCart")]
+        public async Task<IActionResult> ClearCart()
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                await Task.Run(() => _cookieService.ClearCartItemsInCookie());
+                return Ok("Cart cleared.");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { Message = e.Message });
             }
         }
     }
