@@ -28,6 +28,9 @@ namespace api.src.Repositories
             }
 
             var shoppingCart = await _context.ShoppingCarts
+                .Include(s => s.shoppingCartItems)
+                .ThenInclude(item => item.Product)
+                .Include(s => s.User)
                 .FirstOrDefaultAsync(s => s.UserId == user.Id);
 
             if (shoppingCart == null)
@@ -35,19 +38,14 @@ namespace api.src.Repositories
                 throw new InvalidOperationException("Shopping Cart not found.");
             }
 
-            var shoppingCartItems = await _context.ShoppingCartItems
-                .Where(s => s.CartId == shoppingCart.Id)
-                .Include(s => s.Product)
-                .ToListAsync();
-
-            if (!shoppingCartItems.Any())
+            if (shoppingCart.shoppingCartItems == null || !shoppingCart.shoppingCartItems.Any())
             {
                 throw new InvalidOperationException("No items found in the shopping cart.");
             }
 
             purchase.UserId = user.Id;
             purchase.User = user;
-            purchase.Transaction_Date = DateTime.Now;
+            purchase.Transaction_Date = DateTime.UtcNow; 
 
             await _context.Purchases.AddAsync(purchase);
             await _context.SaveChangesAsync();

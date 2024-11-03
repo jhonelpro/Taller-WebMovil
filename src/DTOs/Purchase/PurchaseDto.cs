@@ -7,7 +7,6 @@ namespace api.src.DTOs.Purchase
 
         public int PurchaseId { get; set; }
 
-        public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
 
         public DateTime Transaction_Date { get; set; }

@@ -1,5 +1,6 @@
 using api.src.Data;
 using api.src.DTOs;
+using api.src.DTOs.Product;
 using api.src.Helpers;
 using api.src.Interfaces;
 using api.src.Mappers;
@@ -18,7 +19,7 @@ namespace api.src.Repositories
             _context = context;
         }
 
-        public async Task<List<ProductDto>> GetProducts(QueryObjectProduct query)
+        public async Task<List<ProductDtoForAdmin>> GetProducts(QueryObjectProduct query)
         {
             var products = _context.Products.Include(p => p.ProductType).AsQueryable();
 
@@ -38,7 +39,7 @@ namespace api.src.Repositories
 
             return await products.Skip(skipNumber).Take(query.pageSize)
                 .Include(p => p.ProductType)
-                .Select(p => p.ToProductDto())
+                .Select(p => p.ToProductDtoForAdmin())
                 .ToListAsync();
         }
 

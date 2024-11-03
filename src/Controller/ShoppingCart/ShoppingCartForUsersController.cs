@@ -89,23 +89,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product id, quantity and cart id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
-    
+                return StatusCode(500, new { Message = ex.Message });
             }
             
         }
@@ -156,26 +140,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart not found.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
             
         }
@@ -212,24 +177,8 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product id and quantity cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
-            
         }
 
         [HttpDelete("RemoveFromCart/{productId:int}")]
@@ -250,20 +199,8 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Product id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
-            }
-            
+                return StatusCode(500, new { Message = ex.Message });
+            }      
         }
 
         private async Task<IActionResult> HandleNewCartCreation(AppUser user)
@@ -288,18 +225,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Shopping cart already exists.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
         }
 
@@ -329,26 +255,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart items cannot be null.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
         }
 
@@ -379,28 +286,8 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart items cannot be null.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
-            
         }
     }
 }

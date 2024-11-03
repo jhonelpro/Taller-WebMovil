@@ -13,7 +13,7 @@ namespace api.src.Repositories
     {
         private readonly ApplicationDBContext _context;
 
-        public SaleItemRepository(ApplicationDBContext context, UserManager<AppUser> userManager)
+        public SaleItemRepository(ApplicationDBContext context)
         {
             _context = context;
         }
@@ -115,7 +115,6 @@ namespace api.src.Repositories
                 var purchaseDto = new PurchaseDto
                 {
                     PurchaseId = purchase.Id,
-                    Username = purchase.User?.UserName ?? "Unknown",
                     Email = purchase.User?.Email ?? "Unknown",
                     Country = purchase.Country,
                     City = purchase.City,
@@ -169,7 +168,6 @@ namespace api.src.Repositories
                 var purchaseDto = new PurchaseDto
                 {
                     PurchaseId = purchase.Id,
-                    Username = purchase.User?.UserName ?? "Unknown",
                     Email = purchase.User?.Email ?? "Unknown",
                     Transaction_Date = purchase.Transaction_Date,
                     Country = purchase.Country,

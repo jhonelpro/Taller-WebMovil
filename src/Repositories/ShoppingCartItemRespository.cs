@@ -22,21 +22,28 @@ namespace api.src.Repositories
                 throw new Exception("Product id, quantity and cart id cannot be less than or equal to zero.");
             }
 
-            var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
+            var product = await _context.Products
+                .Include(p => p.ProductType)
+                .FirstOrDefaultAsync(x => x.Id == productId);
 
             if (product == null)
             {
                 throw new Exception("Product not found.");
             }
 
-            var shoppingCart = await _context.ShoppingCarts.FirstOrDefaultAsync(x => x.Id == cartId);
+            var shoppingCart = await _context.ShoppingCarts
+                .Include(s => s.shoppingCartItems)
+                .FirstOrDefaultAsync(x => x.Id == cartId);
 
             if (shoppingCart == null)
             {
                 throw new Exception("Cart not found.");
             }
 
-            var existingCartItem = await _context.ShoppingCartItems.FirstOrDefaultAsync(x => x.ProductId == productId);
+            var existingCartItem = await _context.ShoppingCartItems
+                .Include(s => s.Product)
+                .Include(s => s.shoppingCart)
+                .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (existingCartItem != null)
             {
@@ -78,14 +85,20 @@ namespace api.src.Repositories
                 throw new Exception("Cart items cannot be null.");
             }
 
-            var shoppingCart = await _context.ShoppingCarts.FirstOrDefaultAsync(x => x.Id == cartId);
+            var shoppingCart = await _context.ShoppingCarts
+                .Include(s => s.shoppingCartItems)
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(x => x.Id == cartId);
 
             if (shoppingCart == null)
             {
                 throw new Exception("Cart not found.");
             }
 
-            var existingCartItems = await _context.ShoppingCartItems.Where(x => x.CartId == cartId).ToListAsync();
+            var existingCartItems = await _context.ShoppingCartItems.Where(x => x.CartId == cartId)
+                .Include(s => s.Product)
+                .Include(s => s.shoppingCart)
+                .ToListAsync();
 
             if (existingCartItems != null)
             {
@@ -108,14 +121,19 @@ namespace api.src.Repositories
 
             foreach (var item in cartItems)
             { 
-                var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == item.ProductId);
+                var product = await _context.Products
+                    .Include(p => p.ProductType)
+                    .FirstOrDefaultAsync(x => x.Id == item.ProductId);
 
                 if (product == null)
                 {
                     throw new Exception("Product not found.");
                 }
 
-                var existingCartItem = await _context.ShoppingCartItems.FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
+                var existingCartItem = await _context.ShoppingCartItems
+                    .Include(s => s.Product)
+                    .Include(s => s.shoppingCart)
+                    .FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
 
                 if (existingCartItem == null)
                 {
@@ -163,7 +181,9 @@ namespace api.src.Repositories
                 throw new Exception("Product id, cart id and quantity cannot be less than or equal to zero.");
             }
 
-            var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
+            var product = await _context.Products
+                .Include(p => p.ProductType)
+                .FirstOrDefaultAsync(x => x.Id == productId);
 
             if (product == null)
             {
@@ -209,7 +229,10 @@ namespace api.src.Repositories
                 throw new Exception("Product id cannot be less than or equal to zero.");
             }
 
-            var shoppingCartItem = await _context.ShoppingCartItems.FirstOrDefaultAsync(x => x.ProductId == productId);
+            var shoppingCartItem = await _context.ShoppingCartItems
+                .Include(s => s.Product)
+                .Include(s => s.shoppingCart)
+                .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (shoppingCartItem == null)
             {
@@ -226,7 +249,10 @@ namespace api.src.Repositories
                 throw new Exception("Cart id cannot be less than or equal to zero.");
             }
 
-            var shoppingCartItems = await _context.ShoppingCartItems.Where(x => x.CartId == cartId).ToListAsync();
+            var shoppingCartItems = await _context.ShoppingCartItems.Where(x => x.CartId == cartId)
+                .Include(s => s.shoppingCart)
+                .Include(s => s.Product)
+                .ToListAsync();
 
             if (shoppingCartItems == null)
             {

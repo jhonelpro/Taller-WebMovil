@@ -104,36 +104,8 @@ namespace api.src.Controller.Purchase
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Purchase cannot be null.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Shopping Cart not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Shopping Cart is empty.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else if (ex.Message == "No items found in the shopping cart.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Shopping Cart Items not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
-                }
-            }
-            
+                return StatusCode(500, new { Error = ex.Message });
+            }   
         }
 
         [HttpGet("GetPurchaseRecipt/{purchaseId:int}")]
@@ -143,7 +115,6 @@ namespace api.src.Controller.Purchase
 
             try
             {
-
                 var user = await _userManager.GetUserAsync(User);
 
                 if (user == null)
@@ -170,22 +141,7 @@ namespace api.src.Controller.Purchase
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Purchase ID cannot be null.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Purchase not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else if (ex.Message == "product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
         }
 
@@ -213,22 +169,7 @@ namespace api.src.Controller.Purchase
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User ID cannot be null.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Purchases not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Products not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
         }
     }
