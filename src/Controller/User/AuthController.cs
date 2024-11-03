@@ -51,6 +51,8 @@ namespace api.src.Controller
 
                 if (registerDto.DateOfBirth >= DateTime.Now) return BadRequest("Date of birth must be in the past.");
 
+                if ((DateTime.Now.Year - registerDto.DateOfBirth.Year) < 13) return BadRequest("You must be at least 13 years old to register.");
+
                 if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.ConfirmPassword)) return BadRequest("Password is required.");
 
                 if (!string.Equals(registerDto.Password, registerDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest("Passwords do not match.");
