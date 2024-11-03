@@ -342,10 +342,20 @@ namespace api.src.Repositories
             // Incrementar o decrementar la cantidad según el parámetro isIncrement
             if (isIncrement == true)
             {
+                if (shoppingCartItem.Quantity + quantity <= 0)
+                {
+                    throw new Exception("Quantity must be greater than zero.");
+                }
+
                 shoppingCartItem.Quantity += quantity; // Incrementar
             }
             else if (isIncrement == false)
             {
+                if (shoppingCartItem.Quantity - quantity <= 0)
+                {
+                    throw new Exception("Quantity must be greater than zero.");
+                }
+
                 shoppingCartItem.Quantity -= quantity; // Decrementar
             }
             else

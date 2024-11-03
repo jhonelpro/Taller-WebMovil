@@ -120,6 +120,11 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            if (quantity <= 0)
+            {
+                return BadRequest(new { Message = "Quantity must be greater than 0." });
+            }
+
             try 
             {
                 var user = await _userManager.GetUserAsync(User);
@@ -240,6 +245,11 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            if (quantity <= 0)
+            {
+                return BadRequest(new { Message = "Quantity must be greater than 0." });
+            }
+
             try
             {
                 var user = await _userManager.GetUserAsync(User);
@@ -290,6 +300,11 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            if (productId <= 0)
+            {
+                return BadRequest(new { Message = "Product Id must be greater than 0." });
+            }
+            
             try 
             {
                 var result = await _shoppingCartItem.RemoveShoppingCartItem(productId);
