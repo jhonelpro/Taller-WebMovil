@@ -35,14 +35,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
         }
 
@@ -52,7 +45,8 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            try{
+            try
+            {
                 if (productDto.Image == null || productDto.Image.Length == 0)
                 {
                     return BadRequest("Image is required.");
@@ -87,18 +81,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Product or UploadResult cannot be null.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "ProductType not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
             
         }
@@ -110,8 +93,8 @@ namespace api.src.Controller.Product
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             try
-                {
-                    if (product.Image == null || product.Image.Length == 0)
+            {
+                if (product.Image == null || product.Image.Length == 0)
                 {
                     return BadRequest("Image is required.");
                 }
@@ -150,20 +133,8 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else if (ex.Message == "ProductType not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
-           
         }
 
         [HttpDelete("{id:int}")]
@@ -184,14 +155,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
         }
     }

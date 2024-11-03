@@ -1,4 +1,5 @@
 using api.src.DTOs;
+using api.src.DTOs.Product;
 using api.src.Models;
 
 namespace api.src.Mappers
@@ -9,6 +10,19 @@ namespace api.src.Mappers
         {
             return new ProductDto
             {
+                Name = product.Name,
+                Price = product.Price,
+                Stock = product.Stock,
+                ProductType = product.ProductType,
+                ImageUrl = product.ImageUrl
+            };
+        }
+
+        public static ProductDtoForAdmin ToProductDtoForAdmin(this Product product)
+        {
+            return new ProductDtoForAdmin
+            {
+                Id = product.Id,
                 Name = product.Name,
                 Price = product.Price,
                 Stock = product.Stock,
@@ -36,6 +50,18 @@ namespace api.src.Mappers
                 Price = updateProductRequestDto.Price,
                 Stock = updateProductRequestDto.Stock,
                 ProductTypeId = updateProductRequestDto.ProductTypeId,
+            };
+        }
+
+        public static UpdateProductRequestDto toUpdateProduct(this CreateProductRequestDto createProductRequestDto)
+        {
+            return new UpdateProductRequestDto
+            {
+                Name = createProductRequestDto.Name,
+                Price = createProductRequestDto.Price,
+                Stock = createProductRequestDto.Stock,
+                ProductTypeId = createProductRequestDto.ProductTypeId,
+                Image = createProductRequestDto.Image
             };
         }
     }

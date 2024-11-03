@@ -1,5 +1,6 @@
 using api.src.Data;
 using api.src.DTOs;
+using api.src.DTOs.Product;
 using api.src.Helpers;
 using api.src.Interfaces;
 using api.src.Mappers;
@@ -18,7 +19,7 @@ namespace api.src.Repositories
             _context = context;
         }
 
-        public async Task<List<ProductDto>> GetProducts(QueryObjectProduct query)
+        public async Task<List<ProductDtoForAdmin>> GetProducts(QueryObjectProduct query)
         {
             var products = _context.Products.Include(p => p.ProductType).AsQueryable();
 
@@ -38,13 +39,20 @@ namespace api.src.Repositories
 
             return await products.Skip(skipNumber).Take(query.pageSize)
                 .Include(p => p.ProductType)
-                .Select(p => p.ToProductDto())
+                .Select(p => p.ToProductDtoForAdmin())
                 .ToListAsync();
         }
 
         public async Task<Product> AddProduct(Product product, ImageUploadResult uploadResult)
         {
             if (product == null || uploadResult == null) throw new ArgumentNullException("Product or UploadResult cannot be null.");
+
+            var existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.Name == product.Name);
+
+            if (existingProduct != null && existingProduct.ProductTypeId == product.ProductTypeId)
+            {
+                throw new Exception("Product already exists.");
+            }
             
             var newProduct = new Product
             {
@@ -169,6 +177,21 @@ namespace api.src.Repositories
             if (existingProduct == null)
             {
                 throw new Exception("Product not found.");
+            }
+
+            bool nameChanged = existingProduct.Name != product.Name;
+            bool typeChanged = existingProduct.ProductTypeId != product.ProductTypeId;
+
+            if (nameChanged || typeChanged)
+            {
+                var productValidation = await _context.Products
+                    .Where(p => p.Name == product.Name && p.ProductTypeId == product.ProductTypeId)
+                    .FirstOrDefaultAsync();
+
+                if (productValidation != null)
+                {
+                    throw new Exception("Product already exists.");
+                }
             }
 
             existingProduct.Name = product.Name;

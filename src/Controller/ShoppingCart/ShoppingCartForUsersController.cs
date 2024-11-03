@@ -3,6 +3,7 @@ using api.src.Interfaces;
 using api.src.Mappers;
 using api.src.Models;
 using api.src.Models.User;
+using api.src.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,24 +21,23 @@ namespace api.src.Controller.Product
         private readonly IShoppingCart _shoppingCart;
         private readonly IShoppingCartItem _shoppingCartItem;
         private readonly UserManager<AppUser> _userManager;
+        private readonly ICookieService _cookieService;
 
         public ShoppingCartForUsersController(IProductRepository productRepository, IShoppingCart shoppingCart, 
-        IShoppingCartItem shoppingCartItem, UserManager<AppUser> userManager)
+        IShoppingCartItem shoppingCartItem, UserManager<AppUser> userManager, ICookieService cookieService)
         {
             _productRepository = productRepository;
             _shoppingCart = shoppingCart;
             _shoppingCartItem = shoppingCartItem;
             _userManager = userManager;
+            _cookieService = cookieService;
         }
         
         [HttpPost("CreateCartForUser")]
         public async Task<IActionResult> CreateCartForUser()
         { 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            
             var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
@@ -45,7 +45,7 @@ namespace api.src.Controller.Product
                 return BadRequest("User not found.");
             }
 
-            var cartItems = GetCartItemsFromCookies();
+            var cartItems = _cookieService.GetCartItemsFromCookies();
 
             if (Request.Cookies["ShoppingCart"] != null)
             {
@@ -89,23 +89,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product id, quantity and cart id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
-    
+                return StatusCode(500, new { Message = ex.Message });
             }
             
         }
@@ -156,26 +140,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart not found.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
             
         }
@@ -212,24 +177,8 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product id and quantity cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
-            
         }
 
         [HttpDelete("RemoveFromCart/{productId:int}")]
@@ -250,20 +199,8 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Product id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
-            }
-            
+                return StatusCode(500, new { Message = ex.Message });
+            }      
         }
 
         private async Task<IActionResult> HandleNewCartCreation(AppUser user)
@@ -288,18 +225,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error.");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
         }
 
@@ -318,6 +244,8 @@ namespace api.src.Controller.Product
                         return BadRequest("Failed to add items to cart.");
                     }
 
+                    _cookieService.ClearCartItemsInCookie();
+
                     return Ok("Items added to cart successfully.");
                 }
                 else
@@ -327,26 +255,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart items cannot be null.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
         }
 
@@ -377,39 +286,8 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                if (ex.Message == "User id cannot be null or empty.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart id cannot be less than or equal to zero.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Cart items cannot be null.")
-                {
-                    return BadRequest(new { Message = ex.Message });
-                }
-                else if (ex.Message == "Product not found.")
-                {
-                    return NotFound(new { Message = ex.Message });
-                }   
-                else
-                {
-                    return StatusCode(500, "Internal server error");
-                }
+                return StatusCode(500, new { Message = ex.Message });
             }
-            
-        }
-        
-        private List<ShoppingCartItem> GetCartItemsFromCookies()
-        {
-            var cartItems = new List<ShoppingCartItem>();
-            var cartCookie = Request.Cookies["ShoppingCart"];
-            if (!string.IsNullOrEmpty(cartCookie))
-            {
-                cartItems = JsonConvert.DeserializeObject<List<ShoppingCartItem>>(cartCookie);
-            }
-            return cartItems ?? new List<ShoppingCartItem>();
         }
     }
 }

@@ -21,6 +21,11 @@ namespace api.src.Repositories
                 throw new ArgumentNullException("User id cannot be null or empty.");
             }
 
+            if (await _context.ShoppingCarts.AnyAsync(x => x.UserId == userId))
+            {
+                throw new InvalidOperationException("Shopping cart already exists.");
+            }
+            
             var shoppingCart = new ShoppingCart
             {
                 UserId = userId,
@@ -40,7 +45,11 @@ namespace api.src.Repositories
                 throw new ArgumentNullException("User id cannot be null or empty.");
             }
 
-            var shoppingCart = await _context.ShoppingCarts.FirstOrDefaultAsync(x => x.UserId == userId);
+            var shoppingCart = await _context.ShoppingCarts
+                .Include(x => x.shoppingCartItems)
+                .ThenInclude(x => x.Product)
+                .FirstOrDefaultAsync(x => x.UserId == userId);
+            
 
             return shoppingCart;
         }
