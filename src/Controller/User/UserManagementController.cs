@@ -52,8 +52,12 @@ namespace api.src.Controller
                 var user = _userManager.Users.AsQueryable();
 
                 // Si el query no es nulo, se filtra por el nombre del usuario
-                if (!string.IsNullOrEmpty(query.Name)) user = user.Where(p => p.Name!.Contains(query.Name));
-                
+                if (!string.IsNullOrEmpty(query.Name))
+                {
+                    string nameToSearch = query.Name.ToUpper();
+                    user = user.Where(p => p.Name != null && p.Name.ToUpper().Contains(nameToSearch));
+                }
+
                 // Se obtiene la lista de usuarios de forma paginada
                 var usersList = await user.Skip((query.Page - 1) * query.PageSize).Take(query.PageSize).ToListAsync();
 

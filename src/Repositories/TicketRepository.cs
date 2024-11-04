@@ -77,6 +77,7 @@ namespace api.src.Repositories
 
             // Obtener todos los tickets asociados al ID del usuario
             var tickets = await _context.Tickets
+                                        .OrderBy(x => x.Purchase_Date) // Ordenar por fecha de compra 
                                         .Where(x => x.UserId == userId)
                                         .ToListAsync();
 

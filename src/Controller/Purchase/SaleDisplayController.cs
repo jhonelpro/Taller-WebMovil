@@ -1,3 +1,4 @@
+using api.src.Helpers;
 using api.src.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -43,13 +44,13 @@ namespace api.src.Controller.Purchase
         /// </list>
         /// </returns>
         [HttpGet("SaleDisplay")]
-        public async Task<IActionResult> SaleDisplay()
+        public async Task<IActionResult> SaleDisplay([FromQuery] QueryObjectSale queryObjectSale)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             try
             {
-                var purchases = await _saleItem.GetPurchasesAsyncForAdmin();
+                var purchases = await _saleItem.GetPurchasesAsyncForAdmin(queryObjectSale);
 
                 if (purchases == null)
                 {

@@ -6,6 +6,7 @@ using api.src.Mappers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using api.src.Models.User;
+using api.src.Helpers;
 
 namespace api.src.Repositories
 {
@@ -105,6 +106,7 @@ namespace api.src.Repositories
 
             // Recupera las compras realizadas por el usuario especificado.
             var purchases = await _context.Purchases
+                                        .OrderBy(x => x.Transaction_Date) // Ordena las compras por fecha de transacción.
                                         .Where(x => x.UserId == userId)
                                         .ToListAsync();
 
@@ -159,6 +161,7 @@ namespace api.src.Repositories
                 var purchaseDto = new PurchaseDto
                 {
                     PurchaseId = purchase.Id,
+                    UserName = purchase.User?.Name ?? "Unknown",
                     Email = purchase.User?.Email ?? "Unknown",
                     Country = purchase.Country,
                     City = purchase.City,
@@ -179,44 +182,62 @@ namespace api.src.Repositories
         /// Obtiene todas las compras realizadas, incluyendo la información del usuario, para administración.
         /// </summary>
         /// <returns>Una lista de objetos PurchaseDto que representa todas las compras en el sistema.</returns>
-        public async Task<List<PurchaseDto>> GetPurchasesAsyncForAdmin()
+        public async Task<List<PurchaseDto>> GetPurchasesAsyncForAdmin(QueryObjectSale queryObjectSale)
         {
-            // Obtiene todas las compras de la base de datos e incluye la información del usuario asociado a cada compra.
-            var purchases = await _context.Purchases
-                                        .Include(p => p.User) // Incluye la información del usuario relacionado con la compra.
-                                        .ToListAsync();
+            // Construye la consulta base para obtener las compras con la inclusión del usuario asociado.
+            var query = _context.Purchases.Include(p => p.User).AsQueryable();
+
+            // Filtra por nombre de usuario si se especifica.
+            if (!string.IsNullOrEmpty(queryObjectSale.UserName))
+            {
+                string nameToSearch = queryObjectSale.UserName.ToUpper();
+                query = query.Where(p => p.User != null && p.User.Name != null && p.User.Name.ToUpper().Contains(nameToSearch));
+            }
+
+            // Ordena las compras por fecha de transacción en orden ascendente o descendente.
+            query = queryObjectSale.IsDecendingDate.HasValue && queryObjectSale.IsDecendingDate.Value
+                ? query.OrderByDescending(p => p.Transaction_Date)
+                : query.OrderBy(p => p.Transaction_Date);
+
+            // Aplica la paginación
+            query = query
+                .Skip((queryObjectSale.Page - 1) * queryObjectSale.PageSize)
+                .Take(queryObjectSale.PageSize);
+
+            // Ejecuta la consulta
+            var purchases = await query.ToListAsync();
 
             // Verifica si no se encontraron compras y lanza una excepción si es el caso.
-            if (purchases == null || !purchases.Any())
+            if (!purchases.Any())
             {
                 throw new ArgumentNullException(nameof(purchases), "Purchases not found.");
             }
 
             // Extrae los IDs de las compras obtenidas para consultar los items de venta relacionados.
             var purchaseIds = purchases.Select(y => y.Id).ToList();
-            
+
             // Obtiene los items de venta que están relacionados con las compras.
             var saleItems = await _context.SaleItems
-                                        .Where(x => purchaseIds.Contains(x.PurchaseId)) // Filtra los items de venta por los IDs de compra.
-                                        .ToListAsync();
+                .Where(x => purchaseIds.Contains(x.PurchaseId))
+                .ToListAsync();
 
             // Verifica si no se encontraron items de venta y lanza una excepción si es el caso.
-            if (saleItems == null || !saleItems.Any())
+            if (!saleItems.Any())
             {
                 throw new ArgumentNullException(nameof(saleItems), "Sale Items not found.");
             }
 
             // Extrae los IDs de los productos de los items de venta.
             var productIds = saleItems.Select(y => y.ProductId).ToList();
-            
+
             // Obtiene los productos relacionados con los items de venta.
             var products = await _context.Products
-                                        .Where(x => productIds.Contains(x.Id)) 
-                                        .Include(x => x.ProductType) 
-                                        .ToListAsync();
+                .Where(x => productIds.Contains(x.Id))
+                .Include(x => x.ProductType)
+                .ToListAsync();
 
             // Verifica si no se encontraron productos y lanza una excepción si es el caso.
-            if (products == null || !products.Any())
+            if (!products.Any())
             {
                 throw new ArgumentNullException(nameof(products), "Products not found.");
             }
@@ -227,27 +248,23 @@ namespace api.src.Repositories
             // Itera sobre cada compra para construir el objeto PurchaseDto correspondiente.
             foreach (var purchase in purchases)
             {
-                // Filtra los items de venta relevantes para la compra actual.
                 var relevantSaleItems = saleItems.Where(x => x.PurchaseId == purchase.Id).ToList();
-                
-                // Calcula el precio total sumando los precios de los items de venta relevantes.
                 var totalPrice = relevantSaleItems.Sum(item => item.TotalPrice);
 
-                // Crea un objeto PurchaseDto con la información relevante de la compra.
                 var purchaseDto = new PurchaseDto
                 {
                     PurchaseId = purchase.Id,
-                    Email = purchase.User?.Email ?? "Unknown", // Usa "Unknown" si el email del usuario es nulo.
+                    UserName = purchase.User?.Name ?? "Unknown",
+                    Email = purchase.User?.Email ?? "Unknown",
                     Transaction_Date = purchase.Transaction_Date,
                     Country = purchase.Country,
                     City = purchase.City,
                     Commune = purchase.Commune,
                     Street = purchase.Street,
                     Purchase_TotalPrice = totalPrice,
-                    saleItemDtos = PurchaseMapper.ToSaleItemDto(relevantSaleItems, products) // Mapea los items de venta a DTOs.
+                    saleItemDtos = PurchaseMapper.ToSaleItemDto(relevantSaleItems, products)
                 };
 
-                // Agrega el DTO de la compra a la lista de resultados.
                 purchasesDtos.Add(purchaseDto);
             }
 
