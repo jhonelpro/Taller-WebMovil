@@ -256,6 +256,10 @@ namespace api.src.Controller.Product
             }
         }
 
+        /// <summary>
+        /// Endpoint para limpiar el carrito de compras.
+        /// </summary>
+        /// <returns></returns>
         [HttpDelete("ClearCart")]
         public async Task<IActionResult> ClearCart()
         {

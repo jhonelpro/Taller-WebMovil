@@ -12,7 +12,7 @@ namespace api.src.Mappers
         /// <summary>
         /// Convierte un objeto de tipo Product a su representación DTO.
         /// </summary>
-        /// <param name="product">Parametro de tipo Product que representa el producto a convertir.</param>
+        /// <param name="product">Parámetro de tipo Product que representa el producto a convertir.</param>
         /// <returns>Un objeto de tipo ProductDto que representa el producto convertido.</returns>
         public static ProductDto ToProductDto(this Product product)
         {
@@ -26,6 +26,11 @@ namespace api.src.Mappers
             };
         }
 
+        /// <summary>
+        /// Convierte un objeto de tipo Product a su representación DTO para administradores.
+        /// </summary>
+        /// <param name="product">Parámetro de tipo Product que representa el producto a convertir.</param>
+        /// <returns></returns>
         public static ProductDtoForAdmin ToProductDtoForAdmin(this Product product)
         {
             return new ProductDtoForAdmin
@@ -39,6 +44,11 @@ namespace api.src.Mappers
             };
         }
 
+        /// <summary>
+        /// Convierte un objeto de tipo CreateProductRequestDto a su representación de tipo Product.
+        /// </summary>
+        /// <param name="createProductRequestDto">Parámetro de tipo CreateProductRequestDto que representa el producto a convertir.</param>
+        /// <returns></returns>
         public static Product ToProductFromCreateDto(this CreateProductRequestDto createProductRequestDto)
         {
             return new Product
@@ -47,34 +57,6 @@ namespace api.src.Mappers
                 Price = createProductRequestDto.Price,
                 Stock = createProductRequestDto.Stock,
                 ProductTypeId = createProductRequestDto.ProductTypeId,
-            };
-        }
-
-        /// <summary>
-        /// Convierte un objeto de tipo UpdateProductRequestDto a un objeto de tipo Product.
-        /// </summary>
-        /// <param name="updateProductRequestDto">Parametro de tipo UpdateProductRequestDto que representa los datos necesarios para actualizar un producto existente.</param>
-        /// <returns>Un objeto de tipo Product que representa el producto actualizado.</returns>
-        public static Product ToProductFromUpdateDto(this UpdateProductRequestDto updateProductRequestDto)
-        {
-            return new Product
-            {
-                Name = updateProductRequestDto.Name,
-                Price = updateProductRequestDto.Price,
-                Stock = updateProductRequestDto.Stock,
-                ProductTypeId = updateProductRequestDto.ProductTypeId,
-            };
-        }
-
-        public static UpdateProductRequestDto toUpdateProduct(this CreateProductRequestDto createProductRequestDto)
-        {
-            return new UpdateProductRequestDto
-            {
-                Name = createProductRequestDto.Name,
-                Price = createProductRequestDto.Price,
-                Stock = createProductRequestDto.Stock,
-                ProductTypeId = createProductRequestDto.ProductTypeId,
-                Image = createProductRequestDto.Image
             };
         }
     }
