@@ -48,6 +48,11 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            if (productId <= 0)
+            {
+                return BadRequest(new { Message = "Product Id must be greater than 0." });
+            }
+
             if (quantity <= 0)
             {
                 return BadRequest(new { Message = "Quantity must be greater than 0." });
@@ -190,6 +195,11 @@ namespace api.src.Controller.Product
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            if (productId <= 0)
+            {
+                return BadRequest(new { Message = "Product Id must be greater than 0." });
+            }
+
             if (quantity <= 0)
             {
                 return BadRequest(new { Message = "Quantity must be greater than 0." });
@@ -211,10 +221,20 @@ namespace api.src.Controller.Product
                 {
                     if (isIncrement == true)
                     {
+                        if (product.Quantity + quantity <= 0)
+                        {
+                            return BadRequest(new { Message = "Quantity must be greater than 0." });
+                        }
+
                         product.Quantity += quantity;
                     }
                     else if (isIncrement == false)
                     {
+                        if (product.Quantity - quantity <= 0)
+                        {
+                            return BadRequest(new { Message = "Quantity must be greater than 0." });
+                        }
+
                         product.Quantity -= quantity;
                     }
                     else
@@ -236,6 +256,10 @@ namespace api.src.Controller.Product
             }
         }
 
+        /// <summary>
+        /// Endpoint para limpiar el carrito de compras.
+        /// </summary>
+        /// <returns></returns>
         [HttpDelete("ClearCart")]
         public async Task<IActionResult> ClearCart()
         {

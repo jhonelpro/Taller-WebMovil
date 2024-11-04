@@ -17,7 +17,19 @@ namespace api.src.Interfaces
         /// <param name="id">Parametro int que representa el ID del producto a buscar.</param>
         /// <returns>Producto correspondiente al ID, o null si no se encuentra.</returns>
         Task<Product?> GetProductById(int id);
+
+        /// <summary>
+        /// Obtiene una lista de productos según los criterios de consulta indicado por el administrador.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         Task<List<ProductDtoForAdmin>> GetProducts(QueryObjectProduct query);
+
+        /// <summary>
+        /// Obtiene una lista de productos disponibles según los criterios de consulta.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         Task<List<ProductDto>> GetAvailableProducts(QueryObject query);
 
         /// <summary>

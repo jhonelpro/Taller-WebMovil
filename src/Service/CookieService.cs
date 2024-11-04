@@ -8,15 +8,29 @@ using Newtonsoft.Json;
 
 namespace api.src.Service
 {
+    /// <summary>
+    /// Servicio para la gestión de cookies, proporcionando métodos para obtener, guardar y limpiar los elementos del carrito de compras.
+    /// </summary>
     public class CookieService : ICookieService
     {
-         private readonly IHttpContextAccessor _httpContextAccessor;
+        /// <summary>
+        /// Atributo para acceder al contexto HTTP de la aplicación.
+        /// </summary>
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
+        /// <summary>
+        /// Constructor que inicializa el servicio de cookies con el contexto HTTP de la aplicación.
+        /// </summary>
+        /// <param name="httpContextAccessor">Parámetro que representa el contexto HTTP.</param>
         public CookieService(IHttpContextAccessor httpContextAccessor)
         {
+            // Inicializa el contexto HTTP
             _httpContextAccessor = httpContextAccessor;
         }
 
+        /// <summary>
+        /// Limpia los elementos del carrito de compras almacenados en las cookies.
+        /// </summary>
         public void ClearCartItemsInCookie()
         {
             var context = _httpContextAccessor.HttpContext;
@@ -26,6 +40,10 @@ namespace api.src.Service
             }
         }
 
+        /// <summary>
+        /// Obtiene los elementos del carrito de compras almacenados en las cookies.
+        /// </summary>
+        /// <returns>Retorna una lista de los productos en el carrito de compras gurada en una cookie.</returns>
         public List<ShoppingCartItem> GetCartItemsFromCookies()
         {
             var cartItems = new List<ShoppingCartItem>();
@@ -41,6 +59,10 @@ namespace api.src.Service
             return cartItems ?? new List<ShoppingCartItem>();
         }
 
+        /// <summary>
+        /// Guarda los elementos del carrito de compras en las cookies.
+        /// </summary>
+        /// <param name="cartItems">Parametro que representa el carrito de compras que se guradara en la cookie.</param>
         public void SaveCartItemsToCookies(List<ShoppingCartItem> cartItems)
         {
             var context = _httpContextAccessor.HttpContext;

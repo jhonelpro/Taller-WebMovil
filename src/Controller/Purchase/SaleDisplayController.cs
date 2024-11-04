@@ -49,14 +49,14 @@ namespace api.src.Controller.Purchase
 
             try
             {
-                var saleItems = await _saleItem.GetPurchasesAsyncForAdmin();
+                var purchases = await _saleItem.GetPurchasesAsyncForAdmin();
 
-                if (saleItems == null)
+                if (purchases == null)
                 {
                     return NotFound("No sales found.");
                 }
 
-                return Ok(saleItems);
+                return Ok(purchases);
             }
             catch (Exception ex)
             {

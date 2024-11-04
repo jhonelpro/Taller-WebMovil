@@ -100,29 +100,29 @@ namespace api.src.Repositories
             // Verifica si el ID del usuario es nulo o vacío.
             if (string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentNullException("User ID cannot be null.");
+                throw new ArgumentNullException(nameof(userId), "User ID cannot be null or empty.");
             }
 
             // Recupera las compras realizadas por el usuario especificado.
             var purchases = await _context.Purchases
-                                          .Where(x => x.UserId == userId)
-                                          .ToListAsync();
+                                        .Where(x => x.UserId == userId)
+                                        .ToListAsync();
 
             // Verifica si existen compras para el usuario.
-            if (purchases == null)
+            if (purchases == null || !purchases.Any())
             {
-                throw new ArgumentNullException("Purchases not found.");
+                throw new ArgumentNullException(nameof(purchases), "Purchases not found.");
             }
 
             // Recupera los items de venta relacionados con las compras obtenidas.
             var saleItems = await _context.SaleItems
-                                          .Where(x => purchases.Select(y => y.Id).Contains(x.PurchaseId))
-                                          .ToListAsync();
+                                        .Where(x => purchases.Select(y => y.Id).Contains(x.PurchaseId))
+                                        .ToListAsync();
 
             // Verifica si existen items de venta para las compras.
-            if (saleItems == null)
+            if (saleItems == null || !saleItems.Any())
             {
-                throw new ArgumentNullException("Sale Items not found.");
+                throw new ArgumentNullException(nameof(saleItems), "Sale Items not found.");
             }
 
             // Lista para almacenar los DTOs de las compras.
@@ -131,32 +131,28 @@ namespace api.src.Repositories
             // Itera sobre cada compra para construir el objeto PurchaseDto correspondiente.
             foreach (var purchase in purchases)
             {
-                double totalPrice = 0;
-
                 // Filtra los items de venta correspondientes a la compra actual.
-                var saleItem = saleItems.Where(x => x.PurchaseId == purchase.Id).ToList();
+                var relevantSaleItems = saleItems.Where(x => x.PurchaseId == purchase.Id).ToList();
+                
+                // Verifica si no hay items de venta para la compra.
+                if (!relevantSaleItems.Any())
+                {
+                    continue; // O puedes lanzar una excepción según tu lógica
+                }
 
                 // Suma los precios totales de cada item de venta para obtener el total de la compra.
-                foreach (var item in saleItem)
-                {
-                    totalPrice += item.TotalPrice;
-                }
-
-                if (saleItem == null)
-                {
-                    throw new ArgumentNullException(nameof(saleItem));
-                }
+                double totalPrice = relevantSaleItems.Sum(item => item.TotalPrice);
 
                 // Recupera los productos relacionados con los items de venta de la compra.
                 var products = await _context.Products
-                                             .Where(x => saleItem.Select(y => y.ProductId).Contains(x.Id))
-                                             .Include(x => x.ProductType)
-                                             .ToListAsync();
+                                            .Where(x => relevantSaleItems.Select(y => y.ProductId).Contains(x.Id))
+                                            .Include(x => x.ProductType)
+                                            .ToListAsync();
 
                 // Verifica si los productos existen en la base de datos.
-                if (products == null)
+                if (products == null || !products.Any())
                 {
-                    throw new ArgumentNullException("Products not found.");
+                    throw new ArgumentNullException(nameof(products), "Products not found.");
                 }
 
                 // Crea el objeto PurchaseDto con la información relevante de la compra.
@@ -169,7 +165,7 @@ namespace api.src.Repositories
                     Commune = purchase.Commune,
                     Street = purchase.Street,
                     Purchase_TotalPrice = totalPrice,
-                    saleItemDtos = PurchaseMapper.ToSaleItemDto(saleItem, products)
+                    saleItemDtos = PurchaseMapper.ToSaleItemDto(relevantSaleItems, products)
                 };
 
                 // Agrega el DTO de la compra a la lista de resultados.
@@ -185,52 +181,73 @@ namespace api.src.Repositories
         /// <returns>Una lista de objetos PurchaseDto que representa todas las compras en el sistema.</returns>
         public async Task<List<PurchaseDto>> GetPurchasesAsyncForAdmin()
         {
-            var purchases = await _context.Purchases.Include(p => p.User).ToListAsync();
-
-            if (!purchases.Any())
-            {
-                throw new ArgumentNullException("Purchases not found.");
-            }
-
-            var purchaseIds = purchases.Select(y => y.Id).ToList();
-            var saleItems = await _context.SaleItems.Where(x => purchaseIds.Contains(x.PurchaseId)).ToListAsync();
-
-            if (!saleItems.Any())
-            {
-                throw new ArgumentNullException("Sale Items not found.");
-            }
-
-            var productIds = saleItems.Select(y => y.ProductId).ToList();
-            var products = await _context.Products
-                                        .Where(x => productIds.Contains(x.Id))
-                                        .Include(x => x.ProductType)
+            // Obtiene todas las compras de la base de datos e incluye la información del usuario asociado a cada compra.
+            var purchases = await _context.Purchases
+                                        .Include(p => p.User) // Incluye la información del usuario relacionado con la compra.
                                         .ToListAsync();
 
-            if (!products.Any())
+            // Verifica si no se encontraron compras y lanza una excepción si es el caso.
+            if (purchases == null || !purchases.Any())
             {
-                throw new ArgumentNullException("Products not found.");
+                throw new ArgumentNullException(nameof(purchases), "Purchases not found.");
             }
 
+            // Extrae los IDs de las compras obtenidas para consultar los items de venta relacionados.
+            var purchaseIds = purchases.Select(y => y.Id).ToList();
+            
+            // Obtiene los items de venta que están relacionados con las compras.
+            var saleItems = await _context.SaleItems
+                                        .Where(x => purchaseIds.Contains(x.PurchaseId)) // Filtra los items de venta por los IDs de compra.
+                                        .ToListAsync();
+
+            // Verifica si no se encontraron items de venta y lanza una excepción si es el caso.
+            if (saleItems == null || !saleItems.Any())
+            {
+                throw new ArgumentNullException(nameof(saleItems), "Sale Items not found.");
+            }
+
+            // Extrae los IDs de los productos de los items de venta.
+            var productIds = saleItems.Select(y => y.ProductId).ToList();
+            
+            // Obtiene los productos relacionados con los items de venta.
+            var products = await _context.Products
+                                        .Where(x => productIds.Contains(x.Id)) 
+                                        .Include(x => x.ProductType) 
+                                        .ToListAsync();
+
+            // Verifica si no se encontraron productos y lanza una excepción si es el caso.
+            if (products == null || !products.Any())
+            {
+                throw new ArgumentNullException(nameof(products), "Products not found.");
+            }
+
+            // Crea una lista para almacenar los DTOs de las compras.
             var purchasesDtos = new List<PurchaseDto>();
 
+            // Itera sobre cada compra para construir el objeto PurchaseDto correspondiente.
             foreach (var purchase in purchases)
             {
-                var saleItem = saleItems.Where(x => x.PurchaseId == purchase.Id).ToList();
-                var totalPrice = saleItem.Sum(item => item.TotalPrice);
+                // Filtra los items de venta relevantes para la compra actual.
+                var relevantSaleItems = saleItems.Where(x => x.PurchaseId == purchase.Id).ToList();
+                
+                // Calcula el precio total sumando los precios de los items de venta relevantes.
+                var totalPrice = relevantSaleItems.Sum(item => item.TotalPrice);
 
+                // Crea un objeto PurchaseDto con la información relevante de la compra.
                 var purchaseDto = new PurchaseDto
                 {
                     PurchaseId = purchase.Id,
-                    Email = purchase.User?.Email ?? "Unknown",
+                    Email = purchase.User?.Email ?? "Unknown", // Usa "Unknown" si el email del usuario es nulo.
                     Transaction_Date = purchase.Transaction_Date,
                     Country = purchase.Country,
                     City = purchase.City,
                     Commune = purchase.Commune,
                     Street = purchase.Street,
                     Purchase_TotalPrice = totalPrice,
-                    saleItemDtos = PurchaseMapper.ToSaleItemDto(saleItem, products)
+                    saleItemDtos = PurchaseMapper.ToSaleItemDto(relevantSaleItems, products) // Mapea los items de venta a DTOs.
                 };
 
+                // Agrega el DTO de la compra a la lista de resultados.
                 purchasesDtos.Add(purchaseDto);
             }
 

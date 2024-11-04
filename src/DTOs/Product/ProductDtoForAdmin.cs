@@ -7,6 +7,10 @@ using api.src.Models;
 
 namespace api.src.DTOs.Product
 {
+    /// <summary>
+    /// Clase ProductDtoForAdmin que representa los datos de un producto a mostrar al administrador.
+    /// Contiene las propiedades necesarias para describir un producto en la aplicación.
+    /// </summary>
     public class ProductDtoForAdmin
     {
         public int Id { get; set; }

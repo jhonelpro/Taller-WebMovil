@@ -62,6 +62,12 @@ namespace api.src.Interfaces
         /// <param name="productId">Parametro de tipo int que representa el ID del producto cuyo artículo se desea obtener.</param>
         /// <returns>Instancia del elemento del carrito de compras, o null si no se encuentra.</returns>
         Task<ShoppingCartItem> GetShoppingCartItem(int productId);
+
+        /// <summary>
+        /// limpia el carrito de compras especificado.
+        /// </summary>
+        /// <param name="cartId"></param>
+        /// <returns></returns>
         Task<bool> ClearShoppingCart(int cartId);
     }
 }
