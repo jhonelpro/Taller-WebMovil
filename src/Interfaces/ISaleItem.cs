@@ -1,4 +1,5 @@
 using api.src.DTOs.Purchase;
+using api.src.Helpers;
 using api.src.Models;
 
 namespace api.src.Interfaces
@@ -27,7 +28,7 @@ namespace api.src.Interfaces
         /// Obtiene una lista de todas las compras disponibles para la vista del administrador.
         /// </summary>
         /// <returns>Lista de todas las compras representadas por objetos PurchaseDto.</returns>
-        Task<List<PurchaseDto>> GetPurchasesAsyncForAdmin();
+        Task<List<PurchaseDto>> GetPurchasesAsyncForAdmin(QueryObjectSale queryObjectSale);
 
         /// <summary>
         /// Obtiene los ítems de venta asociados a una compra específica.
