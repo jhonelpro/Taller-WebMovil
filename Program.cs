@@ -124,7 +124,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseMiddleware<BlacklistMiddleware>();
+app.UseMiddleware<BlacklistMiddleware>(); // Se agrega el middleware
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

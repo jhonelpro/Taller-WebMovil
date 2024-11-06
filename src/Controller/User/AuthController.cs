@@ -42,7 +42,15 @@ namespace api.src.Controller
         /// Atributo de tipo IShoppingCart que se encarga de manejar las operaciones de carrito de compras.
         /// </summary>
         private readonly IShoppingCart _shoppingCart;
+
+        /// <summary>
+        /// Atributo de tipo IShoppingCartItem que se encarga de manejar las operaciones de los items del carrito de compras y asi inyectar dependencias.
+        /// </summary>
         private readonly IShoppingCartItem _shoppingCartItem;
+
+        /// <summary>
+        /// Atributo de tipo ICookieService que se encarga de manejar las operaciones de las cookies.
+        /// </summary>
         private readonly ICookieService _cookieService;
 
         public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager,

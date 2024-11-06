@@ -102,16 +102,20 @@ namespace api.src.Service
             return tokenHandler.WriteToken(token);
         }
 
+        /// <summary>
+        /// Método asíncrono que añade un token a la BlackList.
+        /// </summary>
+        /// <param name="token">Parámetro que representa el token el cual se quiere añadir a la BlackList para invalidarlo.</param>
         public async Task AddToBlacklistAsync(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtToken = tokenHandler.ReadJwtToken(token);
             
-            // Extrae el "jti" (ID único del token) y la fecha de expiración
+            // Extrae el jti qeu representa el ID único del token y la fecha de expiración
             var jti = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
             var expiration = jwtToken.ValidTo;
 
-            // Si el token tiene un "jti", lo almacena en la blacklist
+            // Si el token tiene un jti, lo almacena en la blacklist
             if (jti != null)
             {
                 var blacklistedToken = new BlacklistedToken
@@ -125,6 +129,14 @@ namespace api.src.Service
             }
         }
 
+        /// <summary>
+        /// Método asíncrono que verifica si un token está en la BlackList.
+        /// </summary>
+        /// <param name="token">Parámetro que representa el token con el cual se verificara si esta en la Blacklist.</param>
+        /// <returns>
+        /// Si el token esta en la Blacklist y no ha expirado, retorna true.
+        /// De lo contrario, retorna false.
+        /// </returns>
         public async Task<bool> IsTokenBlacklistedAsync(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
