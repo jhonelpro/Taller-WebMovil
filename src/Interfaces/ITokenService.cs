@@ -13,5 +13,9 @@ namespace api.src.Interfaces
         /// <param name="user">Parametro de tipo AppUser que representa el usuario para el cual se genera el token.</param>
         /// <returns>Token de autenticación generado como una cadena de texto.</returns>
         string CreateToken(AppUser user);
+
+        Task AddToBlacklistAsync(string token);
+
+        Task<bool> IsTokenBlacklistedAsync(string token);
     }
 }

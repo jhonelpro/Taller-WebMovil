@@ -228,20 +228,15 @@ namespace api.src.Controller
         [Authorize(Roles = "User,Admin")]
         public async Task<IActionResult> Logout()
         {
-            try
-            {
-                if (User.Identity?.IsAuthenticated != true)
-                {
-                    return BadRequest(new { message = "No active session found." });
-                }
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-                await _signInManager.SignOutAsync();
-                return Ok(new { message = "Logout successful." });
-            }
-            catch (Exception ex)
+            if (!string.IsNullOrEmpty(token))
             {
-                return StatusCode(500, new { message = "An error occurred during logout.", error = ex.Message });
+                await _tokenService.AddToBlacklistAsync(token);
+                await _signInManager.SignOutAsync();
             }
+
+            return Ok(new { message = "Logout successful." });
         }
     }
 }

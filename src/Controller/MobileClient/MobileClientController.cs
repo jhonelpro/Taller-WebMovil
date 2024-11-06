@@ -205,7 +205,7 @@ namespace api.src.Controller.MobileClient
         /// <item>500 Internal Server Error si ocurre un error inesperado.</item>
         /// </list>
         /// </returns>
-        [HttpGet("get products client")]
+        [HttpGet("GetProductsClient")]
         public async Task<IActionResult> GetProductsClient([FromQuery] QueryObjectProductClient query)
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);

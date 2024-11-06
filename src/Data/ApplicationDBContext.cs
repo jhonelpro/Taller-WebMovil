@@ -1,4 +1,5 @@
 using api.src.Models;
+using api.src.Models.Token;
 using api.src.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -53,6 +54,8 @@ namespace api.src.Data
         /// Tabla de boletas.
         /// </summary>
         public DbSet<Ticket> Tickets { get; set; } = null!;
+
+        public DbSet<BlacklistedToken> BlacklistedTokens { get; set; } = null!;
 
         /// <summary>
         /// Configura las relaciones y el mapeo de las entidades de negocio en la base de datos.
