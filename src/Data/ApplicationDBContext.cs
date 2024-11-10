@@ -55,6 +55,9 @@ namespace api.src.Data
         /// </summary>
         public DbSet<Ticket> Tickets { get; set; } = null!;
 
+        /// <summary>
+        /// Tabla de tokens de acceso invalidados.
+        /// </summary> <summary>
         public DbSet<BlacklistedToken> BlacklistedTokens { get; set; } = null!;
 
         /// <summary>

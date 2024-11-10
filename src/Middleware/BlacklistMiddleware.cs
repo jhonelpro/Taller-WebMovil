@@ -69,5 +69,6 @@ namespace api.src.Middleware
             // Llama al siguiente middleware a ejecutarse en el sistema.
             await _next(context);
         }
+
     }
 }

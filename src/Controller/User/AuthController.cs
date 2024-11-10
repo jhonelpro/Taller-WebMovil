@@ -64,7 +64,9 @@ namespace api.src.Controller
             _signInManager = signInManager;
             // Inicializa el atributo _shoppingCart con el valor del parámetro shoppingCart
             _shoppingCart = shoppingCart;
+            // Inicializa el atributo _shoppingCartItem con el valor del parámetro shoppingCartItem
             _shoppingCartItem = shoppingCartItem;
+            // Inicializa el atributo _cookieService con el valor del parámetro cookieService
             _cookieService = cookieService;
         }
 
