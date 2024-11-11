@@ -41,7 +41,7 @@ namespace api.src.Controller
         /// <item>500 Internal Server Error si ocurre un error inesperado.</item>
         /// </list>
         /// </returns>
-        [HttpGet("available")]
+        [HttpGet("getAvailableProducts")]
         public async Task<IActionResult> GetAvailableProducts([FromQuery] QueryObject query)
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);

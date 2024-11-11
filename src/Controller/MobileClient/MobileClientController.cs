@@ -83,7 +83,7 @@ namespace api.src.Controller.MobileClient
         /// Retorna un objeto de tipo IActionResult con el resultado de la operación.
         /// Retorna un mensaje que indica si se cerro sesión correctamente.
         /// </returns>
-        [HttpPost("Logout")]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             try
@@ -117,7 +117,7 @@ namespace api.src.Controller.MobileClient
         /// <item>500 Internal Server Error si ocurre un error inesperado.</item>
         /// </list>
         /// </returns>
-        [HttpDelete("DeleteAccount")]
+        [HttpDelete("deleteAccount")]
         public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountDto deleteAccountDto)
         {
             try
@@ -169,7 +169,7 @@ namespace api.src.Controller.MobileClient
         /// <item>404 Not Found si las boletas no fueron encontrados.</item>
         /// </list>
         /// </returns>
-        [HttpGet("GetTickets")]
+        [HttpGet("getTickets")]
         public async Task<IActionResult> GetTickets()
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -205,7 +205,7 @@ namespace api.src.Controller.MobileClient
         /// <item>500 Internal Server Error si ocurre un error inesperado.</item>
         /// </list>
         /// </returns>
-        [HttpGet("GetProductsClient")]
+        [HttpGet("getProductsClient")]
         public async Task<IActionResult> GetProductsClient([FromQuery] QueryObjectProductClient query)
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);
