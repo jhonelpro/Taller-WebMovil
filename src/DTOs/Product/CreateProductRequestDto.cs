@@ -9,10 +9,13 @@ namespace api.src.DTOs
     public class CreateProductRequestDto
     {
         /// <summary>
-        /// Atributo de tipo string que representa el nombre del producto. Debe tener entre 10 y 64 caracteres.
+        /// Atributo de tipo string que representa el nombre del producto. 
+        /// Debe tener entre 10 y 64 caracteres.
+        /// Debe ser una cadena alfabetica.
         /// </summary>
         [Required]
         [StringLength(64, MinimumLength = 10, ErrorMessage = "El nombre debe tener entre 10 y 64 caracteres")]
+        [RegularExpression("^[a-zA-Z ]+$", ErrorMessage = "El nombre debe consistir solo en letras y espacios")]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>

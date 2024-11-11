@@ -42,7 +42,7 @@ namespace api.src.Controller
         /// <returns>
         /// Retorna una lista con todos los usuarios de la base de datos que cumplan con los criterios de la query
         /// </returns>
-        [HttpPost("GetUsers")]
+        [HttpGet("GetUsers")]
         public async Task<IActionResult> GetUsers([FromQuery] QueryObjectUsers query)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
