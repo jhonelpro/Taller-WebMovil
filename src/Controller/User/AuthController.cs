@@ -245,7 +245,6 @@ namespace api.src.Controller
         [Authorize(Roles = "User,Admin")]
         public async Task<IActionResult> Logout()
         {
-
             // Verificar si el usuario no esta autenticado.
             if (User.Identity?.IsAuthenticated != true)
             {
