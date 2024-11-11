@@ -179,11 +179,11 @@ namespace api.src.Controller
                 if(!ModelState.IsValid) return BadRequest(ModelState);
 
                 var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
-                if(user == null) return Unauthorized("Invalid username or password.");
+                if(user == null) return Unauthorized("Invalid email or password.");
 
                 // Verificar si la contraseña es correcta
                 var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-                if(!result.Succeeded) return Unauthorized("Invalid username or password.");
+                if(!result.Succeeded) return Unauthorized("Invalid email or password.");
 
                 // Verificar si el usuario esta activo
                 if(user.IsActive == 0) return Unauthorized("User is not active.");
