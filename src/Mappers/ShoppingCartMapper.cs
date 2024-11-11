@@ -17,7 +17,7 @@ namespace api.src.Mappers
         /// <returns>Un objeto de tipo CartDto que representa el carrito de compras con sus elementos y el precio total.</returns>
         public static CartDto toCartDto(this List<ShoppingCartDto> shoppingCartItemsDto)
         {
-            double cartTotalPrice = 0;
+            int cartTotalPrice = 0;
 
             foreach (var item in shoppingCartItemsDto)
             {

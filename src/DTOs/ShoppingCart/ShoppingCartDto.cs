@@ -16,7 +16,7 @@ namespace api.src.DTOs.Product
         /// <summary>
         /// Atributo de tipo double que representa el precio del producto.
         /// </summary>
-        public required double Price { get; set; }
+        public required int Price { get; set; }
 
         /// <summary>
         /// Atributo de tipo string que representa la URL de la imagen del producto.
@@ -36,6 +36,6 @@ namespace api.src.DTOs.Product
         /// <summary>
         /// Atributo de tipo double que representa el precio total del artículo en función de la cantidad.
         /// </summary>
-        public double TotalPrice { get; set; }
+        public int TotalPrice { get; set; }
     }
 }

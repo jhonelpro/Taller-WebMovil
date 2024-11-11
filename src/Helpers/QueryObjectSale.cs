@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace api.src.Helpers
+
 {
     public class QueryObjectSale
     {
@@ -14,7 +10,7 @@ namespace api.src.Helpers
         public bool? IsDecendingDate { get; set; }
         
         /// <summary>
-        /// Atributo de tipo string que representa el nombre de usuario del cliente.
+        /// Atributo de tipo string que representa el nombre de usuario del cliente por el cual se desea filtrar.
         /// </summary>
         /// <value></value>
         public string? UserName { get; set; } = string.Empty;

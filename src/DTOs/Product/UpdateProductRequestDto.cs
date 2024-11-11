@@ -17,12 +17,12 @@ namespace api.src.DTOs
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// Atributo de tipo double que representa el precio del producto.
-        /// Debe ser un valor positivo menor a 1000000000.
+        /// Atributo de tipo int que representa el precio del producto.
+        /// Debe ser un valor positivo menor a 100000000.
         /// </summary>
         [Required]
-        [Range(0, 100000000, ErrorMessage = "El precio debe ser un número positivo y menor a 1,000,000,000")]
-        public double Price { get; set; }
+        [Range(0, 100000000, ErrorMessage = "El precio debe ser un número entero positivo y menor a 100,000,000")]
+        public int Price { get; set; }
 
         /// <summary>
         /// Atributo de tipo int que representa el stock disponible del producto.

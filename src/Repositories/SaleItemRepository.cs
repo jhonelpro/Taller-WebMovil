@@ -143,7 +143,7 @@ namespace api.src.Repositories
                 }
 
                 // Suma los precios totales de cada item de venta para obtener el total de la compra.
-                double totalPrice = relevantSaleItems.Sum(item => item.TotalPrice);
+                int totalPrice = relevantSaleItems.Sum(item => item.TotalPrice);
 
                 // Recupera los productos relacionados con los items de venta de la compra.
                 var products = await _context.Products

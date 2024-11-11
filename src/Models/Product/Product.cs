@@ -16,9 +16,9 @@ namespace api.src.Models
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// Atributo de tipo double que representa el precio del producto. Es requerido.
+        /// Atributo de tipo int que representa el precio del producto. Es requerido.
         /// </summary>
-        public required double Price { get; set; }
+        public required int Price { get; set; }
 
         /// <summary>
         /// Atributo de tipo int que representa la cantidad de stock disponible del producto. Es requerido.

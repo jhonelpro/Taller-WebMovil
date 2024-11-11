@@ -10,7 +10,7 @@ namespace api.src.DTOs.ShoppingCart
         /// <summary>
         /// Atributo de tipo double que representa el precio total del carrito de compras.
         /// </summary>
-        public double Cart_TotalPrice { get; set; }
+        public int Cart_TotalPrice { get; set; }
 
         /// <summary>
         /// Atributo de tipo List<ShoppingCartDto> que contiene los artículos en el carrito de compras.
