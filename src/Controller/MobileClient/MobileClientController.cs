@@ -75,32 +75,6 @@ namespace api.src.Controller.MobileClient
             //Inicializa el atributo _productRepository con el objeto de tipo IProductRepository recibido.
             _productRepository = productRepository;
         }
-
-        /// <summary>
-        /// Endpoint para cerrar sesión en el sistema.
-        /// </summary>
-        /// <returns>
-        /// Retorna un objeto de tipo IActionResult con el resultado de la operación.
-        /// Retorna un mensaje que indica si se cerro sesión correctamente.
-        /// </returns>
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            try
-            {
-                if (User.Identity?.IsAuthenticated != true)
-                {
-                    return BadRequest(new { message = "No active session found." });
-                }
-
-                await _signInManager.SignOutAsync();
-                return Ok(new { message = "Logout successful." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred during logout.", error = ex.Message });
-            }
-        }
         
         /// <summary>
         /// Endpoint que permite eliminar la cuenta del usuario con la sesion iniciada.
