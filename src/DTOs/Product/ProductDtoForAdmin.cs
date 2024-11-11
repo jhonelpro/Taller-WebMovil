@@ -13,16 +13,34 @@ namespace api.src.DTOs.Product
     /// </summary>
     public class ProductDtoForAdmin
     {
+        /// <summary>
+        /// Atributo que representa el identificador único de un producto.
+        /// </summary>
         public int Id { get; set; }
 
+        /// <summary>
+        /// Atributo que representa el nombre de un producto.
+        /// </summary>
         public required string Name { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Atributo que representa el precio de un producto.
+        /// </summary>
         public required double Price { get; set; }
 
+        /// <summary>
+        /// Atributo que representa la cantidad de stock de un producto.
+        /// </summary>
         public required int Stock { get; set; }
         
+        /// <summary>
+        /// Atributo que representa el url de la imagen de un producto.
+        /// </summary>
         public string ImageUrl { get; set; } = null!;
         
+        /// <summary>
+        /// Atributo que representa el tipo de un producto.
+        /// </summary>
         public ProductType ProductType { get; set; } = null!;
     }
 }

@@ -3,6 +3,7 @@ using api.src.Controller;
 using api.src.Data;
 using api.src.Helpers;
 using api.src.Interfaces;
+using api.src.Middleware;
 using api.src.Models.User;
 using api.src.Repositories;
 using api.src.Service;
@@ -123,6 +124,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<BlacklistMiddleware>(); // Se agrega el middleware
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

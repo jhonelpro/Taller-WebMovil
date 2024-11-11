@@ -42,7 +42,15 @@ namespace api.src.Controller
         /// Atributo de tipo IShoppingCart que se encarga de manejar las operaciones de carrito de compras.
         /// </summary>
         private readonly IShoppingCart _shoppingCart;
+
+        /// <summary>
+        /// Atributo de tipo IShoppingCartItem que se encarga de manejar las operaciones de los items del carrito de compras y asi inyectar dependencias.
+        /// </summary>
         private readonly IShoppingCartItem _shoppingCartItem;
+
+        /// <summary>
+        /// Atributo de tipo ICookieService que se encarga de manejar las operaciones de las cookies.
+        /// </summary>
         private readonly ICookieService _cookieService;
 
         public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager,
@@ -56,7 +64,9 @@ namespace api.src.Controller
             _signInManager = signInManager;
             // Inicializa el atributo _shoppingCart con el valor del parámetro shoppingCart
             _shoppingCart = shoppingCart;
+            // Inicializa el atributo _shoppingCartItem con el valor del parámetro shoppingCartItem
             _shoppingCartItem = shoppingCartItem;
+            // Inicializa el atributo _cookieService con el valor del parámetro cookieService
             _cookieService = cookieService;
         }
 
@@ -228,20 +238,15 @@ namespace api.src.Controller
         [Authorize(Roles = "User,Admin")]
         public async Task<IActionResult> Logout()
         {
-            try
-            {
-                if (User.Identity?.IsAuthenticated != true)
-                {
-                    return BadRequest(new { message = "No active session found." });
-                }
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-                await _signInManager.SignOutAsync();
-                return Ok(new { message = "Logout successful." });
-            }
-            catch (Exception ex)
+            if (!string.IsNullOrEmpty(token))
             {
-                return StatusCode(500, new { message = "An error occurred during logout.", error = ex.Message });
+                await _tokenService.AddToBlacklistAsync(token);
+                await _signInManager.SignOutAsync();
             }
+
+            return Ok(new { message = "Logout successful." });
         }
     }
 }
