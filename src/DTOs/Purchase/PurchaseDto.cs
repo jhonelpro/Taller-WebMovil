@@ -48,9 +48,9 @@ namespace api.src.DTOs.Purchase
         public string Street { get; set; } = string.Empty;
 
         /// <summary>
-        /// Atributo de tipo double que representa el precio total de la compra.
+        /// Atributo de tipo int que representa el precio total de la compra.
         /// </summary>
-        public double Purchase_TotalPrice { get; set; } = 0;
+        public int Purchase_TotalPrice { get; set; } = 0;
 
         /// <summary>
         /// Lista de objetos de tipo SaleItemDto que representa los elementos de venta asociados a la compra.

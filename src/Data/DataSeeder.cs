@@ -111,7 +111,7 @@ namespace api.src.Data
                 {
                     var ProductFaker = new Faker<Product>()
                         .RuleFor(p => p.Name, f => f.Commerce.ProductName())
-                        .RuleFor(p => p.Price, f => f.Random.Number(1000, 100000))
+                        .RuleFor(p => p.Price, f => f.Random.Number(1000, 10000000))
                         .RuleFor(p => p.Stock, f => f.Random.Number(0, 100000))
                         .RuleFor(p => p.ProductTypeId, f => f.Random.Number(1, 5)); // Asegúrate de que el rango es correcto.
                     

@@ -21,13 +21,13 @@ namespace api.src.DTOs.Purchase
         public int Quantity { get; set; }
 
         /// <summary>
-        /// Atributo de tipo double que representa el precio unitario del producto.
+        /// Atributo de tipo int que representa el precio unitario del producto.
         /// </summary>
-        public double UnitPrice { get; set; }
+        public int UnitPrice { get; set; }
 
         /// <summary>
-        /// Atributo de tipo double que representa el precio total del artículo de venta (cantidad multiplicada por el precio unitario).
+        /// Atributo de tipo int que representa el precio total del artículo de venta (cantidad multiplicada por el precio unitario).
         /// </summary>
-        public double TotalPrice { get; set; }
+        public int TotalPrice { get; set; }
     }
 }

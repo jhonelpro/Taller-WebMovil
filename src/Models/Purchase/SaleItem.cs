@@ -13,12 +13,12 @@ namespace api.src.Models
         /// <summary>
         /// Atributo de tipo double que representa el precio unitario del producto.
         /// </summary>
-        public double UnitPrice { get; set; }
+        public int UnitPrice { get; set; }
 
         /// <summary>
         /// Atributo de tipo double que representa el precio total por la cantidad vendida del producto.
         /// </summary>
-        public double TotalPrice { get; set; }
+        public int TotalPrice { get; set; }
 
         /// <summary>
         /// Atributo de tipo int que representa el identificador único de la compra asociada.

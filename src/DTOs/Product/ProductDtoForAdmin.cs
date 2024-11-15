@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using api.src.Models;
 
 namespace api.src.DTOs.Product
@@ -26,7 +21,7 @@ namespace api.src.DTOs.Product
         /// <summary>
         /// Atributo que representa el precio de un producto.
         /// </summary>
-        public required double Price { get; set; }
+        public required int Price { get; set; }
 
         /// <summary>
         /// Atributo que representa la cantidad de stock de un producto.

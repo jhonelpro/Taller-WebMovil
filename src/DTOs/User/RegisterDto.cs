@@ -18,9 +18,11 @@ namespace api.src.DTOs.User
         /// <summary>
         /// Atributo de tipo string que representa el nombre del nuevo usuario.
         /// Debe tener entre 8 y 255 caracteres de longitud.
+        /// Debe tener solo caracteres del abecedario español.
         /// </summary>
         [Required]
         [StringLength(255, MinimumLength = 8, ErrorMessage = "El nombre debe tener entre 8 y 255 caracteres.")]
+        [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$", ErrorMessage = "El nombre solo debe contener letras del alfabeto español.")]
         public string? Name { get; set; } = string.Empty;
 
         /// <summary>

@@ -21,7 +21,7 @@ namespace api.src.Models
         /// <summary>
         /// Atributo de tipo double que representa el precio total de la compra asociada al ticket.
         /// </summary>
-        public double Purchase_TotalPrice { get; set; } = 0;
+        public int Purchase_TotalPrice { get; set; } = 0;
 
         /// <summary>
         /// Atributo de tipo string que representa el identificador del usuario que realizó la compra.

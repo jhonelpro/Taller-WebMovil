@@ -175,15 +175,22 @@ namespace api.src.Controller
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             try {
+                // Verificar si el usuario ya esta autenticado.
+                if (User.Identity?.IsAuthenticated == true)
+                {
+                    return BadRequest(new { message = "Active session." });
+                }
 
+                // Validar modelo.
                 if(!ModelState.IsValid) return BadRequest(ModelState);
 
+                // Verificar si el usuario existe
                 var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
-                if(user == null) return Unauthorized("Invalid username or password.");
+                if(user == null) return Unauthorized("Invalid email or password.");
 
                 // Verificar si la contraseña es correcta
                 var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-                if(!result.Succeeded) return Unauthorized("Invalid username or password.");
+                if(!result.Succeeded) return Unauthorized("Invalid email or password.");
 
                 // Verificar si el usuario esta activo
                 if(user.IsActive == 0) return Unauthorized("User is not active.");
@@ -238,6 +245,12 @@ namespace api.src.Controller
         [Authorize(Roles = "User,Admin")]
         public async Task<IActionResult> Logout()
         {
+            // Verificar si el usuario no esta autenticado.
+            if (User.Identity?.IsAuthenticated != true)
+            {
+                return BadRequest(new { message = "No active session found." });
+            }
+
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
             if (!string.IsNullOrEmpty(token))

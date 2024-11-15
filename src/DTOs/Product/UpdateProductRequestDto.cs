@@ -11,18 +11,20 @@ namespace api.src.DTOs
         /// <summary>
         /// Atributo de tipo string que representa el nombre del producto.
         /// Debe tener entre 10 y 64 caracteres.
+        /// Debe ser una cadena alfabetica.
         /// </summary>
         [Required]
         [StringLength(64, MinimumLength = 10, ErrorMessage = "El nombre debe tener entre 10 y 64 caracteres")]
+        [RegularExpression("^[a-zA-Z ]+$", ErrorMessage = "El nombre debe consistir solo en letras y espacios")]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// Atributo de tipo double que representa el precio del producto.
-        /// Debe ser un valor positivo menor a 1000000000.
+        /// Atributo de tipo int que representa el precio del producto.
+        /// Debe ser un valor positivo menor a 100000000.
         /// </summary>
         [Required]
-        [Range(0, 100000000, ErrorMessage = "El precio debe ser un número positivo y menor a 1,000,000,000")]
-        public double Price { get; set; }
+        [Range(0, 100000000, ErrorMessage = "El precio debe ser un número entero positivo y menor a 100,000,000")]
+        public int Price { get; set; }
 
         /// <summary>
         /// Atributo de tipo int que representa el stock disponible del producto.
