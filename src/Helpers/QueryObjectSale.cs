@@ -7,7 +7,7 @@ namespace api.src.Helpers
         /// Atributo de tipo bool que representa si se desea ordenar los resultados por fecha.
         /// </summary>
         /// <value></value>
-        public bool? IsDecendingDate { get; set; }
+        public bool? IsDescendingDate { get; set; }
         
         /// <summary>
         /// Atributo de tipo string que representa el nombre de usuario del cliente por el cual se desea filtrar.
