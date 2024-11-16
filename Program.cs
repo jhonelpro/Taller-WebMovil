@@ -19,11 +19,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 Env.Load();
 
+string CloudinaryName = Environment.GetEnvironmentVariable("CLOUDINARY_NAME") ?? "defaultName";
+string CloudinaryApiKey = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY") ?? "defaultApiKey";
+string CloudinaryApiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET") ?? "defaultApiSecret";
+
 var CloudinarySettings = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
     var CloudinaryAccount = new Account(
-        CloudinarySettings!.CloudName,
-        CloudinarySettings.ApiKey,
-        CloudinarySettings.ApiSecret
+        CloudinaryName,
+        CloudinaryApiKey,
+        CloudinaryApiSecret
     );
 var Cloudinary = new Cloudinary(CloudinaryAccount);
 builder.Services.AddSingleton(Cloudinary);
@@ -66,11 +70,11 @@ builder.Services.AddAuthentication(opt => {
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
         ValidateAudience = true,
-        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SigningKey"] ?? throw new ArgumentNullException("Jwt:SigningKey"))),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SIGNING_KEY") ?? "defaultSigningKey")),
     };
 });
 
@@ -103,8 +107,8 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-string connectionString = Environment.GetEnvironmentVariable("DATA_BASE_URL") ?? "Data Source=app.db";
-builder.Services.AddDbContext<ApplicationDBContext>(opt => opt.UseSqlite(connectionString));
+string connectionStringDB = Environment.GetEnvironmentVariable("DATA_BASE_URL") ?? "Data Source=app.db";
+builder.Services.AddDbContext<ApplicationDBContext>(opt => opt.UseSqlite(connectionStringDB));
 
 var app = builder.Build();
 

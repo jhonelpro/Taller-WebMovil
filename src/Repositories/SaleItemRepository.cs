@@ -195,7 +195,7 @@ namespace api.src.Repositories
             }
 
             // Ordena las compras por fecha de transacción en orden ascendente o descendente.
-            query = queryObjectSale.IsDecendingDate.HasValue && queryObjectSale.IsDecendingDate.Value
+            query = queryObjectSale.IsDescendingDate.HasValue && queryObjectSale.IsDescendingDate.Value
                 ? query.OrderByDescending(p => p.Transaction_Date)
                 : query.OrderBy(p => p.Transaction_Date);
 
