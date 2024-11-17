@@ -19,11 +19,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 Env.Load();
 
-string CloudinaryName = Environment.GetEnvironmentVariable("CLOUDINARY_NAME") ?? "defaultName";
-string CloudinaryApiKey = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY") ?? "defaultApiKey";
-string CloudinaryApiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET") ?? "defaultApiSecret";
+// Establecer el nombre, la clave de API y la clave secreta de Cloudinary
+string CloudinaryName = Environment.GetEnvironmentVariable("CLOUDINARY_NAME") ?? throw new ArgumentNullException("Cloudinary name cannot be null or empty.");
+string CloudinaryApiKey = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY") ?? throw new ArgumentNullException("Cloudinary API key cannot be null or empty.");
+string CloudinaryApiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET") ?? throw new ArgumentNullException("Cloudinary API secret cannot be null or empty.");
 
-var CloudinarySettings = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
     var CloudinaryAccount = new Account(
         CloudinaryName,
         CloudinaryApiKey,
@@ -74,7 +74,7 @@ builder.Services.AddAuthentication(opt => {
         ValidateAudience = true,
         ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SIGNING_KEY") ?? "defaultSigningKey")),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SIGNING_KEY") ?? throw new ArgumentNullException("Signing key cannot be null or empty."))),
     };
 });
 

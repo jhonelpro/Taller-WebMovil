@@ -23,11 +23,6 @@ namespace api.src.Service
         private readonly UserManager<AppUser> _userManager;
 
         /// <summary>
-        /// Configuración de la aplicación que contiene los parámetros necesarios para la generación del token.
-        /// </summary>
-        private readonly IConfiguration _config;
-
-        /// <summary>
         /// Clave de seguridad simétrica utilizada para firmar el token.
         /// </summary>
         private readonly SymmetricSecurityKey _key;
@@ -35,25 +30,19 @@ namespace api.src.Service
         private readonly ApplicationDBContext _context;
 
         /// <summary>
-        /// Constructor que inicializa el servicio de token con la configuración y el gestor de usuarios.
+        /// Constructor que inicializa el servicio de token con el gestor de usuarios.
         /// </summary>
-        /// <param name="config">Instancia de la configuración de la aplicación.</param>
         /// <param name="userManager">Instancia del gestor de usuarios.</param>
-        public TokenService(IConfiguration config, UserManager<AppUser> userManager, ApplicationDBContext context)
+        public TokenService(UserManager<AppUser> userManager, ApplicationDBContext context)
         {
             _context = context;
             _userManager = userManager;
-            _config = config;
 
-            // Obtener la clave de firma del token desde la configuración
-            var signinkey = _config["JWT:SigningKey"];
-            if (string.IsNullOrEmpty(signinkey))
-            {
-                throw new ArgumentNullException(nameof(signinkey), "Signing key cannot be null or empty.");
-            }
+            // Obtener la clave de firma del token desde la variable de entorno
+            var signingKey = Environment.GetEnvironmentVariable("JWT_SIGNING_KEY") ?? throw new ArgumentNullException("Signing key cannot be null or empty.");
 
             // Crear la clave de seguridad simétrica a partir de la clave de firma
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signinkey));
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
         }
         
         /// <summary>
@@ -83,15 +72,20 @@ namespace api.src.Service
 
             // Crear las credenciales de firma utilizando la clave de seguridad y el algoritmo de firma
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
-
+            
+            // Establecer el emisor del token desde la variable de entorno
+            var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? throw new ArgumentNullException("JWT Issuer cannot be null or empty.");;
+            // Establecer la audiencia del token desde la variable de entorno
+            var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? throw new ArgumentNullException("JWT Audience cannot be null or empty.");
+            
             // Definir el descriptor del token que contiene la información del token
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims), // Identidad de las reclamaciones
                 Expires = DateTime.Now.AddDays(1), // Establecer la fecha de expiración del token a 1 día
                 SigningCredentials = creds, // Credenciales para firmar el token
-                Issuer = _config["JWT:Issuer"], // Establecer el emisor del token desde la configuración
-                Audience = _config["JWT:Audience"] // Establecer la audiencia del token desde la configuración
+                Issuer = issuer, // Establecer el emisor
+                Audience = audience // Establecer la audiencia 
             };
 
             // Crear el manejador del token y generar el token a partir del descriptor
