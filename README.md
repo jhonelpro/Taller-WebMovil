@@ -38,7 +38,12 @@ code .
 
 ## Instalar dependencias
 
-Una vez que ya abrio vscode, presiona el las teclas "Ctrl + Shift + `" para abrir una terminal en vscode, o tambien puedes ir a la parte superior de vscode, seleccionar los 3 puntitos "...", luego "Terminal", y "New Terminal".
+Una vez que ya abrio vscode, verifica si no te creo un archivo llamado "Taller-WebMovil.sln", si es asi debes eliminar este archivo para evitar errores posteriormente.
+
+> [!CAUTION]
+> Eliminar archivo "Taller-WebMovil.sln".
+
+Abrir una terminal en vscode, presionando las teclas "Ctrl + Shift + `", o tambien puedes ir a la parte superior de vscode, seleccionar los 3 puntitos "...", luego "Terminal", y "New Terminal".
 
 <img src="https://drive.google.com/uc?export=view&id=1vlOWIl9QsAydtAeePWJHbUGt18aAzoES" alt="Abrir terminal en vscode" width="550"/>
 
