@@ -17,6 +17,14 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod() 
+               .AllowAnyHeader()); 
+});
+
 Env.Load();
 
 // Establecer el nombre, la clave de API y la clave secreta de Cloudinary
@@ -126,6 +134,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.UseDeveloperExceptionPage();
 }
+
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 app.UseMiddleware<BlacklistMiddleware>(); // Se agrega el middleware
