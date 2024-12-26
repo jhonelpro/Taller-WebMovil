@@ -52,13 +52,13 @@ namespace api.src.Controller
 
             try
             {
-                if (editProfileDto.DateOfBirth >= DateTime.Now) return BadRequest("Date of birth must be in the past.");
+                if (editProfileDto.DateOfBirth >= DateTime.Now) return BadRequest(new { message = "Date of birth must be in the past."});
 
-                if ((DateTime.Now.Year - editProfileDto.DateOfBirth.Year) < 13) return BadRequest("You must be at least 13 years old to register.");
+                if ((DateTime.Now.Year - editProfileDto.DateOfBirth.Year) < 13) return BadRequest(new { message = "You must be at least 13 years old to register."});
 
                 var user = await _userManager.GetUserAsync(User);
 
-                if (user == null) return Unauthorized("User not found.");
+                if (user == null) return Unauthorized(new { message = "User not found."});
 
                 user.Name = editProfileDto.Name;
                 user.DateOfBirth = editProfileDto.DateOfBirth;
@@ -71,11 +71,11 @@ namespace api.src.Controller
                     return BadRequest(result.Errors);
                 }
 
-                return Ok("Profile updated successfully.");
+                return Ok(new { message = "Profile updated successfully."});
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message});
             }
         }
 
@@ -94,13 +94,13 @@ namespace api.src.Controller
                 if (!ModelState.IsValid) return BadRequest(ModelState);
 
                 var user = await _userManager.GetUserAsync(User);
-                if (user == null) return Unauthorized("User not found.");
+                if (user == null) return Unauthorized(new { message = "User not found."});
 
                 var passwordVerification = await _userManager.CheckPasswordAsync(user, changePasswordDto.CurrentPassword);
 
-                if (!passwordVerification) return BadRequest("Current password is incorrect.");
+                if (!passwordVerification) return BadRequest(new { message = "Current password is incorrect."});
 
-                if (!string.Equals(changePasswordDto.NewPassword, changePasswordDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest("Passwords do not match");
+                if (!string.Equals(changePasswordDto.NewPassword, changePasswordDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest(new { message = "Passwords do not match"});
 
                 var result = await _userManager.ChangePasswordAsync(user, changePasswordDto.CurrentPassword, changePasswordDto.NewPassword);
 
@@ -109,11 +109,11 @@ namespace api.src.Controller
                     return BadRequest(result.Errors);
                 }
 
-                return Ok("Password changed successfully.");
+                return Ok(new { message = "Password changed successfully."});
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message});
             }
         }
     }

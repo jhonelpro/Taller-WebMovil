@@ -68,7 +68,7 @@ namespace api.src.Controller
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message});
             }
         }
 
@@ -84,13 +84,13 @@ namespace api.src.Controller
 
             try
             {
-                if (string.IsNullOrEmpty(email)) return BadRequest("Email is required.");
+                if (string.IsNullOrEmpty(email)) return BadRequest(new { message = "Email is required."});
 
                 var user = await _userManager.FindByEmailAsync(email);
 
                 if (user == null)
                 {
-                    return BadRequest("User not found.");
+                    return BadRequest(new { message = "User not found."});
                 }
 
                 // Se cambia el estado del usuario dependiendo de su estado actual
@@ -108,7 +108,7 @@ namespace api.src.Controller
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
     }
