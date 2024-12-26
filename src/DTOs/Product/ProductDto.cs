@@ -8,6 +8,7 @@ namespace api.src.DTOs
     /// </summary>
     public class ProductDto
     {
+        public required int Id { get; set; }
         /// <summary>
         /// Atributo que representa el nombre único de un producto.
         /// </summary>

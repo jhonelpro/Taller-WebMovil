@@ -18,6 +18,7 @@ namespace api.src.Mappers
         {
             return new ProductDto
             {
+                Id = product.Id,
                 Name = product.Name,
                 Price = product.Price,
                 Stock = product.Stock,
