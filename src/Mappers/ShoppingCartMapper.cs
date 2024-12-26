@@ -41,6 +41,7 @@ namespace api.src.Mappers
         {
             return new ShoppingCartDto
             {
+                Id = product.Id,
                 Name = product.Name,
                 Price = product.Price,
                 ProductType = product.ProductType,

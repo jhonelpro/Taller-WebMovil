@@ -8,6 +8,9 @@ namespace api.src.DTOs.Product
     /// </summary>
     public class ShoppingCartDto
     {
+        
+        public int Id { get; set; }
+        
         /// <summary>
         /// Atributo de tipo string que representa el nombre del producto.
         /// </summary>
