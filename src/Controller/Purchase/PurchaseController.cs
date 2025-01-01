@@ -89,7 +89,7 @@ namespace api.src.Controller.Purchase
 
             if (User.Identity == null || !User.Identity.IsAuthenticated)
             {
-                return Unauthorized(new { Message = "Please log in to complete the purchase." });
+                return Unauthorized(new { message = "Please log in to complete the purchase." });
             }
 
             return await CreatePurchase(purchaseDto);
@@ -118,63 +118,63 @@ namespace api.src.Controller.Purchase
 
                 if (user == null) 
                 {
-                    return BadRequest("User not found.");
+                    return BadRequest( new { message = "User not found."});
                 }
 
                 var purchase = purchaseDto.ToPurchaseFromCreateDto();
 
                 if (purchase == null)
                 {
-                    return BadRequest("Error creating purchase.");
+                    return BadRequest( new { message = "Error creating purchase."});
                 }
                 
                 var newPurchase = await _purchase.createPurchase(purchase, user); 
 
                 if (newPurchase == null)
                 {
-                    return BadRequest("Purchase not created.");
+                    return BadRequest( new { message = "Purchase not created."});
                 }
 
                 var cart = await _shoppingCart.GetShoppingCart(user.Id);
 
                 if (cart == null)
                 {
-                    return BadRequest("Cart not found.");
+                    return BadRequest( new { message = "Cart not found."});
                 }
 
                 var shoppingCartItems = await _shoppingCartItem.GetShoppingCartItems(cart.Id);
 
                 if (shoppingCartItems == null)
                 {
-                    return BadRequest("Cart items not found.");
+                    return BadRequest( new { message = "Cart items not found."});
                 }
 
                 var saleItem = await _saleItem.createSaleItem(shoppingCartItems, newPurchase);
 
                 if (saleItem == null)
                 {
-                    return BadRequest("Sale item not created.");
+                    return BadRequest( new { message = "Sale item not created."});
                 }
 
                 var newTicket = await _ticket.CreateTicket(user, saleItem);
 
                 if (newTicket == null)
                 {
-                    return BadRequest("Ticket not created.");
+                    return BadRequest( new { message = "Ticket not created."});
                 }
 
                 var clearCart = await _shoppingCartItem.ClearShoppingCart(cart.Id);
 
                 if (!clearCart)
                 {
-                    return BadRequest("Cart not cleared.");
+                    return BadRequest( new { message = "Cart not cleared."});
                 }
 
-                return Ok("Purchase created successfully.");
+                return Ok( newPurchase.Id );
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Error = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }   
         }
 
@@ -199,19 +199,19 @@ namespace api.src.Controller.Purchase
 
                 if (user == null)
                 {
-                    return BadRequest("User not found.");
+                    return BadRequest(new { message = "User not found."});
                 }
 
                 if (purchaseId <= 0)
                 {
-                    return BadRequest("Invalid purchase id.");
+                    return BadRequest( new { message = "Invalid purchase id."});
                 }
 
                 var purchase = await _purchase.getPurchase(purchaseId, user.Id);
 
                 if (purchase == null)
                 {
-                    return BadRequest("Purchase not found.");
+                    return BadRequest( new { message = "Purchase not found."});
                 }
 
                 var purchaseRecipt = await _purchase.getPurchaseRecipt(purchaseId, user.Id);
@@ -224,7 +224,7 @@ namespace api.src.Controller.Purchase
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
