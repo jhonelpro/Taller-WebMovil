@@ -85,21 +85,21 @@ namespace api.src.Controller
             {
                 if (!ModelState.IsValid) return BadRequest(ModelState);
 
-                if (await _userManager.Users.AnyAsync(p => p.Email == registerDto.Email)) return BadRequest("Email already exists.");
+                if (await _userManager.Users.AnyAsync(p => p.Email == registerDto.Email)) return BadRequest( new { message = "Email already exists."});
 
                 if (string.IsNullOrEmpty(registerDto.Rut)) return BadRequest("RUT is required.");
 
-                if (await _userManager.Users.AnyAsync(p => p.Rut == registerDto.Rut)) return BadRequest("Rut already exists.");
+                if (await _userManager.Users.AnyAsync(p => p.Rut == registerDto.Rut)) return BadRequest( new { message = "Rut already exists."});
 
-                if (!RutValidations.IsValidRut(registerDto.Rut)) return BadRequest("Invalid Rut format or verification digit.");
+                if (!RutValidations.IsValidRut(registerDto.Rut)) return BadRequest( new { message = "Invalid Rut format or verification digit."});
 
-                if (registerDto.DateOfBirth >= DateTime.Now) return BadRequest("Date of birth must be in the past.");
+                if (registerDto.DateOfBirth >= DateTime.Now) return BadRequest( new { message = "Date of birth must be in the past."});
 
-                if ((DateTime.Now.Year - registerDto.DateOfBirth.Year) < 13) return BadRequest("You must be at least 13 years old to register.");
+                if ((DateTime.Now.Year - registerDto.DateOfBirth.Year) < 13) return BadRequest( new { message = "You must be at least 13 years old to register."});
 
-                if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.ConfirmPassword)) return BadRequest("Password is required.");
+                if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.ConfirmPassword)) return BadRequest( new { message = "Password is required."});
 
-                if (!string.Equals(registerDto.Password, registerDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest("Passwords do not match.");
+                if (!string.Equals(registerDto.Password, registerDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest( new { message = "Passwords do not match."});
 
                 var user = new AppUser
                 {
@@ -149,17 +149,17 @@ namespace api.src.Controller
 
                     else
                     {
-                        return StatusCode(500, roleResult.Errors);
+                        return StatusCode(500, new { message = roleResult.Errors});
                     }
                 }else
                 {
-                    return StatusCode(500, createUser.Errors);
+                    return StatusCode(500,  new { message = createUser.Errors});
                 }
 
             } 
             catch (Exception e)
             {
-                return StatusCode(500, e.Message);
+                return StatusCode(500,  new { message = e.Message});
             }
         }
 
@@ -186,14 +186,14 @@ namespace api.src.Controller
 
                 // Verificar si el usuario existe
                 var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
-                if(user == null) return Unauthorized("Invalid email or password.");
+                if(user == null) return Unauthorized( new { message = "Invalid email or password."});
 
                 // Verificar si la contraseña es correcta
                 var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-                if(!result.Succeeded) return Unauthorized("Invalid email or password.");
+                if(!result.Succeeded) return Unauthorized( new { message = "Invalid email or password."});
 
                 // Verificar si el usuario esta activo
-                if(user.IsActive == 0) return Unauthorized("User is not active.");
+                if(user.IsActive == 0) return Unauthorized( new { message = "User is not active."});
 
                 // Iniciar sesión
                 await _signInManager.SignInAsync(user, isPersistent: true);
@@ -201,7 +201,7 @@ namespace api.src.Controller
                 // Crear token
                 var token = _tokenService.CreateToken(user);
 
-                if (string.IsNullOrEmpty(token)) return Unauthorized("Invalid token.");
+                if (string.IsNullOrEmpty(token)) return Unauthorized( new { message = "Invalid token."});
 
                 var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
 
@@ -230,7 +230,7 @@ namespace api.src.Controller
                 );
                 
             }catch (Exception ex) {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500,  new { message = ex.Message});
             }
         }
 

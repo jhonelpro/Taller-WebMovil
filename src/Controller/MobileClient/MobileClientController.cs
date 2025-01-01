@@ -100,13 +100,13 @@ namespace api.src.Controller.MobileClient
                 if (User.Identity?.IsAuthenticated != true) return BadRequest(new { message = "You have to login." });
 
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId)) return NotFound("User not found.");
+                if (string.IsNullOrEmpty(userId)) return NotFound( new { message = "User not found."});
 
                 var user = await _userManager.FindByIdAsync(userId);
-                if (user == null) return NotFound("User not found.");
+                if (user == null) return NotFound( new { message = "User not found."});
 
                 var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, deleteAccountDto.Password);
-                if (passwordVerificationResult == PasswordVerificationResult.Failed) return BadRequest("Incorrect password.");
+                if (passwordVerificationResult == PasswordVerificationResult.Failed) return BadRequest( new { message = "Incorrect password."});
 
                 if(deleteAccountDto.ConfirmDeleteAccount)
                 {
@@ -115,7 +115,7 @@ namespace api.src.Controller.MobileClient
 
                     if (result.Succeeded)
                     {
-                        return Ok(new { message = "Account deleted successfully." });
+                        return Ok(new { message = "Account deleted successfully."});
                     }
                     else
                     {
@@ -152,14 +152,14 @@ namespace api.src.Controller.MobileClient
 
             if (user == null)
             {
-                return NotFound("User not found");
+                return NotFound( new { message = "User not found"});
             }
 
             var tickets = await _ticket.GetTickets(user.Id);
 
             if (tickets == null)
             {
-                return NotFound("Tickets not found");
+                return NotFound( new { message = "Tickets not found"});
             }   
 
             return Ok(tickets);
@@ -193,11 +193,11 @@ namespace api.src.Controller.MobileClient
             {
                 if (ex.Message == "Product not found")
                 {
-                    return NotFound(new { Message = ex.Message });
+                    return NotFound(new { message = ex.Message });
                 }
                 else if (ex.Message == "Product Type incorrect")
                 {
-                    return BadRequest(new { Message = ex.Message });
+                    return BadRequest(new { message = ex.Message });
                 }
                 else
                 {

@@ -54,14 +54,14 @@ namespace api.src.Controller.Purchase
 
                 if (purchases == null)
                 {
-                    return NotFound("No sales found.");
+                    return NotFound( new { message = "No sales found."});
                 }
 
                 return Ok(purchases);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
     }
