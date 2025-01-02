@@ -75,7 +75,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
@@ -101,17 +101,17 @@ namespace api.src.Controller.Product
             {
                 if (productDto.Image == null || productDto.Image.Length == 0)
                 {
-                    return BadRequest("Image is required.");
+                    return BadRequest( new { message = "La imagen es requerida"});
                 }
 
                 if (productDto.Image.ContentType != "image/jpeg" && productDto.Image.ContentType != "image/png")
                 {
-                    return BadRequest("Image must be a jpeg or png file.");
+                    return BadRequest( new { message = "La imagen debe ser un archivo jpeg o png"});
                 }
 
                 if (productDto.Image.Length > 2 * 1024 * 1024)
                 {
-                    return BadRequest("Image must be less than 2MB.");
+                    return BadRequest( new { message = "La imagen debe tener menos de 2 MB"});
                 }
 
                 // Crear un objeto de tipo ImageUploadParams que permita subir la imagen del producto a Cloudinary.
@@ -127,7 +127,7 @@ namespace api.src.Controller.Product
                 // Verificar si ocurrió un error al subir la imagen.
                 if (uploadResult.Error != null)
                 {
-                    return BadRequest(uploadResult.Error.Message);
+                    return BadRequest( new { message = uploadResult.Error.Message});
                 }
 
                 var product = productDto.ToProductFromCreateDto();
@@ -136,7 +136,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
             
         }
@@ -164,17 +164,17 @@ namespace api.src.Controller.Product
             {
                 if (product.Image == null || product.Image.Length == 0)
                 {
-                    return BadRequest("Image is required.");
+                    return BadRequest( new { message = "La imagen es requerida"});
                 }
 
                 if (product.Image.ContentType != "image/jpeg" && product.Image.ContentType != "image/png")
                 {
-                    return BadRequest("Image must be a jpeg or png file.");
+                    return BadRequest( new { message = "La imagen debe ser un archivo jpeg o png"});
                 }
 
                 if (product.Image.Length > 2 * 1024 * 1024)
                 {
-                    return BadRequest("Image must be less than 2MB.");
+                    return BadRequest( new { message = "La imagen debe tener menos de 2 MB"});
                 }
 
                 // Crear un objeto de tipo ImageUploadParams que permita subir la imagen del producto a Cloudinary.
@@ -190,21 +190,21 @@ namespace api.src.Controller.Product
                 // Verificar si ocurrió un error al subir la imagen.
                 if (uploadResult.Error != null)
                 {
-                    return BadRequest(uploadResult.Error.Message);
+                    return BadRequest( new { message = uploadResult.Error.Message});
                 }
 
                 var existingProduct = await _productRepository.UpdateProduct(id, product, uploadResult);
                 
                 if (existingProduct == null)
                 {
-                    return NotFound("Product not found.");
+                    return NotFound( new { message = "No se encontró el producto"});
                 }
 
                 return Ok(existingProduct.ToProductDto());
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
@@ -230,14 +230,14 @@ namespace api.src.Controller.Product
 
                 if (product == null)
                 {
-                    return NotFound("Product not found.");
+                    return NotFound( new { message = "No se encontró el producto"});
                 }
                 
                 return Ok(product.ToProductDto());
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
     }

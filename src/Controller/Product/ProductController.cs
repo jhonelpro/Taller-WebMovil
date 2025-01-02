@@ -53,17 +53,17 @@ namespace api.src.Controller
             }
             catch (Exception ex) 
             {
-                if (ex.Message == "Product not found.")
+                if (ex.Message == "No se encontraron productos")
                 {
-                    return NotFound(new { Message = ex.Message });
+                    return NotFound(new { message = ex.Message });
                 }
-                else if (ex.Message == "Product Type incorrect.")
+                else if (ex.Message == "Tipo de producto incorrecto")
                 {
-                    return BadRequest(new { Message = ex.Message });
+                    return BadRequest(new { message = ex.Message });
                 }
                 else
                 {
-                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
+                    return StatusCode(500, new { message = "Se produjo un error al procesar su solicitud" });
                 }
             }
         }

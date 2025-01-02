@@ -41,7 +41,7 @@ namespace api.src.Repositories
         {
             if (purchase == null)
             {
-                throw new ArgumentNullException(nameof(purchase), "Purchase cannot be null.");
+                throw new ArgumentNullException(nameof(purchase), "La compra no puede ser nula.");
             }
 
             // Se busca el carrito de compra y sus items, asociados al usuario.
@@ -53,12 +53,12 @@ namespace api.src.Repositories
 
             if (shoppingCart == null)
             {
-                throw new InvalidOperationException("Shopping Cart not found.");
+                throw new InvalidOperationException("Carrito de compras no encontrado.");
             }
 
             if (shoppingCart.shoppingCartItems == null || !shoppingCart.shoppingCartItems.Any())
             {
-                throw new InvalidOperationException("No items found in the shopping cart.");
+                throw new InvalidOperationException("El carrito de compras está vacío.");
             }
 
             // Se actualiza los datos de la compra.
@@ -90,7 +90,7 @@ namespace api.src.Repositories
             
             if (purchase == null)
             {
-                throw new ArgumentNullException("Purchase not found.");
+                throw new ArgumentNullException("Compra no encontrada.");
             }
             
             // Se retorna la compra.
@@ -109,7 +109,7 @@ namespace api.src.Repositories
             // Verifica si el ID de compra es válido.
             if (purchaseId <= 0)
             {
-                throw new ArgumentNullException("Purchase ID cannot be null.");
+                throw new ArgumentNullException("La ID de compra no es válida.");
             }
 
             // Obtiene la compra incluyendo sus items asociados mediante el ID de la compra.
@@ -120,7 +120,7 @@ namespace api.src.Repositories
             // Verifica si la compra existe en la base de datos.
             if (purchase == null)
             {
-                throw new ArgumentNullException("Purchase not found.");
+                throw new ArgumentNullException("La compra no existe.");
             }
 
             // Configuración del archivo PDF y escritura de los datos.
@@ -200,7 +200,7 @@ namespace api.src.Repositories
                     // Verifica si el producto existe.
                     if (product == null)
                     {
-                        throw new ArgumentNullException("product not found.");
+                        throw new ArgumentNullException("Producto no encontrado.");
                     }
 
                     // Limita el nombre del producto a maxChars caracteres si es necesario.

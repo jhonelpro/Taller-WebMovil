@@ -42,13 +42,13 @@ namespace api.src.Repositories
             // Verifica si la lista de items del carrito es nula.
             if (shoppingCartItems == null)
             {
-                throw new ArgumentNullException("Shopping Cart Items cannot be null.");
+                throw new ArgumentNullException("Los artículos del carrito de compras no pueden ser nulos");
             }
 
             // Verifica si la compra es nula.
             if (purchase == null)
             {
-                throw new ArgumentNullException("Purchase cannot be null.");
+                throw new ArgumentNullException("La compra no puede ser nula.");
             }
 
             // Lista para almacenar los items de venta que se crearán.
@@ -63,7 +63,7 @@ namespace api.src.Repositories
                 // Verifica si el producto existe en la base de datos.
                 if (product == null)
                 {
-                    throw new Exception("Product not found.");
+                    throw new Exception("No se encontraron productos");
                 }
 
                 // Crea un nuevo objeto SaleItem con los datos necesarios.
@@ -101,7 +101,7 @@ namespace api.src.Repositories
             // Verifica si el ID del usuario es nulo o vacío.
             if (string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentNullException(nameof(userId), "User ID cannot be null or empty.");
+                throw new ArgumentNullException(nameof(userId), "El ID del usario no puede estar vacia o nula.");
             }
 
             // Recupera las compras realizadas por el usuario especificado.
@@ -113,7 +113,7 @@ namespace api.src.Repositories
             // Verifica si existen compras para el usuario.
             if (purchases == null || !purchases.Any())
             {
-                throw new ArgumentNullException(nameof(purchases), "Purchases not found.");
+                throw new ArgumentNullException(nameof(purchases), "No se encontraron ventas");
             }
 
             // Recupera los items de venta relacionados con las compras obtenidas.
@@ -124,7 +124,7 @@ namespace api.src.Repositories
             // Verifica si existen items de venta para las compras.
             if (saleItems == null || !saleItems.Any())
             {
-                throw new ArgumentNullException(nameof(saleItems), "Sale Items not found.");
+                throw new ArgumentNullException(nameof(saleItems), "No se encontraron articulos en venta");
             }
 
             // Lista para almacenar los DTOs de las compras.
@@ -154,7 +154,7 @@ namespace api.src.Repositories
                 // Verifica si los productos existen en la base de datos.
                 if (products == null || !products.Any())
                 {
-                    throw new ArgumentNullException(nameof(products), "Products not found.");
+                    throw new ArgumentNullException(nameof(products), "No se encontraron productos");
                 }
 
                 // Crea el objeto PurchaseDto con la información relevante de la compra.
@@ -210,7 +210,7 @@ namespace api.src.Repositories
             // Verifica si no se encontraron compras y lanza una excepción si es el caso.
             if (!purchases.Any())
             {
-                throw new ArgumentNullException(nameof(purchases), "Purchases not found.");
+                throw new ArgumentNullException(nameof(purchases), "No se encontraron ventas");
             }
 
             // Extrae los IDs de las compras obtenidas para consultar los items de venta relacionados.
@@ -224,7 +224,7 @@ namespace api.src.Repositories
             // Verifica si no se encontraron items de venta y lanza una excepción si es el caso.
             if (!saleItems.Any())
             {
-                throw new ArgumentNullException(nameof(saleItems), "Sale Items not found.");
+                throw new ArgumentNullException(nameof(saleItems), "No se encontraron artículos en venta");
             }
 
             // Extrae los IDs de los productos de los items de venta.
@@ -239,7 +239,7 @@ namespace api.src.Repositories
             // Verifica si no se encontraron productos y lanza una excepción si es el caso.
             if (!products.Any())
             {
-                throw new ArgumentNullException(nameof(products), "Products not found.");
+                throw new ArgumentNullException(nameof(products), "No se encontraron productos");
             }
 
             // Crea una lista para almacenar los DTOs de las compras.

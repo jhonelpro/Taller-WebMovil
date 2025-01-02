@@ -40,7 +40,7 @@ namespace api.src.Repositories
             // Validar que los IDs y la cantidad son mayores a cero
             if (productId <= 0 || quantity <= 0 || cartId <= 0)
             {
-                throw new Exception("Product id, quantity, and cart id cannot be less than or equal to zero.");
+                throw new Exception("El ID del producto, la cantidad y el ID del carrito no pueden ser menores o iguales a cero");
             }
 
             var product = await _context.Products
@@ -50,7 +50,7 @@ namespace api.src.Repositories
             // Si el producto no existe, lanzar una excepción
             if (product == null)
             {
-                throw new Exception("Product not found.");
+                throw new Exception("Producto no encontrado");
             }
 
             var shoppingCart = await _context.ShoppingCarts
@@ -59,7 +59,7 @@ namespace api.src.Repositories
 
             if (shoppingCart == null)
             {
-                throw new Exception("Cart not found.");
+                throw new Exception("Carrito no encontrado");
             }
 
             var existingCartItem = await _context.ShoppingCartItems
@@ -103,12 +103,12 @@ namespace api.src.Repositories
             // Validar que el ID del carrito es mayor a cero
             if (cartId <= 0)
             {
-                throw new ArgumentException("Cart ID must be greater than zero.", nameof(cartId));
+                throw new ArgumentException("El ID del carrito no puede ser menor o igual a cero", nameof(cartId));
             }
 
             if (cartItems == null || !cartItems.Any())
             {
-                throw new ArgumentException("Cart items cannot be null or empty.", nameof(cartItems));
+                throw new ArgumentException("Los artículos del carrito de compras no pueden ser nulos", nameof(cartItems));
             }
 
             // Obtiene el carrito y sus elementos en una sola consulta
@@ -119,7 +119,7 @@ namespace api.src.Repositories
 
             if (shoppingCart == null)
             {
-                throw new KeyNotFoundException("Cart not found.");
+                throw new KeyNotFoundException("El carro de compras no se encontró");
             }
 
             // Convierte los elementos existentes en un diccionario para búsqueda rápida
@@ -143,7 +143,7 @@ namespace api.src.Repositories
 
                     if (product == null)
                     {
-                        throw new KeyNotFoundException($"Product with ID {item.ProductId} not found.");
+                        throw new KeyNotFoundException($"El producto con ID {item.ProductId} no fue encontrado");
                     }
 
                     var newCartItem = new ShoppingCartItem
@@ -166,14 +166,14 @@ namespace api.src.Repositories
         {
             if (cartId <= 0)
             {
-                throw new ArgumentException("Cart id cannot be less than or equal to zero.", nameof(cartId));
+                throw new ArgumentException("El ID del carrito no pueder ser igual o menor a cero", nameof(cartId));
             }
 
             var shoppingCartItems = await GetShoppingCartItems(cartId);
             
             if (shoppingCartItems == null || !shoppingCartItems.Any())
             {
-                throw new InvalidOperationException("Cart items not found.");
+                throw new InvalidOperationException("No se encontraron elementos en el carrito de compras");
             }
 
             _context.ShoppingCartItems.RemoveRange(shoppingCartItems);
@@ -195,7 +195,7 @@ namespace api.src.Repositories
             // Validar que los IDs y la cantidad son mayores a cero
             if (productId <= 0 || cartId <= 0 || quantity <= 0)
             {
-                throw new Exception("Product id, cart id, and quantity cannot be less than or equal to zero.");
+                throw new Exception("El ID del producto, la cantidad y el ID del carrito no pueden ser menores o iguales a cero");
             }
 
             var product = await _context.Products
@@ -205,7 +205,7 @@ namespace api.src.Repositories
             // Si el producto no existe, lanzar una excepción
             if (product == null)
             {
-                throw new Exception("Product not found.");
+                throw new Exception("Producto no encontrado");
             }
 
             // Crear un nuevo objeto ShoppingCartItem
@@ -236,7 +236,7 @@ namespace api.src.Repositories
             // Validar que el ID del producto es mayor a cero
             if (productId <= 0)
             {
-                throw new Exception("Product id cannot be less than or equal to zero.");
+                throw new Exception("La id del producto no puede ser menor o igual a cero");
             }
 
             var shoppingCartItem = await _context.ShoppingCartItems
@@ -247,7 +247,7 @@ namespace api.src.Repositories
             // Si no se encuentra el item, lanzar una excepción
             if (shoppingCartItem == null)
             {
-                throw new Exception("Product not found.");
+                throw new Exception("Producto no encontrado");
             }
 
             // Retornar el item encontrado
@@ -265,7 +265,7 @@ namespace api.src.Repositories
             // Validar que el ID del carrito es mayor a cero
             if (cartId <= 0)
             {
-                throw new Exception("Cart id cannot be less than or equal to zero.");
+                throw new Exception("La ID del carrito no puede ser menor o igual a cero");
             }
 
             var shoppingCartItems = await _context.ShoppingCartItems.Where(x => x.CartId == cartId)
@@ -276,7 +276,7 @@ namespace api.src.Repositories
             // Si no se encuentran items, lanzar una excepción
             if (shoppingCartItems == null || shoppingCartItems.Count == 0)
             {
-                throw new Exception("Cart not found or no items in the cart.");
+                throw new Exception("No se encontraron items en el carrito");
             }
 
             // Retornar la lista de items
@@ -294,7 +294,7 @@ namespace api.src.Repositories
             // Validar que el ID del producto es mayor a cero
             if (productId <= 0)
             {
-                throw new Exception("Product id cannot be less than or equal to zero.");
+                throw new Exception("La ID del producto no puede ser menor o igual a cero");
             }
 
             // Obtener el item del carrito a eliminar
@@ -303,7 +303,7 @@ namespace api.src.Repositories
             // Si no se encuentra el item, lanzar una excepción
             if (existingCartItem == null)
             {
-                throw new Exception("Product not found.");
+                throw new Exception("Producto no encontrado");
             }
 
             // Eliminar el item del contexto y guardar los cambios
@@ -327,7 +327,7 @@ namespace api.src.Repositories
             // Validar que el ID del producto y la cantidad son mayores a cero
             if (productId <= 0 || quantity <= 0)
             {
-                throw new Exception("Product id and quantity cannot be less than or equal to zero.");
+                throw new Exception("El ID del producto y la cantidad no pueden ser menores o iguales a cero");
             }
 
             // Obtener el item del carrito a actualizar
@@ -336,7 +336,7 @@ namespace api.src.Repositories
             // Si no se encuentra el item, lanzar una excepción
             if (shoppingCartItem == null)
             {
-                throw new Exception("Product not found.");
+                throw new Exception("Producto no encontrado");
             }
 
             // Incrementar o decrementar la cantidad según el parámetro isIncrement
@@ -344,7 +344,7 @@ namespace api.src.Repositories
             {
                 if (shoppingCartItem.Quantity + quantity <= 0)
                 {
-                    throw new Exception("Quantity must be greater than zero.");
+                    throw new Exception("La cantidad debe ser mayor a cero");
                 }
 
                 shoppingCartItem.Quantity += quantity; // Incrementar
@@ -353,7 +353,7 @@ namespace api.src.Repositories
             {
                 if (shoppingCartItem.Quantity - quantity <= 0)
                 {
-                    throw new Exception("Quantity must be greater than zero.");
+                    throw new Exception("La cantidad debe ser mayor a cero");
                 }
 
                 shoppingCartItem.Quantity -= quantity; // Decrementar

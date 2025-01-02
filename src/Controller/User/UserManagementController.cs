@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text;
 using api.src.Helpers;
 using api.src.Mappers;
 using api.src.Models.User;
@@ -84,13 +86,13 @@ namespace api.src.Controller
 
             try
             {
-                if (string.IsNullOrEmpty(email)) return BadRequest(new { message = "Email is required."});
+                if (string.IsNullOrEmpty(email)) return BadRequest(new { message = "El correo electrónico es requerido" });
 
                 var user = await _userManager.FindByEmailAsync(email);
 
                 if (user == null)
                 {
-                    return BadRequest(new { message = "User not found."});
+                    return BadRequest(new { message = "Usuario no encontrado" });
                 }
 
                 // Se cambia el estado del usuario dependiendo de su estado actual

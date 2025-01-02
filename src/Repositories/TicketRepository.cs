@@ -72,7 +72,7 @@ namespace api.src.Repositories
             // Validar que el ID del usuario no sea nulo ni vacío
             if (string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentNullException(nameof(userId), "User id cannot be null or empty.");
+                throw new ArgumentNullException(nameof(userId), "La ID del usuario no puede ser nula o vacía");
             }
 
             // Obtener todos los tickets asociados al ID del usuario
@@ -84,7 +84,7 @@ namespace api.src.Repositories
             // Si no se encuentran tickets, lanzar una excepción
             if (tickets == null)
             {
-                throw new ArgumentNullException(nameof(tickets), "No tickets found for the user.");
+                throw new ArgumentNullException(nameof(tickets), "No se han encontrado boletas para el usuario");
             }
 
             var ticketsDtos = new List<TicketDto>(); // Lista para almacenar los DTOs de los tickets
@@ -103,7 +103,7 @@ namespace api.src.Repositories
                 // Si no se encuentran items de venta, lanzar una excepción
                 if (saleItems == null)
                 {
-                    throw new ArgumentNullException(nameof(saleItems), "No sale items found for the ticket.");
+                    throw new ArgumentNullException(nameof(saleItems), "No se encontraron artículos en venta para esta boleta");
                 }
 
                 // Obtener los productos asociados a los items de venta
@@ -115,7 +115,7 @@ namespace api.src.Repositories
                 // Si no se encuentran productos, lanzar una excepción
                 if (products == null)
                 {
-                    throw new ArgumentNullException(nameof(products), "No products found for the sale items.");
+                    throw new ArgumentNullException(nameof(products), "No se encontraron productos para los artículos en venta");
                 }
 
                 // Mapear el ticket a un TicketDto

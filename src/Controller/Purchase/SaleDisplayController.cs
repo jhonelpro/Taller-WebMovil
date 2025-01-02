@@ -54,7 +54,7 @@ namespace api.src.Controller.Purchase
 
                 if (purchases == null)
                 {
-                    return NotFound( new { message = "No sales found."});
+                    return NotFound( new { message = "No se encontraron ventas realizadas" });
                 }
 
                 return Ok(purchases);

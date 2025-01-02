@@ -97,16 +97,16 @@ namespace api.src.Controller.MobileClient
             try
             {
                 if (!ModelState.IsValid) return BadRequest(ModelState);
-                if (User.Identity?.IsAuthenticated != true) return BadRequest(new { message = "You have to login." });
+                if (User.Identity?.IsAuthenticated != true) return BadRequest(new { message = "Usuario no autenticado"});
 
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId)) return NotFound( new { message = "User not found."});
+                if (string.IsNullOrEmpty(userId)) return NotFound( new { message = "Usuario no encontrado"});
 
                 var user = await _userManager.FindByIdAsync(userId);
-                if (user == null) return NotFound( new { message = "User not found."});
+                if (user == null) return NotFound( new { message = "Usuario no encontrado"});
 
                 var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, deleteAccountDto.Password);
-                if (passwordVerificationResult == PasswordVerificationResult.Failed) return BadRequest( new { message = "Incorrect password."});
+                if (passwordVerificationResult == PasswordVerificationResult.Failed) return BadRequest( new { message = "Contraseña incorrecta"});
 
                 if(deleteAccountDto.ConfirmDeleteAccount)
                 {
@@ -115,18 +115,18 @@ namespace api.src.Controller.MobileClient
 
                     if (result.Succeeded)
                     {
-                        return Ok(new { message = "Account deleted successfully."});
+                        return Ok(new { message = "Cuenta eliminada exitosamente"});
                     }
                     else
                     {
-                        return StatusCode(500, new { message = "Error deleting account.", errors = result.Errors });
+                        return StatusCode(500, new { message = "Error al eliminar la cuenta", errors = result.Errors });
                     }
                 }
-                return BadRequest(new { message = "Account deletion was not confirmed." });
+                return BadRequest(new { message = "No se confirmó la eliminación de la cuenta" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while deleting the account.", error = ex.Message });
+                return StatusCode(500, new { message = "Se produjo un error al procesar su solicitud.", error = ex.Message });
             }
         }
 
@@ -152,14 +152,14 @@ namespace api.src.Controller.MobileClient
 
             if (user == null)
             {
-                return NotFound( new { message = "User not found"});
+                return NotFound( new { message = "Usuaario no encontrado"});
             }
 
             var tickets = await _ticket.GetTickets(user.Id);
 
             if (tickets == null)
             {
-                return NotFound( new { message = "Tickets not found"});
+                return NotFound( new { message = "Boletas no encontradas."});
             }   
 
             return Ok(tickets);
@@ -191,17 +191,17 @@ namespace api.src.Controller.MobileClient
             }
             catch (Exception ex) 
             {
-                if (ex.Message == "Product not found")
+                if (ex.Message == "Producto no encontrado")
                 {
                     return NotFound(new { message = ex.Message });
                 }
-                else if (ex.Message == "Product Type incorrect")
+                else if (ex.Message == "Tipo de producto incorrecto")
                 {
                     return BadRequest(new { message = ex.Message });
                 }
                 else
                 {
-                    return StatusCode(500, new { Message = "An error occurred while processing your request." });
+                    return StatusCode(500, new { Message = "Se produjo un error al procesar su solicitud" });
                 }
             }
         }

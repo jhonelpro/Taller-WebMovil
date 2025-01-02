@@ -85,21 +85,21 @@ namespace api.src.Controller
             {
                 if (!ModelState.IsValid) return BadRequest(ModelState);
 
-                if (await _userManager.Users.AnyAsync(p => p.Email == registerDto.Email)) return BadRequest( new { message = "Email already exists."});
+                if (await _userManager.Users.AnyAsync(p => p.Email == registerDto.Email)) return BadRequest( new { message = "El correo ya existe"});
 
-                if (string.IsNullOrEmpty(registerDto.Rut)) return BadRequest("RUT is required.");
+                if (string.IsNullOrEmpty(registerDto.Rut)) return BadRequest("El rut es requerido");
 
-                if (await _userManager.Users.AnyAsync(p => p.Rut == registerDto.Rut)) return BadRequest( new { message = "Rut already exists."});
+                if (await _userManager.Users.AnyAsync(p => p.Rut == registerDto.Rut)) return BadRequest( new { message = "El rut ya existe"});
 
-                if (!RutValidations.IsValidRut(registerDto.Rut)) return BadRequest( new { message = "Invalid Rut format or verification digit."});
+                if (!RutValidations.IsValidRut(registerDto.Rut)) return BadRequest( new { message = "El rut es invalido"});
 
-                if (registerDto.DateOfBirth >= DateTime.Now) return BadRequest( new { message = "Date of birth must be in the past."});
+                if (registerDto.DateOfBirth >= DateTime.Now) return BadRequest( new { message = "La fecha de nacimiento no puede ser mayor o igual a la fecha actual"});
 
-                if ((DateTime.Now.Year - registerDto.DateOfBirth.Year) < 13) return BadRequest( new { message = "You must be at least 13 years old to register."});
+                if ((DateTime.Now.Year - registerDto.DateOfBirth.Year) < 13) return BadRequest( new { message = "Debes ser mayor de 13 años para registrarte"});
 
-                if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.ConfirmPassword)) return BadRequest( new { message = "Password is required."});
+                if (string.IsNullOrEmpty(registerDto.Password) || string.IsNullOrEmpty(registerDto.ConfirmPassword)) return BadRequest( new { message = "La contraseñas son requeridas"});
 
-                if (!string.Equals(registerDto.Password, registerDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest( new { message = "Passwords do not match."});
+                if (!string.Equals(registerDto.Password, registerDto.ConfirmPassword, StringComparison.Ordinal)) return BadRequest( new { message = "Contraseña y confirmación de contraseña no coinciden"});
 
                 var user = new AppUser
                 {
@@ -178,7 +178,7 @@ namespace api.src.Controller
                 // Verificar si el usuario ya esta autenticado.
                 if (User.Identity?.IsAuthenticated == true)
                 {
-                    return BadRequest(new { message = "Active session." });
+                    return BadRequest(new { message = "Sesion activa" });
                 }
 
                 // Validar modelo.
@@ -186,14 +186,14 @@ namespace api.src.Controller
 
                 // Verificar si el usuario existe
                 var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
-                if(user == null) return Unauthorized( new { message = "Invalid email or password."});
+                if(user == null) return Unauthorized( new { message = "Correo o contraseña incorrectos."});
 
                 // Verificar si la contraseña es correcta
                 var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-                if(!result.Succeeded) return Unauthorized( new { message = "Invalid email or password."});
+                if(!result.Succeeded) return Unauthorized( new { message = "Correo o contraseña incorrectos."});
 
                 // Verificar si el usuario esta activo
-                if(user.IsActive == 0) return Unauthorized( new { message = "User is not active."});
+                if(user.IsActive == 0) return Unauthorized( new { message = "Usuario desactivado."});
 
                 // Iniciar sesión
                 await _signInManager.SignInAsync(user, isPersistent: true);
@@ -201,7 +201,7 @@ namespace api.src.Controller
                 // Crear token
                 var token = _tokenService.CreateToken(user);
 
-                if (string.IsNullOrEmpty(token)) return Unauthorized( new { message = "Invalid token."});
+                if (string.IsNullOrEmpty(token)) return Unauthorized( new { message = "Token invalido"});
 
                 var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
 
@@ -248,7 +248,7 @@ namespace api.src.Controller
             // Verificar si el usuario no esta autenticado.
             if (User.Identity?.IsAuthenticated != true)
             {
-                return BadRequest(new { message = "No active session found." });
+                return BadRequest(new { message = "No se encontró ninguna sesión activa" });
             }
 
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
@@ -259,7 +259,7 @@ namespace api.src.Controller
                 await _signInManager.SignOutAsync();
             }
 
-            return Ok(new { message = "Logout successful." });
+            return Ok(new { message = "Cierre de sesión exitoso" });
         }
     }
 }

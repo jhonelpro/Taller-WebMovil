@@ -37,12 +37,12 @@ namespace api.src.Repositories
             // Validar que el ID del usuario no sea nulo ni vacío
             if (userId == null || string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentNullException("User id cannot be null or empty.");
+                throw new ArgumentNullException("La ID del usuario no puede ser nula o vacía");
             }
 
             if (await _context.ShoppingCarts.AnyAsync(x => x.UserId == userId))
             {
-                throw new InvalidOperationException("Shopping cart already exists.");
+                throw new InvalidOperationException("El usuario ya tiene un carrito de compras");
             }
             
             var shoppingCart = new ShoppingCart
@@ -71,7 +71,7 @@ namespace api.src.Repositories
             // Validar que el ID del usuario no sea nulo ni vacío
             if (userId == null || string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentNullException("User id cannot be null or empty.");
+                throw new ArgumentNullException("La ID del usuario no puede ser nula o vacía");
             }
 
             var shoppingCart = await _context.ShoppingCarts

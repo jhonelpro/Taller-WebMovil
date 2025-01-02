@@ -50,12 +50,12 @@ namespace api.src.Controller.Product
 
             if (productId <= 0)
             {
-                return BadRequest(new { Message = "Product Id must be greater than 0." });
+                return BadRequest(new { message = "El ID del producto debe ser mayor que 0" });
             }
 
             if (quantity <= 0)
             {
-                return BadRequest(new { Message = "Quantity must be greater than 0." });
+                return BadRequest(new { message = "La cantidad debe ser mayor que 0" });
             }
 
             try
@@ -64,7 +64,7 @@ namespace api.src.Controller.Product
 
                 if (existingProduct == null)
                 {
-                    return NotFound(new { Message = "Product not found." });
+                    return NotFound(new { message = "Producto no encontrado" });
                 }
 
                 var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
@@ -86,11 +86,11 @@ namespace api.src.Controller.Product
                 }
 
                 await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems));
-                return Ok("Product added to cart.");
+                return Ok(new { message = "Producto agregado al carrito" });
             }
             catch (Exception e)
             {
-                return StatusCode(500, new { Message = e.Message });
+                return StatusCode(500, new { message = e.Message });
             }
         }
 
@@ -108,7 +108,7 @@ namespace api.src.Controller.Product
 
             if (productId <= 0)
             {
-                return BadRequest(new { Message = "Product Id must be greater than 0." });
+                return BadRequest(new { message = "El ID del producto debe ser mayor que 0" });
             }
 
             try
@@ -117,7 +117,7 @@ namespace api.src.Controller.Product
 
                 if (existingProduct == null)
                 {
-                    return NotFound(new { Message = "Product not found." });
+                    return NotFound(new { message = "Producto no encontrado" });
                 }
 
                 var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
@@ -128,16 +128,16 @@ namespace api.src.Controller.Product
                 {
                     cartItems.Remove(product);
                     await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems.ToList()));
-                    return Ok("Product removed from cart.");
+                    return Ok(new { message = "Producto eliminado del carrito" });
                 }
                 else
                 {
-                    return NotFound(new { Message = "Product not found in cart." });
+                    return NotFound(new { message = "Producto no encontrado en el carrito" });
                 }
             }
             catch (Exception e)
             {
-                return StatusCode(500, new { Message = e.Message });
+                return StatusCode(500, new { message = e.Message });
             }
         }
 
@@ -168,7 +168,7 @@ namespace api.src.Controller.Product
                     }
                     else
                     {
-                        return NotFound(new { Message = "Product not found." });
+                        return NotFound(new { message = "Producto no encontrado" });
                     }
                 }
                 
@@ -176,7 +176,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception e)
             {
-                return StatusCode(500, new { Message = e.Message });
+                return StatusCode(500, new { message = e.Message });
             }
         }
 
@@ -197,12 +197,12 @@ namespace api.src.Controller.Product
 
             if (productId <= 0)
             {
-                return BadRequest(new { Message = "Product Id must be greater than 0." });
+                return BadRequest(new { message = "El ID del producto debe ser mayor que 0" });
             }
 
             if (quantity <= 0)
             {
-                return BadRequest(new { Message = "Quantity must be greater than 0." });
+                return BadRequest(new { message = "La cantidad debe ser mayor que 0" });
             }
 
             try
@@ -211,7 +211,7 @@ namespace api.src.Controller.Product
 
                 if (existingProduct == null)
                 {
-                    return NotFound(new { Message = "Product not found." });
+                    return NotFound(new { message = "No se encontraron productos" });
                 }
 
                 var cartItems = await Task.Run(() => _cookieService.GetCartItemsFromCookies());
@@ -223,7 +223,7 @@ namespace api.src.Controller.Product
                     {
                         if (product.Quantity + quantity <= 0)
                         {
-                            return BadRequest(new { Message = "Quantity must be greater than 0." });
+                            return BadRequest(new { message = "La cantidad debe ser mayor que 0" });
                         }
 
                         product.Quantity += quantity;
@@ -232,7 +232,7 @@ namespace api.src.Controller.Product
                     {
                         if (product.Quantity - quantity <= 0)
                         {
-                            return BadRequest(new { Message = "Quantity must be greater than 0." });
+                            return BadRequest(new { message = "La cantidad debe ser mayor que 0" });
                         }
 
                         product.Quantity -= quantity;
@@ -243,16 +243,16 @@ namespace api.src.Controller.Product
                     }
                     
                     await Task.Run(() => _cookieService.SaveCartItemsToCookies(cartItems.ToList()));
-                    return Ok("Product updated in cart.");
+                    return Ok(new { message = "Producto actualizado en el carrito"});
                 }
                 else
                 {
-                    return NotFound(new { Message = "Product not found in cart." });
+                    return NotFound(new { message = "Producto no encontrado en el carrito" });
                 }
             }
             catch (Exception e)
             {
-                return StatusCode(500, new { Message = e.Message });
+                return StatusCode(500, new { message = e.Message });
             }
         }
 
@@ -268,11 +268,11 @@ namespace api.src.Controller.Product
             try
             {
                 await Task.Run(() => _cookieService.ClearCartItemsInCookie());
-                return Ok("Cart cleared.");
+                return Ok(new { message = "Carrito limpiado exitosamente" });
             }
             catch (Exception e)
             {
-                return StatusCode(500, new { Message = e.Message });
+                return StatusCode(500, new { message = e.Message });
             }
         }
     }

@@ -81,7 +81,7 @@ namespace api.src.Controller.Product
 
             if (user == null)
             {
-                return BadRequest("User not found.");
+                return BadRequest( new { message = "Usuario no encontrado" });
             }
 
             var cartItems = _cookieService.GetCartItemsFromCookies();
@@ -122,7 +122,7 @@ namespace api.src.Controller.Product
 
             if (quantity <= 0)
             {
-                return BadRequest(new { Message = "Quantity must be greater than 0." });
+                return BadRequest(new { message = "La cantidad debe ser mayor que 0" });
             }
 
             try 
@@ -131,24 +131,24 @@ namespace api.src.Controller.Product
 
                 if (user == null)
                 {
-                    return BadRequest("User not found.");
+                    return BadRequest(new { message = "Usuario no encontrado" });
                 }
 
                 var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
 
                 if (shoppingCart == null)
                 {
-                    return BadRequest("Cart not found.");
+                    return BadRequest(new { message = "Carrito no encontrado" });
                 }
 
                 var shoppingCartItem = await _shoppingCartItem.AddNewShoppingCartItem(productId, shoppingCart.Id, quantity);
 
                 if (shoppingCartItem == null)
                 {
-                    return BadRequest("Failed to add product to cart.");
+                    return BadRequest(new { message = "Producto no agregado al carrito" });
                 }
 
-                return Ok("Product added to cart.");
+                return Ok(new { message = "Porducto agregado al carrito" });
             }
             catch (Exception ex)
             {
@@ -182,21 +182,21 @@ namespace api.src.Controller.Product
 
                 if (user == null)
                 {
-                    return BadRequest("User not found");
+                    return BadRequest(new { message = "Usuario no encontrado" });
                 }
 
                 var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
 
                 if (shoppingCart == null)
                 {
-                    return BadRequest("Cart not found");
+                    return BadRequest(new { message = "Carrito no encontrado" });
                 }
 
                 var cartItems = await _shoppingCartItem.GetShoppingCartItems(shoppingCart.Id);
 
                 if (cartItems == null)
                 {
-                    return BadRequest("Cart is empty");
+                    return BadRequest(new { message = "Carrito vacío" });
                 }
 
                 var products = new List<ShoppingCartDto>();
@@ -207,7 +207,7 @@ namespace api.src.Controller.Product
 
                     if (product == null)
                     {
-                        return BadRequest("Product not found");
+                        return BadRequest(new { message = "Producto no encontrado" });
                     }
 
                     products.Add(product.ToShoppingCartDto(item));
@@ -217,7 +217,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
             
         }
@@ -247,7 +247,7 @@ namespace api.src.Controller.Product
 
             if (quantity <= 0)
             {
-                return BadRequest(new { Message = "Quantity must be greater than 0." });
+                return BadRequest(new { message = "La cantidad debe ser mayor que 0" });
             }
 
             try
@@ -256,28 +256,28 @@ namespace api.src.Controller.Product
 
                 if (user == null)
                 {
-                    return BadRequest("User not found.");
+                    return BadRequest(new { message = "Usuario no encontrado" });
                 }
 
                 var shoppingCart = await _shoppingCart.GetShoppingCart(user.Id);
 
                 if (shoppingCart == null)
                 {
-                    return BadRequest("Cart not found.");
+                    return BadRequest(new { message = "Carrito no encontrado" });
                 }
 
                 var shoppingCartItem = await _shoppingCartItem.UpdateShoppingCartItem(productId, quantity, isIncrement);
 
                 if (shoppingCartItem == null)
                 {
-                    return BadRequest("Failed to update product in cart.");
+                    return BadRequest(new { message = "Producto no actualizado en el carrito" });
                 }
 
-                return Ok("Product updated in cart.");
+                return Ok(new { message = "Producto actualizado en el carrito" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
@@ -302,7 +302,7 @@ namespace api.src.Controller.Product
 
             if (productId <= 0)
             {
-                return BadRequest(new { Message = "Product Id must be greater than 0." });
+                return BadRequest(new { message = "El ID del producto debe ser mayor que 0" });
             }
             
             try 
@@ -311,14 +311,14 @@ namespace api.src.Controller.Product
 
                 if (result == null)
                 {
-                    return BadRequest("Failed to remove product from cart.");
+                    return BadRequest(new { message = "Producto no eliminado del carrito" });
                 }
 
-                return Ok("Product removed from cart");
+                return Ok(new { message = "Producto eliminado del carrito" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }      
         }
 
@@ -345,7 +345,7 @@ namespace api.src.Controller.Product
                 // Si el carrito ya existe, se retorna un mensaje de éxito.
                 if (existingCart != null)
                 {
-                    return Ok("Cart already exists.");
+                    return Ok(new { message = "Carrito ya existe" });
                 }
 
                 // Si el carrito no existe, se crea un carrito vacío.
@@ -353,14 +353,14 @@ namespace api.src.Controller.Product
 
                 if (shoppingCart == null)
                 {
-                    return BadRequest("Failed to create cart.");
+                    return BadRequest(new { message = "Error al crear el carrito" });
                 }
             
-                return Ok("Cart created successfully.");
+                return Ok(new { message = "Carrito creado exitosamente" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
@@ -392,12 +392,12 @@ namespace api.src.Controller.Product
 
                     if (cartItemsFromDb == null)
                     {
-                        return BadRequest("Failed to add items to cart.");
+                        return BadRequest(new { message = "Error al agregar productos al carrito" });
                     }
 
                     _cookieService.ClearCartItemsInCookie();
 
-                    return Ok("Items added to cart successfully.");
+                    return Ok(new { message = "Productos agregados al carrito exitosamente" });
                 }
                 else
                 {
@@ -406,7 +406,7 @@ namespace api.src.Controller.Product
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
@@ -430,7 +430,7 @@ namespace api.src.Controller.Product
         {
             if (cartItems == null || cartItems.Count == 0)
             {
-                return BadRequest(new { Message = "Cart is empty." });
+                return BadRequest(new { message = "Carrito esta vacio" });
             }
 
             try
@@ -439,21 +439,21 @@ namespace api.src.Controller.Product
 
                 if (shoppingCart == null)
                 {
-                    return BadRequest(new { Message = "Failed to create cart." });
+                    return BadRequest(new { message = "Error al crear carrito" });
                 }
 
                 var shoppingCartItems = await _shoppingCartItem.AddShoppingCarItem(cartItems, shoppingCart.Id);
 
                 if (shoppingCartItems == null)
                 {
-                    return BadRequest(new { Message = "Failed to add items to cart." });
+                    return BadRequest(new { message = "Error al agregar productos en el carrito" });
                 }
 
-                return Ok("Cart created successfully.");
+                return Ok(new { message = "Carrrito creado exitosamente" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
     }

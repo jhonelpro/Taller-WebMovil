@@ -39,13 +39,13 @@ namespace api.src.Repositories
             if (!string.IsNullOrEmpty(query.textFilter))
             {
                 // Se filtran los productos por el textFilter.
-                products = products.Where(p => p.Name.Contains(query.textFilter) ||
-                                               p.ProductType.Name.Contains(query.textFilter) ||
+                products = products.Where(p => p.Name.ToUpper().Contains(query.textFilter.ToUpper()) ||
+                                               p.ProductType.Name.ToUpper().Contains(query.textFilter.ToUpper()) ||
                                                p.Price.ToString().Contains(query.textFilter) ||
                                                p.Stock.ToString().Contains(query.textFilter));
                 if (!products.Any())
                 {
-                    throw new Exception("Product not found.");
+                    throw new Exception("No se encontraron productos");
                 }
             }
 
@@ -70,13 +70,13 @@ namespace api.src.Repositories
         public async Task<Product> AddProduct(Product product, ImageUploadResult uploadResult)
         {
             // Si el producto es nulo o el uploadResult es nulo.
-            if (product == null || uploadResult == null) throw new ArgumentNullException("Product or UploadResult cannot be null.");
+            if (product == null || uploadResult == null) throw new ArgumentNullException("El producto o la iamgen no pueden ser nulos");
 
             var existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.Name == product.Name);
 
             if (existingProduct != null && existingProduct.ProductTypeId == product.ProductTypeId)
             {
-                throw new Exception("Product already exists.");
+                throw new Exception("El producto ya existe");
             }
             
             // Se crea la instancia del producto, con los datos ingresados.
@@ -90,7 +90,7 @@ namespace api.src.Repositories
             };
 
             // Se asigna el tipo de producto al producto.
-            newProduct.ProductType = await _context.ProductTypes.FirstOrDefaultAsync(p => p.Id == product.ProductTypeId) ?? throw new Exception("ProductType not found.");
+            newProduct.ProductType = await _context.ProductTypes.FirstOrDefaultAsync(p => p.Id == product.ProductTypeId) ?? throw new Exception("Tipo de producto no encontrado");
 
             // Se aniade el producto a la base de datos.
             await _context.Products.AddAsync(newProduct);
@@ -116,7 +116,7 @@ namespace api.src.Repositories
 
             if (product == null)
             {
-                throw new Exception("Product not found.");
+                throw new Exception("Producto no encontrado");
             }
             
             // Se elimina el producto de la base de datos.
@@ -142,14 +142,14 @@ namespace api.src.Repositories
             if (!string.IsNullOrEmpty(query.textFilter))
             {
                 // Se filtran los productos que contengan el textFilter en alguno de sus atributos.
-                products = products.Where(p => p.Name.Contains(query.textFilter) ||
-                                               p.ProductType.Name.Contains(query.textFilter) ||
+                products = products.Where(p => p.Name.ToUpper().Contains(query.textFilter.ToUpper()) ||
+                                               p.ProductType.Name.ToUpper().Contains(query.textFilter.ToUpper()) ||
                                                p.Price.ToString().Contains(query.textFilter) ||
                                                p.Stock.ToString().Contains(query.textFilter));
                 
                 if(!products.Any())
                 {
-                    throw new Exception("Product not found.");
+                    throw new Exception("No se encontraron productos");
                 }
             }
 
@@ -162,7 +162,7 @@ namespace api.src.Repositories
                 // Si el campo productType no contiene ninguno de los strings validos.
                 if (!validProductTypes.Contains(query.productType))
                 {
-                    throw new Exception("Product Type incorrect.");
+                    throw new Exception("Tipo de producto incorrecto");
                 }
 
                 // Se filtran los productos, por el campo productType.
@@ -170,7 +170,7 @@ namespace api.src.Repositories
 
                 if(!products.Any())
                 {
-                    throw new Exception("Product not found.");
+                    throw new Exception("No se encontraron productos");
                 }
             }
 
@@ -215,7 +215,7 @@ namespace api.src.Repositories
                 // Si el campo productType no contiene un string valido. 
                 if (!validProductTypes.Contains(query.productType))
                 {
-                    throw new Exception("Product Type incorrect");
+                    throw new Exception("Tipo de producto incorrecto");
                 }
 
                 // Se filtran los productos por el campo productType.
@@ -223,7 +223,7 @@ namespace api.src.Repositories
 
                 if(!products.Any())
                 {
-                    throw new Exception("Product not found");
+                    throw new Exception("No se encontraron productos");
                 }
             }
 
@@ -263,7 +263,7 @@ namespace api.src.Repositories
             
             if (existingProduct == null)
             {
-                throw new Exception("Product not found.");
+                throw new Exception("Producto no encontrado");
             }
 
             bool nameChanged = existingProduct.Name != product.Name;
@@ -277,7 +277,7 @@ namespace api.src.Repositories
 
                 if (productValidation != null)
                 {
-                    throw new Exception("Product already exists.");
+                    throw new Exception("El producto ya existe");
                 }
             }
 
@@ -309,7 +309,7 @@ namespace api.src.Repositories
 
             if (product == null)
             {
-                throw new Exception("Product not found.");
+                throw new Exception("Producto no encontrado");
             }
             
             // Se retorna el producto.
