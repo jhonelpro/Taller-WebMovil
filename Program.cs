@@ -20,7 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
-        builder.WithOrigins("http://localhost:4200")  // Tu frontend de Angular
+        builder.WithOrigins("http://localhost:4200", "http://localhost:8100")  // Tu frontend de Angular
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials());
